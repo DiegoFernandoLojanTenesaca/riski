@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#14181b">
+
+<title>Riksi · Identifica animales y plantas del Ecuador sin internet</title>
+<meta name="description" content="Apunta la cámara a un animal o una planta del Ecuador y te dice qué es. Funciona sin señal, sin cuenta y sin instalar nada: el modelo pesa 3,8 MB y corre dentro del navegador.">
+<meta name="keywords" content="identificar especies Ecuador, biodiversidad, sin conexión, offline, Galápagos, aves del Ecuador, plantas, ONNX, inteligencia artificial en el navegador">
+<meta name="author" content="Diego Fernando Lojan Tenesaca">
+<link rel="canonical" href="https://diegofernandolojantenesaca.github.io/riski/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_EC">
+<meta property="og:title" content="Riksi · Identifica animales y plantas del Ecuador sin internet">
+<meta property="og:description" content="Apuntas la cámara y te dice qué es. Sin señal, sin cuenta, sin instalar nada.">
+<meta property="og:image" content="portada.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="icono.svg">
+<link rel="stylesheet" href="estilo.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Riksi",
+  "applicationCategory": "EducationalApplication",
+  "operatingSystem": "Cualquier navegador",
+  "description": "Identificación de especies del Ecuador que funciona sin conexión, con el modelo ejecutándose dentro del navegador.",
+  "inLanguage": "es-EC",
+  "isAccessibleForFree": true,
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Person", "name": "Diego Fernando Lojan Tenesaca" },
+  "license": "https://opensource.org/licenses/MIT"
+}
+</script>
+</head>
+<body>
+
+<header class="barra">
+  <a class="marca" href="index.html"><img src="icono.svg" alt="">Riksi</a>
+  <nav class="menu">
+    <a href="#como">Cómo usarla</a>
+    <a href="#reconoce">Qué reconoce</a>
+    <a href="#herramientas">Herramientas</a>
+    <a href="#colaborar">Colaborar</a>
+    <a href="#acerca">Acerca de</a>
+  </nav>
+  <a class="boton" href="app.html">Abrir la cámara</a>
+</header>
+
+<div class="envoltura">
+
+  <div class="hero">
+    <div class="asoma">
+      <span class="etiqueta">Identificación de especies · Ecuador</span>
+      <h1>Reconoce la naturaleza del <em>Ecuador</em>.</h1>
+      <p class="bajada">Apuntas la cámara del teléfono a un animal o a una planta
+        y te dice qué es. No pide cuenta, no hay que instalar nada y
+        <b>funciona sin internet</b>.</p>
+      <p class="kichwa"><i>Riksiy</i>, en kichwa, es reconocer. Saber quién es
+        alguien.</p>
+      <div class="acciones">
+        <a class="boton" href="app.html">Abrir la cámara</a>
+        <a class="boton hueco" href="#como">Ver cómo funciona</a>
+        <small>3,8&nbsp;MB, una sola vez</small>
+      </div>
+    </div>
+    <figure class="lamina asoma" id="lamina" style="margin:0"></figure>
+  </div>
+</div>
+
+<div class="franja">
+  <div class="envoltura">
+    <div class="cifras">
+      <div class="cifra"><b data-cuenta="100" id="c-especies">100</b><span class="etiqueta">especies que conoce</span></div>
+      <div class="cifra"><b id="c-peso">3,8 MB</b><span class="etiqueta">pesa el modelo entero</span></div>
+      <div class="cifra"><b data-cuenta="75" data-sufijo="&nbsp;%" id="c-top1">75 %</b><span class="etiqueta">acierta a la primera</span></div>
+      <div class="cifra"><b data-cuenta="90" data-sufijo="&nbsp;%" id="c-top3">90 %</b><span class="etiqueta">acierta entre sus tres opciones</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="envoltura">
+
+  <section id="como" class="asoma">
+    <span class="etiqueta">Cómo usarla</span>
+    <h2>Tres pasos, y el tercero ya no necesita señal.</h2>
+    <p>La primera vez conviene abrirla con datos o con wifi, porque tiene que
+      bajarse el modelo. A partir de ahí el teléfono ya sabe reconocer solo.</p>
+    <div class="pasos">
+      <div class="paso">
+        <span class="n">Paso 1</span>
+        <h3>Se descarga una vez</h3>
+        <p>Son 3,8 MB, menos que una canción. Quedan guardados en el teléfono
+          junto con la página, así que la próxima vez abre incluso en modo avión.</p>
+      </div>
+      <div class="paso">
+        <span class="n">Paso 2</span>
+        <h3>Apuntas la cámara</h3>
+        <p>Las cuatro esquinas marcan la parte que se mira de verdad. Si el
+          animal queda fuera de ese cuadro, no cuenta. Acércate todo lo que
+          puedas y evita el contraluz.</p>
+      </div>
+      <div class="paso">
+        <span class="n">Paso 3</span>
+        <h3>Sale una ficha</h3>
+        <p>Aparecen tres candidatas con su porcentaje de confianza. Si ninguna
+          convence lo suficiente, la ficha sale marcada con <b>cf.</b>, que es
+          como los biólogos escriben «se parece a, pero no lo aseguro».</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="asoma">
+    <span class="etiqueta">Por qué sin conexión</span>
+    <h2>Donde de verdad hace falta, no hay señal.</h2>
+    <p>En Galápagos, en el Yasuní o en el páramo el teléfono se queda sin
+      cobertura. Y es justo ahí donde alguien necesita saber qué acaba de ver.
+      Cualquier aplicación que le pregunte a un servidor falla en ese momento
+      exacto. Por eso aquí el modelo viaja dentro del teléfono. <b>No es una
+      limitación técnica, es la idea entera</b>.</p>
+
+    <div class="versus">
+      <div class="propia">
+        <h3>Riksi</h3>
+        <ul>
+          <li>Funciona en el páramo, en la selva y en el mar</li>
+          <li>La foto nunca sale de tu teléfono</li>
+          <li>Responde en menos de un segundo</li>
+          <li>No pide cuenta ni correo</li>
+          <li>Seguirá funcionando dentro de años, porque no hay servidor que pagar</li>
+        </ul>
+      </div>
+      <div class="otra">
+        <h3>Una app que consulta un servidor</h3>
+        <ul>
+          <li>Sin cobertura no hace nada</li>
+          <li>Cada foto viaja a una empresa</li>
+          <li>Depende de cómo ande la red</li>
+          <li>Regístrate para empezar</li>
+          <li>El día que dejen de pagar el servidor, deja de existir</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="reconoce" class="asoma">
+    <span class="etiqueta">Qué reconoce</span>
+    <h2>Cien especies, de las que la gente fotografía de verdad.</h2>
+    <p>Son las más registradas del país: aves, plantas, reptiles, insectos y
+      alguna sorpresa marina. Todas estas fotos salen del mismo material con el
+      que aprendió, y cada una lleva el nombre de quien la tomó, porque su
+      licencia lo exige.</p>
+    <div id="laminas"></div>
+  </section>
+
+  <section class="asoma">
+    <span class="etiqueta">Qué tan bien lo hace</span>
+    <h2>De cada cien fotos, acierta setenta y cinco a la primera.</h2>
+    <p>Y noventa si se le permite dar tres opciones, que es como funciona una
+      guía de campo de verdad: te deja dos o tres candidatas y tú decides
+      mirando el pico, la hoja o la cola. Las fotos con las que se midió son de
+      campo, torcidas y con mala luz, no de estudio.</p>
+
+    <p style="margin-top:26px"><b>Por qué el tamaño importa tanto.</b> Un modelo
+      se puede guardar con números finos o con números gruesos. Con números
+      gruesos ocupa cuatro veces menos y por fin cabe en un teléfono, pero
+      algunos modelos se estropean al redondear. Se probaron tres y solo uno
+      aguantó el redondeo sin perder nada.</p>
+
+    <table class="medidas">
+      <thead>
+        <tr>
+          <th>modelo probado</th><th>tamaño</th><th>acierta</th>
+          <th>entre tres</th><th>pierde al redondear</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="gana"><td>EfficientNet-Lite0</td><td>3,8 MB</td><td>79,2 %</td><td>90,9 %</td><td>nada</td></tr>
+        <tr><td>MobileNetV2</td><td>2,7 MB</td><td>75,2 %</td><td>90,2 %</td><td>1,1 puntos</td></tr>
+        <tr><td>MobileNetV3-Large</td><td>4,7 MB</td><td>69,5 %</td><td>85,5 %</td><td>7,1 puntos</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:20px;font-size:14.5px;color:var(--tenue)">Comparación
+      hecha con las mismas 56 especies para los tres, que es la única forma de
+      que signifique algo. El modelo que está funcionando ahora es el ganador,
+      reentrenado ya con las 100 especies.</p>
+  </section>
+
+  <section id="herramientas" class="asoma">
+    <span class="etiqueta">Herramientas</span>
+    <h2>Qué hay debajo.</h2>
+    <p>Nada de esto tiene coste ni servidor. Todo el proyecto cabe en una
+      carpeta y se publica como una página estática.</p>
+    <div class="piezas">
+      <div class="pieza">
+        <span class="rol">Los datos</span>
+        <h3>GBIF e iNaturalist</h3>
+        <p>749.952 fotos de Ecuador con licencia libre. Se filtran, se bajan por
+          especie y cada una guarda su autor y su licencia.</p>
+      </div>
+      <div class="pieza">
+        <span class="rol">Entrenamiento</span>
+        <h3>PyTorch y timm</h3>
+        <p>Se parte de un modelo que ya sabe mirar y se le enseña a distinguir
+          estas cien especies. Cuatro minutos por intento en una RTX 5060.</p>
+      </div>
+      <div class="pieza">
+        <span class="rol">Ejecución</span>
+        <h3>ONNX Runtime Web</h3>
+        <p>El mismo modelo, traducido a un formato que el navegador entiende y
+          ejecuta con WebAssembly. Sin servidor de por medio.</p>
+      </div>
+      <div class="pieza">
+        <span class="rol">Sin conexión</span>
+        <h3>Service Worker</h3>
+        <p>Guarda la página y el modelo en el teléfono la primera vez. Después
+          la aplicación abre igual con el avión activado.</p>
+      </div>
+      <div class="pieza">
+        <span class="rol">Honestidad</span>
+        <h3>Partición por observación</h3>
+        <p>Las fotos del mismo animal en el mismo sitio nunca se reparten entre
+          entrenamiento y examen. Si se mezclaran, el porcentaje saldría bonito
+          y sería mentira.</p>
+      </div>
+      <div class="pieza">
+        <span class="rol">Comprobación</span>
+        <h3>Prueba cruzada</h3>
+        <p>La misma foto pasa por el navegador y por Python, y se comparan los
+          dos resultados. Es la única forma de detectar que la web está
+          preparando la imagen distinto.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="asoma">
+    <span class="etiqueta">Límites</span>
+    <h2>Lo que todavía no sabe.</h2>
+    <p>Conoce cien especies de las miles que hay en el país. Si le apuntas a algo
+      que no está entre ellas, va a contestar con lo más parecido que conozca, y
+      por eso existe el <b>cf.</b> Prefiere quedar en duda antes que afirmar algo
+      falso: en el campo, una identificación equivocada dicha con seguridad hace
+      más daño que no dar ninguna.</p>
+    <p>Separar una iguana marina de un lobo marino es fácil. Separar dos
+      atrapamoscas pardos es difícil incluso para un ornitólogo con la foto
+      delante. Por eso se empezó con pocas especies y se va creciendo midiendo
+      cada paso.</p>
+  </section>
+
+  <section id="colaborar" class="asoma">
+    <span class="etiqueta">¿Quieres colaborar?</span>
+    <h2>Hay tres formas, y una no necesita saber programar.</h2>
+    <div class="aportes">
+      <div class="aporte">
+        <h3>Sube fotos</h3>
+        <p>Publica tus observaciones en iNaturalist con licencia libre. Esas
+          fotos son las que alimentan la próxima versión, y hoy faltan justo de
+          las especies menos fotografiadas.</p>
+      </div>
+      <div class="aporte">
+        <h3>Dinos qué falta</h3>
+        <p>Si trabajas en campo y echas de menos una especie concreta, o ves que
+          se equivoca siempre con la misma, escríbelo en el repositorio.</p>
+      </div>
+      <div class="aporte">
+        <h3>Toca el código</h3>
+        <p>Está todo publicado con licencia MIT: el descargador del dataset, el
+          entrenamiento, la exportación y esta misma página.</p>
+      </div>
+    </div>
+    <p style="margin-top:32px">
+      <a class="boton" href="https://github.com/DiegoFernandoLojanTenesaca/riski">Ver el repositorio</a>
+    </p>
+  </section>
+
+  <section id="acerca" class="asoma">
+    <span class="etiqueta">Acerca de</span>
+    <h2>Quién lo hizo y por qué.</h2>
+    <div class="firma">
+      <div class="quien">
+        <b>Diego Fernando Lojan Tenesaca</b>
+        Data &amp; AI Engineer · Ecuador
+      </div>
+      <div>
+        <p style="margin-top:0">Riksi nació de una idea sencilla: casi todas las
+          herramientas para identificar naturaleza dan por hecho que hay
+          internet, y en el Ecuador rural eso casi nunca se cumple. El reto
+          técnico interesante no era entrenar un clasificador, era conseguir que
+          cupiera en un teléfono modesto sin perder precisión por el camino.</p>
+        <p>El código, el dataset y el modelo están publicados para que cualquiera
+          los reutilice o los mejore.</p>
+        <p><a href="https://github.com/DiegoFernandoLojanTenesaca">github.com/DiegoFernandoLojanTenesaca</a></p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="pie">
+    <p>Código con licencia MIT. Las fotos pertenecen a sus autores, con licencia
+      CC0 o CC-BY 4.0 según el caso, y el detalle está en el fichero de créditos
+      del dataset. El dataset y el modelo derivados se publican con licencia
+      CC-BY 4.0. Los datos vienen de <a href="https://www.gbif.org">GBIF</a> y de
+      <a href="https://www.inaturalist.org">iNaturalist</a>.</p>
+  </footer>
+</div>
+
+<script>
+/* La portada se rellena con los mismos ficheros que usa la aplicación. Si se
+   reentrena con más especies, las cifras y las fotos se actualizan solas y no
+   quedan dos verdades que mantener a mano. */
+const quieto = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+fetch("muestras/muestras.json").then((r) => r.json()).then((lista) => {
+  const primera = lista[0];
+  if (primera) {
+    document.querySelector("#lamina").innerHTML = `
+      <img src="muestras/${primera.archivo}" alt="${primera.comun || primera.especie}">
+      <div class="marco"></div>
+      <figcaption>
+        <i>${primera.comun || primera.especie}</i>
+        <span>${primera.autor || "autor desconocido"}<br>${primera.licencia}</span>
+      </figcaption>`;
+  }
+
+  // Agrupadas como en una guía impresa: una lámina por grupo, y los grupos con
+  // una sola especie se juntan al final para no dejar filas huérfanas.
+  const porGrupo = {};
+  for (const m of lista) (porGrupo[m.grupo || "Otras"] ??= []).push(m);
+  const grandes = Object.entries(porGrupo).filter(([, v]) => v.length > 1)
+    .sort((a, b) => b[1].length - a[1].length);
+  const sueltas = Object.entries(porGrupo).filter(([, v]) => v.length === 1).flatMap(([, v]) => v);
+  if (sueltas.length) grandes.push(["Y algunas más", sueltas]);
+
+  document.querySelector("#laminas").innerHTML = grandes.map(([grupo, fotos], n) => `
+    <div class="grupo">
+      <h3>Lámina ${"I".repeat(n + 1)} · ${grupo} <small>${fotos.length} especies</small></h3>
+      <div class="rejilla">
+        ${fotos.map((m) => `
+          <figure>
+            <div class="foto"><img src="muestras/${m.archivo}" alt="${m.comun || m.especie}" loading="lazy"></div>
+            <figcaption>
+              <span class="comun">${m.comun || m.especie}</span>
+              <span class="cientifico">${m.especie}</span>
+              <small>${m.autor || "autor desconocido"} · ${m.licencia}</small>
+            </figcaption>
+          </figure>`).join("")}
+      </div>
+    </div>`).join("");
+}).catch(() => {});
+
+fetch("modelo/metricas.json").then((r) => r.ok ? r.json() : null).then((m) => {
+  if (!m) return;
+  const pon = (id, valor, texto) => {
+    const el = document.querySelector(id);
+    el.dataset.cuenta = valor;
+    el.textContent = texto;
+  };
+  pon("#c-especies", m.clases, m.clases);
+  pon("#c-top1", Math.round(m.int8.top1 * 100), Math.round(m.int8.top1 * 100) + " %");
+  pon("#c-top3", Math.round(m.int8.top3 * 100), Math.round(m.int8.top3 * 100) + " %");
+  document.querySelector("#c-peso").textContent = m.int8.mb.toFixed(1).replace(".", ",") + " MB";
+}).catch(() => {});
+
+// Aparecer al desplazar, y los números contando cuando entran en pantalla.
+const ojo = new IntersectionObserver((entradas) => {
+  for (const e of entradas) {
+    if (!e.isIntersecting) continue;
+    e.target.classList.add("visible");
+    ojo.unobserve(e.target);
+    for (const n of e.target.querySelectorAll("[data-cuenta]")) contar(n);
+  }
+}, { rootMargin: "0px 0px -12% 0px" });
+
+function contar(el) {
+  const fin = Number(el.dataset.cuenta);
+  const sufijo = el.dataset.sufijo ? " %" : "";
+  if (quieto || !fin) return;
+  const t0 = performance.now(), dur = 900;
+  const paso = (t) => {
+    const k = Math.min(1, (t - t0) / dur);
+    el.textContent = Math.round(fin * (1 - Math.pow(1 - k, 3))) + sufijo;
+    if (k < 1) requestAnimationFrame(paso);
+  };
+  requestAnimationFrame(paso);
+}
+
+document.querySelectorAll(".asoma, .franja").forEach((el) => ojo.observe(el));
+
+if ("serviceWorker" in navigator && location.protocol !== "file:") {
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+}
+</script>
+</body>
+</html>

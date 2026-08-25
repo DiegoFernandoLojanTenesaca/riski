@@ -1,0 +1,24 @@
+.venv/
+__pycache__/
+*.pyc
+*.log
+
+# El dataset vive en C:, no en el repo. Se reconstruye con datos.py.
+datos/
+*.jpg
+*.png
+!icono.svg
+
+# Los pesos de entrenamiento y el modelo sin cuantizar no van al repo: son
+# 14 y 13 MB que nadie necesita para abrir la web.
+*.pt
+*.pth
+*.onnx
+*.onnx.data
+
+# Salvo lo que la web necesita para funcionar en GitHub Pages. Sin estas
+# excepciones se publica una página incapaz de cargar su propio modelo.
+!docs/modelo/riksi-int8.onnx
+!docs/muestras/*.jpg
+!docs/prueba/*.jpg
+!docs/portada.jpg

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14181b">
+<title>Riksi · Identificar una especie con la cámara</title>
+<meta name="description" content="Apunta la cámara a un animal o una planta del Ecuador. El modelo corre dentro del navegador, sin enviar la foto a ningún servidor.">
+<link rel="icon" href="icono.svg">
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body class="app">
+
+<header class="barra">
+  <a class="marca" href="index.html"><img src="icono.svg" alt="">Riksi</a>
+  <nav class="menu">
+    <a href="index.html#como">Cómo usarla</a>
+    <a href="index.html#reconoce">Qué reconoce</a>
+    <a href="index.html#colaborar">Colaborar</a>
+  </nav>
+  <span class="etiqueta" id="meta" style="margin-left:auto;color:var(--tenue)">cargando</span>
+</header>
+
+<div class="tablero">
+  <div class="columna">
+    <main id="visor">
+      <video id="camara" playsinline muted autoplay hidden></video>
+      <img id="foto" hidden alt="">
+      <div id="mira" hidden></div>
+      <p id="aviso">Cargando el modelo. Son 3,8 MB y se quedan guardados, así que
+         la próxima vez abre sin conexión.</p>
+
+      <div class="guia" id="guia" hidden>
+        <b>1</b> Encuadra dentro de las esquinas
+        <b>2</b> Pulsa el botón amarillo
+        <button type="button" aria-label="Cerrar la guía" id="cerrar-guia">×</button>
+      </div>
+    </main>
+
+    <nav class="controles">
+      <label class="secundario" for="archivo" tabindex="0" role="button">Subir foto</label>
+      <input id="archivo" type="file" accept="image/*">
+      <button id="identificar" class="obturador" disabled aria-label="Identificar lo que ve la cámara">
+        <span></span>
+      </button>
+      <button id="volver" class="secundario">Cámara</button>
+    </nav>
+  </div>
+
+  <aside id="panel">
+    <section id="ficha" aria-live="polite">
+      <div class="encabezado"><span>Determinación</span><span>sin datos</span></div>
+      <p class="vacio"><b>Todavía no hay nada determinado.</b>
+         Encuadra el animal o la planta dentro de las esquinas y pulsa el botón.
+         La foto no sale de este dispositivo.</p>
+    </section>
+    <footer class="telemetria">
+      EfficientNet-Lite0 · <b id="peso">3,8 MB</b> · int8 ·
+      <b id="n-especies">100</b> especies · <b id="motor">wasm</b> · <b id="ms">0 ms</b>
+    </footer>
+  </aside>
+</div>
+
+<script src="vendor/ort.wasm.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

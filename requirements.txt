@@ -1,0 +1,14 @@
+# torch y torchvision NO se instalan desde aquí: la RTX 5060 es Blackwell y
+# necesita la variante cu128, que no vive en PyPI.
+#
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
+#   pip install -r requirements.txt
+
+timm
+onnx
+onnxscript
+onnxruntime
+pillow
+pandas
+scikit-learn
+tqdm

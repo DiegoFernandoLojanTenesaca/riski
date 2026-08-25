@@ -1,0 +1,354 @@
+/* Riksi — basalto y liquen.
+ * La roca volcánica de Galápagos y el amarillo que crece encima. La ficha de
+ * determinación es papel de archivo: un documento de trabajo, no una postal.
+ *
+ * Tres familias con un trabajo cada una:
+ *   serif  → titulares y nombres de especie (la cursiva científica es la
+ *            convención real de cualquier guía de campo)
+ *   sans   → prosa
+ *   mono   → datos, etiquetas y cualquier número que se compare con otro
+ */
+:root {
+  --basalto: #14181b;
+  --basalto-2: #1a2023;
+  --basalto-3: #101416;
+  --marea: #2c3639;
+  --papel: #e4e5df;
+  --tinta: #171b1c;
+  --tinta-2: #5d6663;
+  --linea: rgba(23,27,28,.16);
+  --liquen: #c7c24b;
+  --liquen-2: #9a9526;
+  --agua: #79b0a8;
+  --texto: #dce0da;
+  --suave: #b9c1b9;
+  --tenue: #8a938d;
+
+  --mono: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Menlo, Consolas, monospace;
+  --serif: Georgia, "Iowan Old Style", "Times New Roman", serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --panel: 380px;
+  --barra: 68px;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--barra) + 12px); }
+body {
+  margin: 0; background: var(--basalto); color: var(--texto);
+  font-family: var(--sans); font-size: 16.5px; line-height: 1.7;
+  -webkit-tap-highlight-color: transparent;
+}
+img { max-width: 100%; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--agua); outline-offset: 3px; }
+[hidden] { display: none !important; }
+
+.etiqueta {
+  display: block; font-family: var(--mono); font-size: 10.5px;
+  letter-spacing: .2em; text-transform: uppercase; color: var(--liquen);
+}
+.envoltura { max-width: 1120px; margin: 0 auto; padding: 0 26px; }
+
+/* ── barra ──────────────────────────────────────────────────────── */
+.barra {
+  position: sticky; top: 0; z-index: 20; height: var(--barra);
+  display: flex; align-items: center; gap: 18px; padding: 0 26px;
+  background: rgba(20,24,27,.92); backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--marea);
+}
+.marca {
+  display: flex; align-items: center; gap: 11px; text-decoration: none;
+  font-family: var(--mono); font-size: 15px; font-weight: 700;
+  letter-spacing: .34em; color: var(--liquen);
+}
+.marca img { width: 26px; height: 26px; }
+.menu { display: none; margin-left: auto; gap: 30px; align-items: center; }
+@media (min-width: 900px) { .menu { display: flex; } }
+.menu a {
+  text-decoration: none; color: var(--suave); font-size: 14px;
+  padding: 6px 0; border-bottom: 1px solid transparent; transition: .15s;
+}
+.menu a:hover { color: var(--texto); border-bottom-color: var(--liquen); }
+.barra .boton { margin-left: auto; }
+@media (min-width: 900px) { .barra .boton { margin-left: 0; } }
+
+.boton {
+  display: inline-block; background: var(--liquen); color: var(--tinta);
+  text-decoration: none; font-family: var(--mono); font-size: 12.5px; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase; padding: 13px 22px;
+  border: 0; cursor: pointer; transition: transform .14s, box-shadow .14s;
+}
+.boton:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(199,194,75,.22); }
+.boton.hueco { background: none; color: var(--texto); box-shadow: inset 0 0 0 1px var(--marea); font-weight: 400; }
+.boton.hueco:hover { box-shadow: inset 0 0 0 1px var(--liquen); }
+
+/* ── entrada al desplazar ───────────────────────────────────────── */
+.asoma { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s cubic-bezier(.2,.8,.3,1); }
+.asoma.visible { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .asoma { opacity: 1; transform: none; transition: none; }
+  html { scroll-behavior: auto; }
+}
+
+/* ── hero ───────────────────────────────────────────────────────── */
+.hero { padding: 76px 0 64px; display: grid; gap: 40px; align-items: center; }
+@media (min-width: 900px) { .hero { grid-template-columns: 1.02fr .98fr; gap: 64px; } }
+.hero h1 {
+  font-family: var(--serif); font-weight: 400; font-size: clamp(44px, 7.4vw, 76px);
+  line-height: 1.02; margin: 16px 0 0; letter-spacing: -.022em;
+}
+.hero h1 em { font-style: italic; color: var(--liquen); }
+.hero .bajada { font-size: 19px; color: var(--suave); max-width: 48ch; margin: 20px 0 0; }
+.hero .bajada b { color: var(--texto); font-weight: 600; }
+.kichwa {
+  margin-top: 20px; padding-left: 15px; border-left: 2px solid var(--liquen);
+  color: var(--tenue); font-size: 15px; max-width: 46ch;
+}
+.acciones { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin-top: 32px; }
+.acciones small { font-family: var(--mono); font-size: 11px; color: var(--tenue); letter-spacing: .05em; }
+
+/* Lámina del hero: una foto del propio dataset, con su pie, como en una guía
+   impresa. No es una ilustración de archivo, es lo que el modelo vio. */
+.lamina { position: relative; }
+.lamina img { width: 100%; aspect-ratio: 4/5; object-fit: cover; display: block; filter: saturate(.94); }
+.lamina .marco { position: absolute; inset: 12px; border: 1px solid rgba(228,229,223,.28); pointer-events: none; }
+.lamina figcaption {
+  background: var(--papel); color: var(--tinta); padding: 13px 16px;
+  display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+}
+.lamina figcaption i { font-family: var(--serif); font-size: 16px; }
+.lamina figcaption span { font-family: var(--mono); font-size: 9.5px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--tinta-2); text-align: right; }
+
+/* ── franja de cifras ───────────────────────────────────────────── */
+.franja { border-top: 1px solid var(--marea); border-bottom: 1px solid var(--marea); background: var(--basalto-3); }
+.cifras { display: grid; grid-template-columns: repeat(2, 1fr); }
+@media (min-width: 760px) { .cifras { grid-template-columns: repeat(4, 1fr); } }
+.cifra { padding: 30px 26px; border-right: 1px solid var(--marea); }
+.cifra:last-child { border-right: 0; }
+.cifra b { display: block; font-family: var(--mono); font-size: clamp(28px, 4vw, 40px);
+  color: var(--liquen); font-variant-numeric: tabular-nums; letter-spacing: -.03em; line-height: 1.1; }
+.cifra span { margin-top: 6px; color: var(--tenue); }
+
+/* ── secciones ──────────────────────────────────────────────────── */
+section { padding: 84px 0; border-top: 1px solid var(--marea); }
+section:first-of-type { border-top: 0; }
+h2 { font-family: var(--serif); font-weight: 400; font-size: clamp(30px, 3.6vw, 42px);
+  margin: 12px 0 20px; letter-spacing: -.02em; line-height: 1.12; }
+section p { max-width: 64ch; color: var(--suave); }
+section p b { color: var(--texto); font-weight: 600; }
+.doble { display: grid; gap: 44px; }
+@media (min-width: 900px) { .doble { grid-template-columns: 1fr 1fr; align-items: center; } }
+
+/* Los tres pasos SON una secuencia real: descargar, apuntar, determinar. */
+.pasos { display: grid; gap: 30px; margin-top: 36px; }
+@media (min-width: 800px) { .pasos { grid-template-columns: repeat(3, 1fr); gap: 38px; } }
+.paso { border-top: 2px solid var(--liquen); padding-top: 16px; }
+.paso .n { font-family: var(--mono); font-size: 11px; color: var(--liquen); letter-spacing: .22em; }
+.paso h3 { font-size: 19px; margin: 10px 0 8px; font-weight: 600; }
+.paso p { font-size: 15px; color: var(--tenue); margin: 0; }
+
+/* ── láminas por grupo ──────────────────────────────────────────── */
+.grupo { margin-top: 44px; }
+.grupo > h3 {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--liquen); border-bottom: 1px solid var(--marea); padding-bottom: 10px; margin: 0 0 16px;
+  display: flex; justify-content: space-between; align-items: baseline;
+}
+.grupo > h3 small { color: var(--tenue); letter-spacing: .1em; }
+.rejilla { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+@media (min-width: 640px) { .rejilla { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 980px) { .rejilla { grid-template-columns: repeat(4, 1fr); } }
+.rejilla figure { margin: 0; background: var(--basalto-3); }
+.rejilla .foto { position: relative; aspect-ratio: 1; overflow: hidden; background: #000; }
+.rejilla img { width: 100%; height: 100%; object-fit: cover; display: block;
+  filter: saturate(.92); transition: transform .5s cubic-bezier(.2,.8,.3,1); }
+.rejilla figure:hover img { transform: scale(1.05); }
+.rejilla figcaption { padding: 11px 13px 13px; }
+.rejilla .comun { font-size: 14.5px; }
+.rejilla .cientifico { font-family: var(--serif); font-style: italic; font-size: 13.5px; color: var(--tenue); display: block; }
+.rejilla small { display: block; font-family: var(--mono); font-size: 9px; letter-spacing: .05em;
+  color: var(--tinta-2); color: #6d766f; margin-top: 6px; }
+
+/* ── comparativa ────────────────────────────────────────────────── */
+.versus { display: grid; gap: 2px; background: var(--marea); margin-top: 34px; }
+@media (min-width: 760px) { .versus { grid-template-columns: 1fr 1fr; } }
+.versus > div { background: var(--basalto); padding: 26px 24px; }
+.versus h3 { font-family: var(--mono); font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+  margin: 0 0 18px; color: var(--tenue); }
+.versus .propia h3 { color: var(--liquen); }
+.versus ul { list-style: none; margin: 0; padding: 0; }
+.versus li { padding: 11px 0 11px 30px; position: relative; border-bottom: 1px solid rgba(44,54,57,.6); font-size: 15px; }
+.versus li:last-child { border-bottom: 0; }
+.versus li::before { position: absolute; left: 0; font-family: var(--mono); font-size: 15px; }
+.versus .propia li::before { content: "✓"; color: var(--liquen); }
+.versus .otra li { color: var(--tenue); }
+.versus .otra li::before { content: "×"; color: #7d5e5e; }
+
+/* ── tablas ─────────────────────────────────────────────────────── */
+table.medidas { width: 100%; border-collapse: collapse; margin-top: 30px; font-size: 14.5px; }
+table.medidas th, table.medidas td { text-align: right; padding: 14px 12px; border-bottom: 1px solid var(--marea); }
+table.medidas th:first-child, table.medidas td:first-child { text-align: left; }
+table.medidas th { font-family: var(--mono); font-size: 10px; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--tenue); font-weight: 400; }
+table.medidas td { font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--suave); }
+table.medidas tr.gana td { color: var(--texto); background: rgba(199,194,75,.07); }
+table.medidas tr.gana td:first-child { color: var(--liquen); font-weight: 700;
+  box-shadow: inset 3px 0 0 var(--liquen); }
+
+/* ── tarjetas de herramientas ───────────────────────────────────── */
+.piezas { display: grid; gap: 16px; margin-top: 34px; }
+@media (min-width: 700px) { .piezas { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1000px) { .piezas { grid-template-columns: repeat(3, 1fr); } }
+.pieza { border: 1px solid var(--marea); padding: 22px; transition: border-color .2s, transform .2s; }
+.pieza:hover { border-color: var(--liquen); transform: translateY(-3px); }
+.pieza h3 { font-family: var(--mono); font-size: 13px; letter-spacing: .06em; margin: 0 0 4px; color: var(--texto); }
+.pieza .rol { font-family: var(--mono); font-size: 9.5px; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--liquen); }
+.pieza p { font-size: 14.5px; color: var(--tenue); margin: 10px 0 0; }
+
+/* ── colaborar y acerca de ──────────────────────────────────────── */
+.aportes { display: grid; gap: 18px; margin-top: 32px; }
+@media (min-width: 800px) { .aportes { grid-template-columns: repeat(3, 1fr); } }
+.aporte { border-left: 2px solid var(--liquen); padding: 4px 0 4px 18px; }
+.aporte h3 { font-size: 17px; margin: 0 0 6px; font-weight: 600; }
+.aporte p { font-size: 14.5px; color: var(--tenue); margin: 0; }
+
+.firma { display: grid; gap: 26px; align-items: start; margin-top: 26px; }
+@media (min-width: 800px) { .firma { grid-template-columns: 220px 1fr; gap: 40px; } }
+.firma .quien { font-family: var(--mono); font-size: 11px; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--tenue); border-top: 2px solid var(--liquen); padding-top: 14px; }
+.firma .quien b { display: block; font-family: var(--sans); font-size: 19px; letter-spacing: 0;
+  text-transform: none; color: var(--texto); margin-bottom: 4px; }
+
+footer.pie { border-top: 1px solid var(--marea); padding: 40px 0 64px; color: var(--tenue); font-size: 14px; }
+footer.pie a { color: var(--agua); }
+footer.pie p { max-width: 70ch; }
+
+/* ══ APLICACIÓN ═════════════════════════════════════════════════ */
+body.app { height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+body.app .barra { position: static; flex: none; }
+.tablero { flex: 1; min-height: 0; display: grid; grid-template-rows: 1fr auto; }
+@media (min-width: 900px) {
+  .tablero { grid-template-columns: 1fr var(--panel); grid-template-rows: 1fr; }
+  .columna { border-right: 1px solid var(--marea); }
+}
+.columna { display: grid; grid-template-rows: 1fr auto; min-height: 0; }
+
+#visor { position: relative; min-height: 0; background: #000; display: grid; place-items: center; overflow: hidden; }
+#visor video, #visor img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* Las esquinas marcan el recorte que ve el modelo, el 87,5% central del lado
+   corto. No es adorno: fuera de ahí no mira. */
+#mira {
+  position: absolute; inset: 12.5%; pointer-events: none; opacity: .6; --c: 20px;
+  background:
+    linear-gradient(var(--liquen), var(--liquen)) 0 0 / var(--c) 1px,
+    linear-gradient(var(--liquen), var(--liquen)) 0 0 / 1px var(--c),
+    linear-gradient(var(--liquen), var(--liquen)) 100% 0 / var(--c) 1px,
+    linear-gradient(var(--liquen), var(--liquen)) 100% 0 / 1px var(--c),
+    linear-gradient(var(--liquen), var(--liquen)) 0 100% / var(--c) 1px,
+    linear-gradient(var(--liquen), var(--liquen)) 0 100% / 1px var(--c),
+    linear-gradient(var(--liquen), var(--liquen)) 100% 100% / var(--c) 1px,
+    linear-gradient(var(--liquen), var(--liquen)) 100% 100% / 1px var(--c);
+  background-repeat: no-repeat;
+}
+#aviso { position: absolute; max-width: 36ch; padding: 24px; text-align: center; color: var(--tenue); font-size: 14px; }
+
+/* Guía de primer uso: se muestra encima del visor hasta que se identifica algo
+   por primera vez. Quien llega desde la portada no tiene por qué adivinar. */
+.guia {
+  position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 10px; white-space: nowrap;
+  background: rgba(16,20,22,.86); border: 1px solid var(--marea);
+  padding: 9px 15px; font-size: 13px; color: var(--suave);
+}
+.guia b { color: var(--liquen); font-family: var(--mono); font-size: 11px; letter-spacing: .1em; }
+.guia button { background: none; border: 0; color: var(--tenue); cursor: pointer; font-size: 16px; line-height: 1; padding: 0 0 0 4px; }
+
+.controles {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 14px 24px calc(14px + env(safe-area-inset-bottom));
+  background: var(--basalto-2); border-top: 1px solid var(--marea);
+}
+.obturador {
+  width: 62px; height: 62px; border-radius: 50%; padding: 0; flex: none;
+  border: 2px solid var(--texto); background: none; cursor: pointer;
+  display: grid; place-items: center; transition: transform .12s;
+}
+.obturador > span { width: 46px; height: 46px; border-radius: 50%; background: var(--liquen); }
+.obturador:active { transform: scale(.93); }
+.obturador:disabled { opacity: .3; cursor: default; }
+.secundario {
+  background: none; border: 0; color: var(--tenue); cursor: pointer; width: 96px;
+  font-family: var(--mono); font-size: 11px; letter-spacing: .12em;
+  text-transform: uppercase; padding: 12px 0;
+}
+.secundario:first-of-type { text-align: left; }
+.secundario:last-of-type { text-align: right; }
+.secundario:hover { color: var(--texto); }
+input[type=file] { position: absolute; width: 1px; height: 1px; opacity: 0; }
+
+#panel { background: var(--papel); color: var(--tinta); display: flex; flex-direction: column;
+  min-height: 0; border-top: 3px solid var(--liquen); }
+@media (min-width: 900px) { #panel { border-top: 0; border-left: 3px solid var(--liquen); } }
+
+#ficha { flex: 1; overflow-y: auto; padding: 18px 22px 20px; }
+#ficha.nuevo { animation: entrar .26s cubic-bezier(.2,.8,.3,1); }
+@keyframes entrar { from { opacity: 0; transform: translateY(8px); } }
+@media (prefers-reduced-motion: reduce) { #ficha.nuevo { animation: none; } }
+
+.encabezado {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
+  font-family: var(--mono); font-size: 10px; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--tinta-2); border-bottom: 1px solid var(--linea); padding-bottom: 10px;
+}
+.principal { padding: 18px 0 2px; }
+.comun { font-size: 25px; line-height: 1.2; font-weight: 600; letter-spacing: -.01em; }
+.cientifico { font-family: var(--serif); font-style: italic; color: var(--tinta-2); }
+.principal .cientifico { display: block; font-size: 17px; margin-top: 5px; }
+
+/* «cf.» — confer. Lo que escribe un taxónomo en la etiqueta cuando la
+   determinación es probable pero no firme. Aquí sale por debajo del umbral. */
+.cf { display: inline-block; font-family: var(--mono); font-weight: 700; font-size: 12px;
+  background: var(--liquen); color: var(--tinta); padding: 2px 7px; margin-right: 8px; vertical-align: 4px; }
+.nota { font-size: 13px; line-height: 1.6; color: var(--tinta-2);
+  border-left: 2px solid var(--liquen); padding-left: 11px; margin: 16px 0 0; }
+.nota b { font-family: var(--mono); }
+
+.medida { display: flex; align-items: baseline; gap: 10px; margin-top: 9px;
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--tinta-2); }
+.medida b { margin-left: auto; font-size: 14px; letter-spacing: 0; color: var(--tinta);
+  font-variant-numeric: tabular-nums; }
+
+.alternativas { margin-top: 20px; border-top: 1px solid var(--linea); }
+.alternativas > p { font-family: var(--mono); font-size: 10px; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--tinta-2); margin: 13px 0 4px; }
+.fila { display: flex; align-items: baseline; gap: 12px; padding: 8px 0; }
+.fila .nombre { flex: 1; min-width: 0; font-size: 14px; }
+.fila .cientifico { font-size: 14.5px; }
+.pct { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 12.5px; }
+
+/* La barra lleva marcada la línea del umbral: se ve dónde cae cada candidata
+   respecto al corte a partir del cual sí se afirma algo. */
+.escala { position: relative; height: 3px; background: rgba(23,27,28,.13); margin-top: 6px; }
+.escala > i { position: absolute; inset: 0 auto 0 0; background: var(--tinta); }
+.escala > u { position: absolute; top: -3px; bottom: -3px; width: 1px; background: var(--liquen-2); }
+
+.vacio { color: var(--tinta-2); font-size: 14px; padding-top: 20px; }
+.vacio b { display: block; color: var(--tinta); font-weight: 600; margin-bottom: 6px; }
+
+/* Una tira, no una rejilla de pares: son datos de referencia, no un panel de
+   control. */
+.telemetria {
+  border-top: 1px solid var(--linea); padding: 11px 22px calc(11px + env(safe-area-inset-bottom));
+  font-family: var(--mono); font-size: 10px; letter-spacing: .09em;
+  text-transform: uppercase; color: var(--tinta-2);
+}
+.telemetria b { color: var(--tinta); font-weight: 500; font-variant-numeric: tabular-nums; }
+
+@media (max-width: 899px) {
+  body.app { height: auto; overflow: auto; }
+  .tablero { grid-template-rows: 58vh auto; }
+}

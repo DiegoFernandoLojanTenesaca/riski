@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Riksi">
+  <!-- La vesica se lee como ojo y como hoja a la vez: ese es el nombre. -->
+  <path d="M4 32C16 12 48 12 60 32 48 52 16 52 4 32Z"
+        fill="#0f4d34" stroke="#0b3a27" stroke-width="2" stroke-linejoin="round"/>
+  <!-- nervadura / rabillo -->
+  <path d="M4 32H60" stroke="#0b3a27" stroke-width="1.5" opacity=".35"/>
+  <circle cx="32" cy="32" r="10.5" fill="#f4c445"/>
+  <circle cx="32" cy="32" r="4.5" fill="#0b3a27"/>
+  <circle cx="28.5" cy="28" r="1.8" fill="#fff" opacity=".9"/>
+</svg>
