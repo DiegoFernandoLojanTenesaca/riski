@@ -36,6 +36,8 @@
       <div class="cifra"><b id="m-web">·</b><span class="etiqueta">acierta el navegador</span></div>
       <div class="cifra"><b id="m-acuerdo">·</b><span class="etiqueta">coinciden entre sí</span></div>
       <div class="cifra"><b id="m-desvio">·</b><span class="etiqueta">desvío medio de confianza</span></div>
+      <div class="cifra"><b id="m-ms">·</b><span class="etiqueta">mediana por foto</span></div>
+      <div class="cifra"><b id="m-px">·</b><span class="etiqueta">resolución de entrada</span></div>
     </div>
 
     <div id="discrepancias"></div>
@@ -108,11 +110,15 @@ async function correr() {
   }
 
   let aciertosWeb = 0, acuerdos = 0, sumaDesvio = 0;
-  const discrepan = [];
+  const discrepan = [], tiempos = [];
 
   for (const [n, caso] of banco.imagenes.entries()) {
     const im = await cargar("banco/" + caso.archivo);
+    // Se cronometra el trabajo completo: preparar la imagen y ejecutar el
+    // modelo. Al usuario le da igual en cuál de los dos se va el tiempo.
+    const t0 = performance.now();
     const salida = await sesion.run({ [sesion.inputNames[0]]: aTensor(im, im.naturalWidth, im.naturalHeight) });
+    tiempos.push(performance.now() - t0);
     const probs = probabilidades(Array.from(salida[sesion.outputNames[0]].data));
     let mejor = 0;
     for (let i = 1; i < probs.length; i++) if (probs[i] > probs[mejor]) mejor = i;
@@ -132,6 +138,11 @@ async function correr() {
   $("#m-web").textContent = pct(aciertosWeb / total);
   $("#m-acuerdo").textContent = pct(acuerdos / total);
   $("#m-desvio").textContent = (sumaDesvio / Math.max(1, acuerdos) * 100).toFixed(1).replace(".", ",") + " pts";
+  // Mediana y no media: una sola pausa del recolector de basura desplaza la
+  // media y hace parecer lento algo que no lo es.
+  tiempos.sort((a, b) => a - b);
+  $("#m-ms").textContent = Math.round(tiempos[Math.floor(tiempos.length / 2)]) + " ms";
+  $("#m-px").textContent = pre.tam + " px";
 
   $("#discrepancias").innerHTML = discrepan.length ? `
     <h2 style="margin-top:46px">Las ${discrepan.length} que no coinciden</h2>

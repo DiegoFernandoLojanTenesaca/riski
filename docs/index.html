@@ -282,23 +282,82 @@
 
   <section id="acerca" class="asoma">
     <span class="etiqueta">Acerca de</span>
-    <h2>Quién lo hizo y por qué.</h2>
-    <div class="firma">
-      <div class="quien">
+    <h2>Quién lo hizo, y por qué se hizo así.</h2>
+
+    <div class="ficha-autor">
+      <div class="tarjeta">
         <b>Diego Fernando Lojan Tenesaca</b>
-        Data &amp; AI Engineer · Ecuador
+        <span>Data &amp; AI Engineer · Ecuador</span>
+        <ul>
+          <li>Modelos de lenguaje, RAG y agentes</li>
+          <li>Embeddings y búsqueda vectorial</li>
+          <li>Visión por computador e inferencia con ONNX</li>
+          <li>Datos: ingesta, limpieza y publicación</li>
+        </ul>
+        <a href="https://github.com/DiegoFernandoLojanTenesaca">github.com/DiegoFernandoLojanTenesaca</a>
       </div>
-      <div>
-        <p style="margin-top:0">Riksi nació de una idea sencilla: casi todas las
-          herramientas para identificar naturaleza dan por hecho que hay
-          internet, y en el Ecuador rural eso casi nunca se cumple. El reto
-          técnico interesante no era entrenar un clasificador, era conseguir que
-          cupiera en un teléfono modesto sin perder precisión por el camino.</p>
-        <p>El código, el dataset y el modelo están publicados para que cualquiera
-          los reutilice o los mejore.</p>
-        <p><a href="https://github.com/DiegoFernandoLojanTenesaca">github.com/DiegoFernandoLojanTenesaca</a></p>
+
+      <div class="relato">
+        <p>Casi todas las herramientas para identificar naturaleza dan por
+          sentado que hay internet. En el Ecuador rural eso casi nunca se
+          cumple, y el sitio donde más falta hace saber qué animal tienes
+          delante es justo donde no hay ni una raya de cobertura.</p>
+
+        <p>El reto interesante nunca fue entrenar un clasificador: eso lo hace
+          cualquiera con un tutorial. Era conseguir que el modelo <b>cupiera en
+          un teléfono modesto y siguiera acertando</b>, y demostrar con números
+          cada decisión del camino en vez de repetir lo que dicen los blogs.</p>
+
+        <p>Riksi es la primera pieza de una ruta de proyectos con los que estoy
+          demostrando ingeniería de IA de principio a fin. No un cuaderno con
+          una precisión bonita: un producto que alguien puede abrir en su
+          teléfono, sin cuenta, y que funciona en el páramo.</p>
       </div>
     </div>
+
+    <h3 class="sub">Lo que este proyecto demuestra</h3>
+    <div class="demuestra">
+      <div>
+        <b>Datos desde cero</b>
+        <p>Consulta a una API pública, filtrado por licencia, descarga en
+          paralelo y créditos por foto. Con el hallazgo de que el conteo que
+          anuncia GBIF no predice las fotos utilizables: hubo que descartar 118
+          candidatas para llenar 100 plazas.</p>
+      </div>
+      <div>
+        <b>Evaluación honesta</b>
+        <p>Partición por observación y no por foto, porque varias imágenes del
+          mismo animal en el mismo sitio inflarían el resultado hasta volverlo
+          mentira.</p>
+      </div>
+      <div>
+        <b>Decisiones medidas</b>
+        <p>Cuatro configuraciones comparadas con las mismas imágenes. Se
+          descubrió que subir la resolución da cuatro puntos sin engordar la
+          descarga, y que una arquitectura de 2024 pierde 8,9 al cuantizar.</p>
+      </div>
+      <div>
+        <b>Despliegue de verdad</b>
+        <p>Cuantización a 8 bits, ejecución dentro del navegador con ONNX
+          Runtime Web y funcionamiento sin conexión. Sin servidor, sin coste y
+          sin nada que se caiga dentro de un año.</p>
+      </div>
+      <div>
+        <b>Saber cuándo callarse</b>
+        <p>El umbral de confianza no está puesto a ojo: se mide la curva
+          completa y se elige el corte más bajo con el que las respuestas
+          aciertan el 85% de las veces.</p>
+      </div>
+      <div>
+        <b>Verificación cruzada</b>
+        <p>Un banco de pruebas compara lo que responde el navegador contra lo
+          que responde Python sobre las mismas fotos. Un preprocesado desviado
+          no da ningún error: solo acierta menos.</p>
+      </div>
+    </div>
+
+    <p style="margin-top:34px">El código, el dataset y el modelo están
+      publicados para que cualquiera los reutilice o los mejore.</p>
   </section>
 
   <footer class="pie">

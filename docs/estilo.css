@@ -214,12 +214,34 @@ table.medidas tr.gana td:first-child { color: var(--liquen); font-weight: 700;
 .aporte h3 { font-size: 17px; margin: 0 0 6px; font-weight: 600; }
 .aporte p { font-size: 14.5px; color: var(--tenue); margin: 0; }
 
-.firma { display: grid; gap: 26px; align-items: start; margin-top: 26px; }
-@media (min-width: 800px) { .firma { grid-template-columns: 220px 1fr; gap: 40px; } }
-.firma .quien { font-family: var(--mono); font-size: 11px; letter-spacing: .16em;
-  text-transform: uppercase; color: var(--tenue); border-top: 2px solid var(--liquen); padding-top: 14px; }
-.firma .quien b { display: block; font-family: var(--sans); font-size: 19px; letter-spacing: 0;
-  text-transform: none; color: var(--texto); margin-bottom: 4px; }
+/* ── acerca de ──────────────────────────────────────────────────── */
+.ficha-autor { display: grid; gap: 30px; margin-top: 30px; align-items: start; }
+@media (min-width: 860px) { .ficha-autor { grid-template-columns: 300px 1fr; gap: 52px; } }
+
+.tarjeta { border-top: 2px solid var(--liquen); padding-top: 18px; }
+.tarjeta b { display: block; font-size: 20px; line-height: 1.3; margin-bottom: 4px; }
+.tarjeta > span { display: block; font-family: var(--mono); font-size: 11px;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--liquen); }
+.tarjeta ul { list-style: none; margin: 20px 0 0; padding: 0; }
+.tarjeta li { font-size: 14px; color: var(--tenue); padding: 7px 0 7px 16px;
+  position: relative; line-height: 1.5; }
+.tarjeta li::before { content: "·"; position: absolute; left: 2px; color: var(--liquen); }
+.tarjeta a { display: inline-block; margin-top: 18px; font-family: var(--mono);
+  font-size: 11.5px; color: var(--agua); word-break: break-all; }
+
+.relato p { margin: 0 0 18px; max-width: 60ch; }
+.relato p:last-child { margin-bottom: 0; }
+
+h3.sub { font-family: var(--mono); font-size: 11px; letter-spacing: .2em;
+  text-transform: uppercase; color: var(--liquen); font-weight: 400;
+  border-bottom: 1px solid var(--marea); padding-bottom: 12px; margin: 56px 0 0; }
+
+.demuestra { display: grid; gap: 1px; background: var(--marea); margin-top: 1px; }
+@media (min-width: 700px) { .demuestra { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1000px) { .demuestra { grid-template-columns: repeat(3, 1fr); } }
+.demuestra > div { background: var(--basalto); padding: 24px 22px; }
+.demuestra b { display: block; font-size: 16px; margin-bottom: 8px; }
+.demuestra p { font-size: 14px; color: var(--tenue); margin: 0; max-width: none; }
 
 footer.pie { border-top: 1px solid var(--marea); padding: 40px 0 64px; color: var(--tenue); font-size: 14px; }
 footer.pie a { color: var(--agua); }
