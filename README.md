@@ -44,9 +44,14 @@ Mismas 100 especies y mismas imágenes de validación para todos:
 
 | configuración | int8 | top1 | top3 | coste de cuantizar |
 |---|---|---|---|---|
+| EfficientNet-Lite0 · 320 px | 3,8 MB | 79,6% | 92,3% | 0,2 pts |
 | **EfficientNet-Lite0 · 288 px** | **3,8 MB** | **79,2%** | **91,5%** | 0,1 pts |
 | EfficientNet-Lite0 · 224 px | 3,8 MB | 75,0% | 89,6% | 0 |
 | MobileNetV4-conv-small · 224 px | 2,9 MB | 63,3% | 81,2% | **8,9 pts** |
+
+**La curva se aplana en 288.** De 224 a 288 hay 4,2 puntos; de 288 a 320, solo
+0,4, y eso cuesta un 23% más de cómputo. Se publica el de 288: 320 gana dentro
+del margen de ruido y se paga en cada foto que alguien haga en el campo.
 
 **Subir la resolución salió gratis en descarga.** Los pesos son los mismos 3,8 MB
 a 224 que a 288, porque una CNN no cambia de tamaño con la entrada: solo cuesta
@@ -104,6 +109,25 @@ python -m http.server 8080 -d docs
 
 `http://127.0.0.1:8080` es la portada; `/app.html` la cámara, con tres candidatos con su confianza y un
 `?test=1` que compara el resultado del navegador contra el de Python.
+
+### Lo que mide el navegador
+
+`banco.html` pasa un lote de validación por el modelo dentro del navegador y lo
+compara con lo que dio Python sobre esas mismas fotos. Medido con 200 imágenes a
+288 px:
+
+| | |
+|---|---|
+| acierta Python | 78,0% |
+| acierta el navegador | **80,5%** |
+| coinciden entre sí | 93,0% |
+| desvío medio de confianza | 5,1 pts |
+| mediana por foto | **99 ms** |
+
+**El `canvas` no cuesta precisión.** Las discrepancias se concentran en
+predicciones de confianza baja, donde el modelo duda y un píxel decide el
+ganador; de hecho en ocho de las catorce el que acertó fue el navegador. El
+banco se genera con `--banco N` y no se publica.
 
 Esa comprobación existe por un motivo: si el preprocesado del navegador no
 replica exactamente el del entrenamiento (otro *resize*, otro orden de canales,

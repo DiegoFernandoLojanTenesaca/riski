@@ -18,6 +18,7 @@ import csv
 import io
 import json
 import sys
+import time
 import urllib.parse
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -30,15 +31,32 @@ LICENCIAS = ["CC0_1_0", "CC_BY_4_0"]
 AGENTE = "riksi/0.1 (https://github.com/DiegoFernandoLojanTenesaca/riksi)"
 
 
-def pedir(ruta, **params):
+def pedir(ruta, intentos=4, **params):
+    """Consulta a GBIF, reintentando.
+
+    Una descarga de 300 especies son miles de consultas y GBIF corta alguna por
+    el camino: la primera corrida murió en la especie 92 con un
+    `RemoteDisconnected`. Sin reintento, cualquier hipo de red tira horas de
+    trabajo, y el reintento va aquí y no en cada llamador porque todas las
+    consultas pasan por esta función.
+    """
     pares = []
     for k, v in params.items():
         for item in v if isinstance(v, list) else [v]:
             pares.append((k, item))
     url = f"{API}/{ruta}?{urllib.parse.urlencode(pares)}"
     req = urllib.request.Request(url, headers={"User-Agent": AGENTE})
-    with urllib.request.urlopen(req, timeout=90) as r:
-        return json.load(r)
+
+    for intento in range(intentos):
+        try:
+            with urllib.request.urlopen(req, timeout=90) as r:
+                return json.load(r)
+        except Exception as err:
+            if intento == intentos - 1:
+                raise
+            espera = 2 ** intento          # 1 s, 2 s, 4 s: si está saturado, insistir seguido empeora
+            print(f"    reintento {intento + 1}/{intentos - 1} en {espera}s ({err})", file=sys.stderr)
+            time.sleep(espera)
 
 
 def especies_mas_fotografiadas(n):
@@ -187,8 +205,17 @@ def main():
     raiz = Path(args.salida)
     (raiz / "imagenes").mkdir(parents=True, exist_ok=True)
 
-    print(f"Buscando candidatas de Ecuador para llenar {args.especies} plazas…")
-    candidatas = especies_mas_fotografiadas(args.especies * 3)
+    # Las candidatas se guardan: son unas 900 consultas a GBIF y no cambian de
+    # un día para otro. Sin esto, cada reanudación tras un corte de red vuelve a
+    # gastar veinte minutos en preguntar lo mismo.
+    cache = raiz / "candidatas.json"
+    if cache.exists():
+        candidatas = json.loads(cache.read_text(encoding="utf-8"))
+        print(f"Candidatas leídas de {cache.name}")
+    else:
+        print(f"Buscando candidatas de Ecuador para llenar {args.especies} plazas…")
+        candidatas = especies_mas_fotografiadas(args.especies * 3)
+        cache.write_text(json.dumps(candidatas, ensure_ascii=False), encoding="utf-8")
     print(f"  {len(candidatas)} candidatas, de {candidatas[0]['disponibles']:,} "
           f"a {candidatas[-1]['disponibles']:,} ocurrencias\n")
 

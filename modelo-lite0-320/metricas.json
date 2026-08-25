@@ -1,0 +1,21 @@
+{
+ "arquitectura": "efficientnet_lite0",
+ "tam": 320,
+ "clases": 100,
+ "imagenes_validacion": 1000,
+ "pytorch": {
+  "top1": 0.8,
+  "top3": 0.933
+ },
+ "fp32": {
+  "mb": 13.528780937194824,
+  "top1": 0.798,
+  "top3": 0.933
+ },
+ "int8": {
+  "mb": 3.8476457595825195,
+  "top1": 0.796,
+  "top3": 0.923
+ },
+ "coste_top1": 0.0020000000000000018
+}
