@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Riksi · banco de pruebas del navegador</title>
+<link rel="icon" href="icono.svg">
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+
+<header class="barra">
+  <a class="marca" href="index.html"><img src="icono.svg" alt="">Riksi</a>
+  <span class="etiqueta" style="margin-left:auto;color:var(--tenue)">herramienta interna</span>
+</header>
+
+<div class="envoltura">
+  <section style="border-top:0">
+    <span class="etiqueta">Comprobación</span>
+    <h2>¿Cuánto cuesta preparar la imagen en el navegador?</h2>
+    <p>El modelo aprendió con imágenes recortadas y escaladas por PIL. En el
+      navegador ese trabajo lo hace el <code>canvas</code>, que no interpola
+      igual. La diferencia no da ningún error: se paga en aciertos, y hasta
+      medirla no se sabe cuánto.</p>
+    <p>Esta página pasa el mismo lote de validación por el modelo <b>dentro del
+      navegador</b> y lo compara con lo que dio Python sobre esas mismas fotos.
+      El banco se genera en local con <code>python comprobar.py --banco 200</code>
+      y no se publica.</p>
+
+    <p style="margin-top:30px"><button class="boton" id="correr">Ejecutar el lote</button></p>
+    <p class="cuenta" id="avance"></p>
+
+    <div class="cifras" id="marcador" hidden style="margin-top:30px;border:1px solid var(--marea)">
+      <div class="cifra"><b id="m-python">·</b><span class="etiqueta">acierta Python</span></div>
+      <div class="cifra"><b id="m-web">·</b><span class="etiqueta">acierta el navegador</span></div>
+      <div class="cifra"><b id="m-acuerdo">·</b><span class="etiqueta">coinciden entre sí</span></div>
+      <div class="cifra"><b id="m-desvio">·</b><span class="etiqueta">desvío medio de confianza</span></div>
+    </div>
+
+    <div id="discrepancias"></div>
+  </section>
+</div>
+
+<script src="vendor/ort.wasm.min.js"></script>
+<script>
+const $ = (s) => document.querySelector(s);
+const lienzo = document.createElement("canvas");
+const cx = lienzo.getContext("2d", { willReadFrequently: true });
+const bufer = [document.createElement("canvas"), document.createElement("canvas")];
+let sesion, clases, pre;
+
+/* Copia exacta del preprocesado de app.js. Si aquí se escribiera otra versión,
+   la prueba mediría esta página y no la aplicación, que es lo que importa. */
+function aTensor(fuente, ancho, alto) {
+  const tam = pre.tam;
+  let sw = Math.min(ancho, alto) * (tam / pre.resize);
+  let sh = sw, sx = (ancho - sw) / 2, sy = (alto - sh) / 2, origen = fuente;
+  for (let i = 0; sw > tam * 2; i++) {
+    const m = Math.max(tam, Math.round(sw / 2));
+    const c = bufer[i % 2];
+    c.width = c.height = m;
+    const g = c.getContext("2d");
+    g.imageSmoothingQuality = "high";
+    g.drawImage(origen, sx, sy, sw, sh, 0, 0, m, m);
+    origen = c; sx = sy = 0; sw = sh = m;
+  }
+  cx.imageSmoothingQuality = "high";
+  cx.drawImage(origen, sx, sy, sw, sh, 0, 0, tam, tam);
+  const px = cx.getImageData(0, 0, tam, tam).data;
+  const plano = tam * tam;
+  const datos = new Float32Array(3 * plano);
+  for (let i = 0, p = 0; p < plano; i += 4, p++) {
+    datos[p]             = (px[i]     / 255 - pre.media[0]) / pre.desv[0];
+    datos[plano + p]     = (px[i + 1] / 255 - pre.media[1]) / pre.desv[1];
+    datos[2 * plano + p] = (px[i + 2] / 255 - pre.media[2]) / pre.desv[2];
+  }
+  return new ort.Tensor("float32", datos, [1, 3, tam, tam]);
+}
+
+function probabilidades(logits) {
+  const max = Math.max(...logits);
+  const exp = logits.map((v) => Math.exp(v - max));
+  const suma = exp.reduce((a, b) => a + b, 0);
+  return exp.map((v) => v / suma);
+}
+
+const cargar = (src) => new Promise((ok, mal) => {
+  const im = new Image();
+  im.onload = () => ok(im); im.onerror = mal; im.src = src;
+});
+
+async function correr() {
+  $("#correr").disabled = true;
+  ort.env.wasm.numThreads = 1;
+  ort.env.wasm.wasmPaths = new URL("vendor/", location.href).href;
+
+  pre = await (await fetch("modelo/preprocesado.json")).json();
+  clases = await (await fetch("modelo/clases.json")).json();
+  lienzo.width = lienzo.height = pre.tam;
+  sesion = await ort.InferenceSession.create("modelo/riksi-int8.onnx", { executionProviders: ["wasm"] });
+
+  const banco = await fetch("banco/banco.json").then((r) => r.json()).catch(() => null);
+  if (!banco) {
+    $("#avance").textContent = "No hay banco. Genera uno con: python comprobar.py --banco 200";
+    $("#correr").disabled = false;
+    return;
+  }
+
+  let aciertosWeb = 0, acuerdos = 0, sumaDesvio = 0;
+  const discrepan = [];
+
+  for (const [n, caso] of banco.imagenes.entries()) {
+    const im = await cargar("banco/" + caso.archivo);
+    const salida = await sesion.run({ [sesion.inputNames[0]]: aTensor(im, im.naturalWidth, im.naturalHeight) });
+    const probs = probabilidades(Array.from(salida[sesion.outputNames[0]].data));
+    let mejor = 0;
+    for (let i = 1; i < probs.length; i++) if (probs[i] > probs[mejor]) mejor = i;
+
+    if (clases[mejor] === caso.verdadera) aciertosWeb++;
+    if (clases[mejor] === caso.python) { acuerdos++; sumaDesvio += Math.abs(probs[mejor] - caso.prob); }
+    else discrepan.push({ ...caso, web: clases[mejor], probWeb: probs[mejor] });
+
+    if (n % 5 === 0) $("#avance").textContent = `${n + 1} de ${banco.imagenes.length}`;
+  }
+
+  const total = banco.imagenes.length;
+  const pct = (v) => (v * 100).toFixed(1).replace(".", ",") + " %";
+  $("#avance").textContent = `${total} imágenes, terminado`;
+  $("#marcador").hidden = false;
+  $("#m-python").textContent = pct(banco.top1_python);
+  $("#m-web").textContent = pct(aciertosWeb / total);
+  $("#m-acuerdo").textContent = pct(acuerdos / total);
+  $("#m-desvio").textContent = (sumaDesvio / Math.max(1, acuerdos) * 100).toFixed(1).replace(".", ",") + " pts";
+
+  $("#discrepancias").innerHTML = discrepan.length ? `
+    <h2 style="margin-top:46px">Las ${discrepan.length} que no coinciden</h2>
+    <p>Son las fotos donde el navegador eligió otra especie que Python. Si la
+      lista crece, el preprocesado se ha desviado.</p>
+    <table class="medidas">
+      <thead><tr><th>foto</th><th>de verdad es</th><th>python</th><th>navegador</th></tr></thead>
+      <tbody>${discrepan.map((d) => `<tr>
+        <td>${d.archivo}</td>
+        <td>${d.verdadera.replace(/_/g, " ")}</td>
+        <td>${d.python.replace(/_/g, " ")} ${(d.prob * 100).toFixed(0)} %</td>
+        <td>${d.web.replace(/_/g, " ")} ${(d.probWeb * 100).toFixed(0)} %</td>
+      </tr>`).join("")}</tbody>
+    </table>` : `<p style="margin-top:40px">Ninguna discrepancia: el navegador
+      eligió exactamente lo mismo que Python en las ${total} imágenes.</p>`;
+
+  $("#correr").disabled = false;
+}
+
+$("#correr").addEventListener("click", correr);
+</script>
+</body>
+</html>

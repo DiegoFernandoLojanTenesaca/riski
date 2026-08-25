@@ -15,6 +15,7 @@ normalización— el modelo no falla: acierta menos. Sin este contraste, eso se
 confunde con "el modelo es malo" y se buscan meses en el sitio equivocado.
 """
 
+import argparse
 import csv
 import json
 import shutil
@@ -123,10 +124,74 @@ def galeria(datos, clases, comunes, ancho=480):
     return salida
 
 
+def banco(datos, clases, pre, ses, cuantas, minimo=50, ancho=480):
+    """Deja un lote de validación servible por HTTP con su veredicto de Python.
+
+    La prueba de una sola imagen dice si el preprocesado está *roto*. No dice
+    cuánto cuesta: el `canvas` no reduce igual que PIL, y esa diferencia se
+    paga en puntos de precisión que nadie ha medido. Con doscientas imágenes
+    etiquetadas el navegador puede calcular su propio acierto y compararlo con
+    el de Python sobre exactamente las mismas fotos.
+
+    El banco NO va al repositorio (lo excluye .gitignore): son megas que solo
+    sirven para medir en local.
+    """
+    from torchvision.datasets import ImageFolder
+    from entrenar import filtrar_clases, partir_por_observacion
+
+    base = filtrar_clases(ImageFolder(datos / "imagenes", allow_empty=True), minimo)
+    assert base.classes == clases, "las clases del disco no son las del modelo"
+    _, idx_va = partir_por_observacion(base)
+
+    destino = WEB / "banco"
+    destino.mkdir(exist_ok=True)
+    for viejo in destino.glob("*.jpg"):
+        viejo.unlink()
+
+    entrada = ses.get_inputs()[0].name
+    filas, aciertos = [], 0
+    for i in idx_va[:cuantas]:
+        ruta, verdadera = base.samples[i]
+        ruta = Path(ruta)
+        im = Image.open(ruta).convert("RGB")
+        if im.width > ancho:
+            im = im.resize((ancho, round(im.height * ancho / im.width)), Image.LANCZOS)
+        copia = destino / ruta.name
+        im.save(copia, quality=88)
+
+        # Python mide sobre la MISMA copia reducida que va a recibir el
+        # navegador. Si midiera el original, la diferencia entre los dos
+        # incluiría este reescalado y no solo el del canvas, que es lo que se
+        # quiere aislar.
+        probs = softmax(ses.run(None, {entrada: preparar(copia, pre)})[0][0])
+        elegida = int(probs.argmax())
+        aciertos += elegida == verdadera
+
+        filas.append({
+            "archivo": ruta.name,
+            "verdadera": clases[verdadera],
+            "python": clases[elegida],
+            "prob": round(float(probs[elegida]), 4),
+        })
+
+    (destino / "banco.json").write_text(json.dumps({
+        "imagenes": filas,
+        "top1_python": round(aciertos / len(filas), 4),
+        "nota": "las fotos van reducidas a 480 px, igual que las verá el navegador",
+    }, ensure_ascii=False, indent=1), encoding="utf-8")
+    return aciertos / len(filas), len(filas)
+
+
 def main():
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-    origen = Path(sys.argv[1] if len(sys.argv) > 1 else "modelo-efficientnet_lite0")
-    datos = Path("C:/datos/riksi")
+    p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument("--modelo", default="modelo-efficientnet_lite0")
+    p.add_argument("--datos", default="C:/datos/riksi")
+    p.add_argument("--banco", type=int, default=0,
+                   help="imágenes de validación para medir el navegador contra Python")
+    args = p.parse_args()
+    origen = Path(args.modelo)
+    datos = Path(args.datos)
 
     (WEB / "modelo").mkdir(parents=True, exist_ok=True)
     for f in ("riksi-int8.onnx", "clases.json", "preprocesado.json"):
@@ -173,6 +238,12 @@ def main():
 
     assert clases[i] == carpeta.name, f"el modelo falla su propia clase: {clases[i]} != {carpeta.name}"
     print(f"prueba · {muestra.name} → {clases[i]} {probs[i]:.3f}")
+
+    if args.banco:
+        acierto, n = banco(datos, clases, pre, ses, args.banco)
+        print(f"banco · {n} imágenes · python acierta {acierto:.1%}")
+        print("compara con el navegador en banco.html")
+
     print("ahora: abre docs/app.html?test=1 (con un servidor, no file://)")
 
 

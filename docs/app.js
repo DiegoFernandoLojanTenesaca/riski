@@ -157,8 +157,48 @@ async function identificar() {
 
   const top = probs.map((p, i) => [p, i]).sort((a, b) => b[0] - a[0]).slice(0, 3);
   pintar(top, ms);
+  // Del fotograma congelado, no del vídeo: para cuando esto corre, el bicho ya
+  // se movió y la miniatura no sería de lo que se determinó.
+  anotar(top, ms, fuente === video ? bufer[0] : fuente, ancho, alto);
   return top;
 }
+
+/* En una salida se identifican veinte cosas seguidas y solo quedaba la última
+ * en pantalla. El historial vive en memoria y se pierde al recargar.
+ * ponytail: si hace falta que sobreviva, IndexedDB; localStorage no aguanta
+ * veinte fotos. */
+const historial = [];
+
+function anotar(top, ms, fuente, ancho, alto) {
+  const c = bufer[1];
+  c.width = c.height = 96;
+  const lado = Math.min(ancho, alto);
+  c.getContext("2d").drawImage(fuente, (ancho - lado) / 2, (alto - lado) / 2, lado, lado, 0, 0, 96, 96);
+
+  historial.unshift({
+    miniatura: c.toDataURL("image/jpeg", 0.7),
+    top, ms,
+    hora: new Date().toLocaleTimeString("es-EC", { hour: "2-digit", minute: "2-digit" }),
+  });
+  historial.length = Math.min(historial.length, 12);
+
+  $("#historial").hidden = false;
+  $("#tira").innerHTML = historial.map((h, n) => `
+    <button type="button" data-n="${n}" title="${comun(h.top[0][1]) || cientifico(h.top[0][1])} · ${h.hora}">
+      <img src="${h.miniatura}" alt="">
+      <span>${(h.top[0][0] * 100).toFixed(0)}%</span>
+    </button>`).join("");
+}
+
+$("#tira").addEventListener("click", (ev) => {
+  const boton = ev.target.closest("button");
+  if (!boton) return;
+  const h = historial[Number(boton.dataset.n)];
+  foto.src = h.miniatura;                 // la miniatura, que es lo que se guardó
+  foto.hidden = false; video.hidden = true;
+  volver.textContent = "Volver a la cámara";
+  pintar(h.top, h.ms);
+});
 
 const cientifico = (i) => clases[i].replace(/_/g, " ");
 const comun = (i) => comunes[clases[i]] || "";
