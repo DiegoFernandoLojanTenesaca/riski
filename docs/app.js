@@ -25,6 +25,11 @@ const bufer = [document.createElement("canvas"), document.createElement("canvas"
 
 let sesion, clases, comunes = {}, pre;
 
+/** Estado en la barra. Con punto verde solo cuando de verdad puede trabajar. */
+function estado(texto, listo = true) {
+  meta.innerHTML = (listo ? '<i class="punto"></i>' : "") + texto;
+}
+
 async function arrancar() {
   // Un solo hilo a propósito: los hilos de WASM piden aislamiento de origen
   // (COOP/COEP) que GitHub Pages no da, y sin él ORT los desactiva igual.
@@ -51,7 +56,7 @@ async function arrancar() {
   aviso.hidden = true;
   boton.disabled = false;
   $("#n-especies").textContent = clases.length;
-  meta.textContent = "sin conexión · listo";
+  estado("listo, funciona sin conexión");
   // La guía se enseña hasta la primera determinación: quien llega desde la
   // portada no tiene por qué adivinar que hay que encuadrar dentro del marco.
   if (!localStorage.getItem("riksi-guia-vista")) $("#guia").hidden = false;
@@ -65,6 +70,7 @@ async function abrirCamara() {
       video: { facingMode: { ideal: "environment" } }, audio: false,
     });
     video.hidden = false; foto.hidden = true; mira.hidden = false; aviso.hidden = true;
+    volver.textContent = "Cámara";
   } catch (err) {
     // Sin cámara (PC, permiso denegado, http sin TLS) queda la vía de subir foto.
     video.hidden = true; mira.hidden = true; aviso.hidden = false;
@@ -111,6 +117,21 @@ function aTensor(fuente, ancho, alto) {
   return new ort.Tensor("float32", datos, [1, 3, tam, tam]);
 }
 
+/** Deja quieta la imagen que se acaba de analizar.
+ *
+ * Con el vídeo en marcha, la ficha habla de un instante que ya pasó: el ave se
+ * fue y en pantalla hay una rama, así que parece que el modelo se equivocó.
+ * Una cámara de verdad tampoco te devuelve el visor, te devuelve la foto.
+ */
+function congelar(ancho, alto) {
+  const c = bufer[0];
+  c.width = ancho; c.height = alto;
+  c.getContext("2d").drawImage(video, 0, 0);
+  foto.src = c.toDataURL("image/jpeg", 0.9);
+  foto.hidden = false; video.hidden = true;
+  volver.textContent = "Volver a la cámara";
+}
+
 function probabilidades(logits) {
   const max = Math.max(...logits);
   const exp = logits.map((v) => Math.exp(v - max));   // -max: si no, desborda
@@ -122,12 +143,14 @@ async function identificar() {
   const fuente = video.hidden ? foto : video;
   const ancho = fuente.videoWidth || fuente.naturalWidth;
   const alto = fuente.videoHeight || fuente.naturalHeight;
-  if (!ancho) { meta.textContent = "todavía no hay imagen"; return; }
+  if (!ancho) { estado("todavía no hay imagen", false); return; }
 
   boton.disabled = true;
-  meta.textContent = "determinando";
+  estado("mirando la imagen", false);
   const t0 = performance.now();
-  const salida = await sesion.run({ [sesion.inputNames[0]]: aTensor(fuente, ancho, alto) });
+  const tensor = aTensor(fuente, ancho, alto);
+  if (fuente === video) congelar(ancho, alto);
+  const salida = await sesion.run({ [sesion.inputNames[0]]: tensor });
   const probs = probabilidades(Array.from(salida[sesion.outputNames[0]].data));
   const ms = Math.round(performance.now() - t0);
   boton.disabled = false;
@@ -186,7 +209,7 @@ function pintar(top, ms) {
   ficha.classList.add("nuevo");
   cerrarGuia();
   $("#ms").textContent = ms + " ms";
-  meta.textContent = "sin conexión · listo";
+  estado("listo, funciona sin conexión");
 }
 
 $("#archivo").addEventListener("change", (e) => {
