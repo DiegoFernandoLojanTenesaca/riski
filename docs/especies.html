@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#14181b">
+<title>Las cien especies que reconoce Riksi · aves, plantas y reptiles del Ecuador</title>
+<meta name="description" content="Catálogo completo de las especies del Ecuador que Riksi identifica: nombre común, nombre científico, grupo y cuántas fotos aprendió de cada una.">
+<link rel="canonical" href="https://diegofernandolojantenesaca.github.io/riski/especies.html">
+<meta property="og:title" content="Las cien especies que reconoce Riksi">
+<meta property="og:description" content="Aves, plantas, reptiles e insectos del Ecuador, con nombre común y científico.">
+<meta property="og:image" content="portada.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="icono.svg">
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+
+<header class="barra">
+  <a class="marca" href="index.html"><img src="icono.svg" alt="">Riksi</a>
+  <nav class="menu">
+    <a href="index.html#como">Cómo usarla</a>
+    <a href="especies.html">Las especies</a>
+    <a href="index.html#herramientas">Herramientas</a>
+    <a href="index.html#colaborar">Colaborar</a>
+  </nav>
+  <a class="boton" href="app.html">Abrir la cámara</a>
+</header>
+
+<div class="envoltura">
+  <section style="border-top:0;padding-bottom:34px">
+    <span class="etiqueta">El catálogo</span>
+    <h2>Todo lo que Riksi sabe reconocer.</h2>
+    <p>Cada ficha lleva el nombre con el que se conoce a la especie, su nombre
+      científico y cuántas fotos vio el modelo para aprenderla. Las que tienen
+      pocas son también las que peor identifica.</p>
+
+    <div class="filtros">
+      <input type="search" id="busca" placeholder="Buscar por nombre" aria-label="Buscar especie">
+      <div id="grupos"></div>
+    </div>
+    <p class="cuenta" id="cuenta"></p>
+  </section>
+
+  <div class="rejilla" id="lista" style="padding-bottom:70px"></div>
+
+  <footer class="pie">
+    <p>Las fotografías pertenecen a sus autores, con licencia CC0 o CC-BY 4.0.
+      Provienen de <a href="https://www.gbif.org">GBIF</a> y de
+      <a href="https://www.inaturalist.org">iNaturalist</a>, y aquí se muestran
+      reducidas. El nombre en español viene del listado de nombres vernáculos de
+      GBIF, que no lo tiene para todas.</p>
+  </footer>
+</div>
+
+<script>
+let todas = [], grupo = "", texto = "";
+
+const normaliza = (s) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+
+function pintar() {
+  const vistas = todas.filter((e) =>
+    (!grupo || e.grupo === grupo) &&
+    (!texto || normaliza(e.especie + " " + e.comun).includes(texto)));
+
+  document.querySelector("#cuenta").textContent =
+    vistas.length === todas.length
+      ? `${todas.length} especies`
+      : `${vistas.length} de ${todas.length} especies`;
+
+  document.querySelector("#lista").innerHTML = vistas.map((e) => `
+    <figure>
+      <div class="foto"><img src="catalogo/${e.archivo}" alt="${e.comun || e.especie}" loading="lazy"></div>
+      <figcaption>
+        <span class="comun">${e.comun || e.especie}</span>
+        <span class="cientifico">${e.especie}</span>
+        <small>${e.fotos} fotos · ${e.autor || "autor desconocido"} · ${e.licencia}</small>
+      </figcaption>
+    </figure>`).join("") ||
+    `<p class="vacio-busqueda">Ninguna especie coincide con «${texto}». Prueba con
+      el nombre científico, o mira el listado completo.</p>`;
+}
+
+fetch("catalogo/catalogo.json").then((r) => r.json()).then((lista) => {
+  todas = lista;
+
+  const cuenta = {};
+  for (const e of lista) cuenta[e.grupo || "Otras"] = (cuenta[e.grupo || "Otras"] || 0) + 1;
+  document.querySelector("#grupos").innerHTML =
+    `<button class="chip activo" data-grupo="">Todas</button>` +
+    Object.entries(cuenta).sort((a, b) => b[1] - a[1])
+      .map(([g, n]) => `<button class="chip" data-grupo="${g}">${g} <i>${n}</i></button>`).join("");
+
+  document.querySelector("#grupos").addEventListener("click", (ev) => {
+    const boton = ev.target.closest(".chip");
+    if (!boton) return;
+    grupo = boton.dataset.grupo;
+    for (const c of document.querySelectorAll(".chip")) c.classList.toggle("activo", c === boton);
+    pintar();
+  });
+
+  pintar();
+});
+
+document.querySelector("#busca").addEventListener("input", (e) => {
+  texto = normaliza(e.target.value.trim());
+  pintar();
+});
+
+if ("serviceWorker" in navigator && location.protocol !== "file:") {
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+}
+</script>
+</body>
+</html>

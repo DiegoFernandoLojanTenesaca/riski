@@ -1,10 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Riksi">
-  <!-- La vesica se lee como ojo y como hoja a la vez: ese es el nombre. -->
-  <path d="M4 32C16 12 48 12 60 32 48 52 16 52 4 32Z"
-        fill="#0f4d34" stroke="#0b3a27" stroke-width="2" stroke-linejoin="round"/>
+  <!-- La vesica se lee como ojo y como hoja a la vez: ese es el nombre.
+       Colores de la paleta del sitio, basalto y liquen. -->
+  <rect width="64" height="64" rx="12" fill="#14181b"/>
+  <path d="M6 32C17 14 47 14 58 32 47 50 17 50 6 32Z"
+        fill="none" stroke="#c7c24b" stroke-width="2.5" stroke-linejoin="round"/>
   <!-- nervadura / rabillo -->
-  <path d="M4 32H60" stroke="#0b3a27" stroke-width="1.5" opacity=".35"/>
-  <circle cx="32" cy="32" r="10.5" fill="#f4c445"/>
-  <circle cx="32" cy="32" r="4.5" fill="#0b3a27"/>
-  <circle cx="28.5" cy="28" r="1.8" fill="#fff" opacity=".9"/>
+  <path d="M6 32H58" stroke="#c7c24b" stroke-width="1.5" opacity=".38"/>
+  <circle cx="32" cy="32" r="9.5" fill="#c7c24b"/>
+  <circle cx="32" cy="32" r="4" fill="#14181b"/>
+  <circle cx="28.8" cy="28.6" r="1.7" fill="#e4e5df" opacity=".92"/>
 </svg>

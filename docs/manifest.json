@@ -1,0 +1,21 @@
+{
+  "name": "Riksi · reconoce la naturaleza del Ecuador",
+  "short_name": "Riksi",
+  "description": "Identifica animales y plantas del Ecuador con la cámara, sin conexión y sin cuenta.",
+  "lang": "es-EC",
+  "start_url": "app.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#14181b",
+  "theme_color": "#14181b",
+  "categories": ["education", "utilities"],
+  "icons": [
+    {
+      "src": "icono.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

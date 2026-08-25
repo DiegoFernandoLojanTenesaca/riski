@@ -17,6 +17,9 @@
 <meta property="og:image" content="portada.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="icono.svg">
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Riksi">
 <link rel="stylesheet" href="estilo.css">
 <script type="application/ld+json">
 {
@@ -40,7 +43,7 @@
   <a class="marca" href="index.html"><img src="icono.svg" alt="">Riksi</a>
   <nav class="menu">
     <a href="#como">Cómo usarla</a>
-    <a href="#reconoce">Qué reconoce</a>
+    <a href="especies.html">Las especies</a>
     <a href="#herramientas">Herramientas</a>
     <a href="#colaborar">Colaborar</a>
     <a href="#acerca">Acerca de</a>
@@ -152,6 +155,9 @@
       que aprendió, y cada una lleva el nombre de quien la tomó, porque su
       licencia lo exige.</p>
     <div id="laminas"></div>
+    <p style="margin-top:36px">
+      <a class="boton hueco" href="especies.html">Ver las cien especies</a>
+    </p>
   </section>
 
   <section class="asoma">
@@ -310,11 +316,11 @@
    quedan dos verdades que mantener a mano. */
 const quieto = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-fetch("muestras/muestras.json").then((r) => r.json()).then((lista) => {
+fetch("catalogo/catalogo.json").then((r) => r.json()).then((lista) => {
   const primera = lista[0];
   if (primera) {
     document.querySelector("#lamina").innerHTML = `
-      <img src="muestras/${primera.archivo}" alt="${primera.comun || primera.especie}">
+      <img src="catalogo/${primera.archivo}" alt="${primera.comun || primera.especie}">
       <div class="marco"></div>
       <figcaption>
         <i>${primera.comun || primera.especie}</i>
@@ -322,10 +328,16 @@ fetch("muestras/muestras.json").then((r) => r.json()).then((lista) => {
       </figcaption>`;
   }
 
+  // En la portada van doce, repartidas a lo largo del listado. Las cien
+  // completas tienen su propia página: aquí solo hacen falta las suficientes
+  // para que se entienda de qué va.
+  const paso = Math.max(1, Math.floor(lista.length / 12));
+  const seleccion = lista.filter((_, i) => i % paso === 0).slice(0, 12);
+
   // Agrupadas como en una guía impresa: una lámina por grupo, y los grupos con
   // una sola especie se juntan al final para no dejar filas huérfanas.
   const porGrupo = {};
-  for (const m of lista) (porGrupo[m.grupo || "Otras"] ??= []).push(m);
+  for (const m of seleccion) (porGrupo[m.grupo || "Otras"] ??= []).push(m);
   const grandes = Object.entries(porGrupo).filter(([, v]) => v.length > 1)
     .sort((a, b) => b[1].length - a[1].length);
   const sueltas = Object.entries(porGrupo).filter(([, v]) => v.length === 1).flatMap(([, v]) => v);
@@ -337,7 +349,7 @@ fetch("muestras/muestras.json").then((r) => r.json()).then((lista) => {
       <div class="rejilla">
         ${fotos.map((m) => `
           <figure>
-            <div class="foto"><img src="muestras/${m.archivo}" alt="${m.comun || m.especie}" loading="lazy"></div>
+            <div class="foto"><img src="catalogo/${m.archivo}" alt="${m.comun || m.especie}" loading="lazy"></div>
             <figcaption>
               <span class="comun">${m.comun || m.especie}</span>
               <span class="cientifico">${m.especie}</span>

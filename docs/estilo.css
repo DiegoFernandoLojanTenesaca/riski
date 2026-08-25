@@ -361,3 +361,23 @@ input[type=file] { position: absolute; width: 1px; height: 1px; opacity: 0; }
   display: inline-block; width: 7px; height: 7px; border-radius: 50%;
   background: var(--liquen); margin-right: 8px; vertical-align: 1px;
 }
+
+/* ── catálogo de especies ───────────────────────────────────────── */
+.filtros { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin-top: 30px; }
+.filtros input {
+  flex: 1 1 220px; max-width: 320px; background: var(--basalto-3); color: var(--texto);
+  border: 1px solid var(--marea); padding: 12px 14px; font: inherit; font-size: 15px;
+}
+.filtros input::placeholder { color: var(--tenue); }
+#grupos { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  background: none; border: 1px solid var(--marea); color: var(--suave); cursor: pointer;
+  font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+  padding: 9px 13px; transition: .15s;
+}
+.chip:hover { border-color: var(--liquen); color: var(--texto); }
+.chip.activo { background: var(--liquen); border-color: var(--liquen); color: var(--tinta); font-weight: 700; }
+.chip i { font-style: normal; opacity: .65; margin-left: 4px; }
+.cuenta { font-family: var(--mono); font-size: 11px; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--tenue); margin: 22px 0 0; }
+.vacio-busqueda { grid-column: 1 / -1; color: var(--tenue); padding: 30px 0; }

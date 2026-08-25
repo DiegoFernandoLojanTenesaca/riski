@@ -1,0 +1,902 @@
+[
+ {
+  "archivo": "4465655991_143.jpg",
+  "especie": "Aglaeactis cupripennis",
+  "comun": "Colibrí cobrizo",
+  "grupo": "Aves",
+  "fotos": 200,
+  "autor": "Adam Jackson",
+  "licencia": "CC0"
+ },
+ {
+  "archivo": "4600042574_88.jpg",
+  "especie": "Aglaiocercus coelestis",
+  "comun": "Cometa colivioleta",
+  "grupo": "Aves",
+  "fotos": 198,
+  "autor": "Bill Levine",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "4599848668_59.jpg",
+  "especie": "Amazilia tzacatl",
+  "comun": "Amazilia Colirrufa",
+  "grupo": "Aves",
+  "fotos": 198,
+  "autor": "Bill Levine",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "6413102993_30.jpg",
+  "especie": "Amblyrhynchus cristatus",
+  "comun": "Iguana Marina",
+  "grupo": "Reptiles",
+  "fotos": 200,
+  "autor": "Slunky",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "4597431500_45.jpg",
+  "especie": "Anartia amathea",
+  "comun": "Mariposa pavo real roja",
+  "grupo": "Insectos",
+  "fotos": 195,
+  "autor": "Nico",
+  "licencia": "CC0"
+ },
+ {
+  "archivo": "4522639645_51.jpg",
+  "especie": "Anas bahamensis",
+  "comun": "Pato Gargantillo",
+  "grupo": "Aves",
+  "fotos": 200,
+  "autor": "Rob Foster",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "4854814212_68.jpg",
+  "especie": "Anous stolidus",
+  "comun": "Bubí",
+  "grupo": "Aves",
+  "fotos": 200,
+  "autor": "TheMongrelKoi",
+  "licencia": "CC0"
+ },
+ {
+  "archivo": "5007074223_199.jpg",
+  "especie": "Apis mellifera",
+  "comun": "Abeja doméstica europea",
+  "grupo": "Insectos",
+  "fotos": 199,
+  "autor": "Esteban Poveda",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "5828606318_105.jpg",
+  "especie": "Baccharis latifolia",
+  "comun": "Azul chilca",
+  "grupo": "Plantas",
+  "fotos": 169,
+  "autor": "Matthew Franz",
+  "licencia": "CC0"
+ },
+ {
+  "archivo": "4522663902_50.jpg",
+  "especie": "Bodianus diplotaenia",
+  "comun": "Copetona",
+  "grupo": "Chordata",
+  "fotos": 200,
+  "autor": "Rob Foster",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "4599861513_67.jpg",
+  "especie": "Boissonneaua flavescens",
+  "comun": "Colibrí chupasavia",
+  "grupo": "Aves",
+  "fotos": 199,
+  "autor": "Bill Levine",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "5007690128_34.jpg",
+  "especie": "Bomarea multiflora",
+  "comun": "Achiotillo",
+  "grupo": "Plantas",
+  "fotos": 54,
+  "autor": "Skjold Søndergaard",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "5076905364_17.jpg",
+  "especie": "Brachyotum ledifolium",
+  "comun": "Arete de inca",
+  "grupo": "Plantas",
+  "fotos": 95,
+  "autor": "harrii",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "4847141400_91.jpg",
+  "especie": "Bursera graveolens",
+  "comun": "Caraño",
+  "grupo": "Plantas",
+  "fotos": 111,
+  "autor": "John Brew",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "4855046504_76.jpg",
+  "especie": "Butorides sundevalli",
+  "comun": "Garcilla de Galápagos",
+  "grupo": "Aves",
+  "fotos": 200,
+  "autor": "TheMongrelKoi",
+  "licencia": "CC0"
+ },
+ {
+  "archivo": "5206679609_132.jpg",
+  "especie": "Chelonia mydas",
+  "comun": "Caguama",
+  "grupo": "Tortugas",
+  "fotos": 200,
+  "autor": "Melissa Meadows",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "5063556955_33.jpg",
+  "especie": "Chelonoidis niger",
+  "comun": "Tortuga Gigante de Floreana",
+  "grupo": "Tortugas",
+  "fotos": 200,
+  "autor": "Theo Summer",
+  "licencia": "CC0"
+ },
+ {
+  "archivo": "3070343541_113.jpg",
+  "especie": "Chelonoidis porteri",
+  "comun": "Tortuga Gigante de La Reserva",
+  "grupo": "Tortugas",
+  "fotos": 200,
+  "autor": "Diego Inclan",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "5828153471_74.jpg",
+  "especie": "Chuquiraga jussieui",
+  "comun": "Chukirawa",
+  "grupo": "Plantas",
+  "fotos": 200,
+  "autor": "Eric Haavind-Berman",
+  "licencia": "CC0"
+ },
+ {
+  "archivo": "5134668868_33.jpg",
+  "especie": "Colibri coruscans",
+  "comun": "Colibrí Orejivioleta Ventriazul",
+  "grupo": "Aves",
+  "fotos": 200,
+  "autor": "nikonbird007",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "4974206995_113.jpg",
+  "especie": "Colibri delphinae",
+  "comun": "Colibrí Orejivioláceo Pardo",
+  "grupo": "Aves",
+  "fotos": 199,
+  "autor": "Ken-ichi Ueda",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "5063502883_30.jpg",
+  "especie": "Conolophus subcristatus",
+  "comun": "Iguana Terrestre de las Galápagos",
+  "grupo": "Reptiles",
+  "fotos": 200,
+  "autor": "Theo Summer",
+  "licencia": "CC0"
+ },
+ {
+  "archivo": "5134652779_112.jpg",
+  "especie": "Coragyps atratus",
+  "comun": "Buitre negro americano",
+  "grupo": "Aves",
+  "fotos": 200,
+  "autor": "Raúl A. Ruiz M.",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "4908481459_146.jpg",
+  "especie": "Cordia lutea",
+  "comun": "Muyuyo",
+  "grupo": "Plantas",
+  "fotos": 200,
+  "autor": "Nicolás Baresch Uribe",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "5206562639_53.jpg",
+  "especie": "Coriaria ruscifolia",
+  "comun": "Deu",
+  "grupo": "Plantas",
+  "fotos": 115,
+  "autor": "Eric Haavind-Berman",
+  "licencia": "CC0"
+ },
+ {
+  "archivo": "5063708983_140.jpg",
+  "especie": "Creagrus furcatus",
+  "comun": "\"Gaviota Tijereta, Gaviota de Cola Bifurcada\"",
+  "grupo": "Aves",
+  "fotos": 200,
+  "autor": "Deep Marine Scenes",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "4978471027_54.jpg",
+  "especie": "Croton scouleri",
+  "comun": "chala",
+  "grupo": "Plantas",
+  "fotos": 91,
+  "autor": "Skjold Søndergaard",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "4994545942_79.jpg",
+  "especie": "Crotophaga ani",
+  "comun": "\"Garrapatero Piquiliso, Garrapatero\"",
+  "grupo": "Aves",
+  "fotos": 200,
+  "autor": "Ingvild Riska",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "4522759220_58.jpg",
+  "especie": "Cryptocarpus pyriformis",
+  "comun": "Chope",
+  "grupo": "Plantas",
+  "fotos": 116,
+  "autor": "Zihao Wang",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "5188293577_45.jpg",
+  "especie": "Dalea coerulea",
+  "comun": "Chiripique",
+  "grupo": "Plantas",
+  "fotos": 134,
+  "autor": "Eric Schmidt",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "4430840580_28.jpg",
+  "especie": "Dasyprocta fuliginosa",
+  "comun": "Agutí negro",
+  "grupo": "Mamíferos",
+  "fotos": 59,
+  "autor": "Tommy Andriollo",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "4599761840_59.jpg",
+  "especie": "Dasyprocta punctata",
+  "comun": "Agoutí Rojizo",
+  "grupo": "Mamíferos",
+  "fotos": 158,
+  "autor": "Paul Bonner",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "4596979617_31.jpg",
+  "especie": "Disterigma empetrifolium",
+  "comun": "",
+  "grupo": "Plantas",
+  "fotos": 67,
+  "autor": "Nolan Exe",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "5006875326_88.jpg",
+  "especie": "Euphonia xanthogaster",
+  "comun": "Eufonia Ventrinaranja",
+  "grupo": "Aves",
+  "fotos": 200,
+  "autor": "Esteban Poveda",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "6188027457_47.jpg",
+  "especie": "Florisuga mellivora",
+  "comun": "Colibrí Capucha Azul",
+  "grupo": "Aves",
+  "fotos": 200,
+  "autor": "Nico",
+  "licencia": "CC0"
+ },
+ {
+  "archivo": "5036836637_120.jpg",
+  "especie": "Fregata magnificens",
+  "comun": "\"Fragata Magnífica, Fragata Real\"",
+  "grupo": "Aves",
+  "fotos": 200,
+  "autor": "Hunter Hammil",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "6178646652_1.jpg",
+  "especie": "Gaultheria myrsinoides",
+  "comun": "Capulincillo",
+  "grupo": "Plantas",
+  "fotos": 200,
+  "autor": "Sebastián Ordóñez",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "5062917857_92.jpg",
+  "especie": "Gentiana sedifolia",
+  "comun": "Amor sacha",
+  "grupo": "Plantas",
+  "fotos": 156,
+  "autor": "Zoltán Stekkelpak",
+  "licencia": "CC0"
+ },
+ {
+  "archivo": "5006843138_28.jpg",
+  "especie": "Gentianella cerastioides",
+  "comun": "Flores de novios",
+  "grupo": "Plantas",
+  "fotos": 94,
+  "autor": "Esteban Poveda",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "4507837930_40.jpg",
+  "especie": "Gentianella rapunculoides",
+  "comun": "Kallpachina yuyu",
+  "grupo": "Plantas",
+  "fotos": 69,
+  "autor": "Attila Oláh",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "3014006398_193.jpg",
+  "especie": "Geospiza fortis",
+  "comun": "\"Pinzón Terrestre Mediano, Pinzón de Cactus Común\"",
+  "grupo": "Aves",
+  "fotos": 200,
+  "autor": "Michael Bakker Paiva",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "4855268611_64.jpg",
+  "especie": "Geospiza fuliginosa",
+  "comun": "\"Pinzón Terrestre Chico, Pinzón de Tierra Pequeño\"",
+  "grupo": "Aves",
+  "fotos": 200,
+  "autor": "TheMongrelKoi",
+  "licencia": "CC0"
+ },
+ {
+  "archivo": "3327794334_182.jpg",
+  "especie": "Geospiza scandens",
+  "comun": "\"Pinzón Cactero Común, Pinzón de Cactus Común\"",
+  "grupo": "Aves",
+  "fotos": 189,
+  "autor": "William Stephens",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "5007222511_47.jpg",
+  "especie": "Geospizopsis unicolor",
+  "comun": "Pájaro plomo",
+  "grupo": "Aves",
+  "fotos": 199,
+  "autor": "Zoltán Stekkelpak",
+  "licencia": "CC0"
+ },
+ {
+  "archivo": "5206306602_72.jpg",
+  "especie": "Grapsus grapsus",
+  "comun": "Cangrejo Corredor Rojo",
+  "grupo": "Crustáceos",
+  "fotos": 200,
+  "autor": "Melissa Meadows",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "6131341578_58.jpg",
+  "especie": "Halenia weddelliana",
+  "comun": "Nillus",
+  "grupo": "Plantas",
+  "fotos": 59,
+  "autor": "Morten Ross",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "4935722574_137.jpg",
+  "especie": "Heliodoxa jacula",
+  "comun": "Brillante Coroniverde",
+  "grupo": "Aves",
+  "fotos": 199,
+  "autor": "Nico",
+  "licencia": "CC0"
+ },
+ {
+  "archivo": "4597360710_76.jpg",
+  "especie": "Heliodoxa rubinoides",
+  "comun": "Brillante Pechianteado",
+  "grupo": "Aves",
+  "fotos": 199,
+  "autor": "drtimk",
+  "licencia": "CC0"
+ },
+ {
+  "archivo": "5153029888_13.jpg",
+  "especie": "Hypericum laricifolium",
+  "comun": "Bura bura del llano",
+  "grupo": "Plantas",
+  "fotos": 100,
+  "autor": "Esteban Poveda",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "5892719306_62.jpg",
+  "especie": "Hypochaeris sessiliflora",
+  "comun": "Achicoria",
+  "grupo": "Plantas",
+  "fotos": 193,
+  "autor": "Theo Summer",
+  "licencia": "CC0"
+ },
+ {
+  "archivo": "3903289888_87.jpg",
+  "especie": "Jasminocereus thouarsii",
+  "comun": "Cactus candelabro de las Galapágos",
+  "grupo": "Plantas",
+  "fotos": 200,
+  "autor": "Círculo de Investigación en Taxonomía, Florística y Ecología Vegetal",
+  "licencia": "CC0"
+ },
+ {
+  "archivo": "5007235958_119.jpg",
+  "especie": "Lesbia victoriae",
+  "comun": "Colacintillo Colinegro",
+  "grupo": "Aves",
+  "fotos": 194,
+  "autor": "Esteban Poveda",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "3407976412_145.jpg",
+  "especie": "Leucophaeus fuliginosus",
+  "comun": "Gaviota de Lava",
+  "grupo": "Aves",
+  "fotos": 200,
+  "autor": "ajott",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "4600117536_75.jpg",
+  "especie": "Metallura tyrianthina",
+  "comun": "Colibrí Tirio",
+  "grupo": "Aves",
+  "fotos": 159,
+  "autor": "Adam Jackson",
+  "licencia": "CC0"
+ },
+ {
+  "archivo": "5230607656_14.jpg",
+  "especie": "Miconia crocea",
+  "comun": "Amarillo",
+  "grupo": "Plantas",
+  "fotos": 58,
+  "autor": "Eric Schmidt",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "3912386910_91.jpg",
+  "especie": "Microlophus albemarlensis",
+  "comun": "Lagartija de la lava de Galápagos",
+  "grupo": "Reptiles",
+  "fotos": 200,
+  "autor": "Andrew Meeds",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "4976612021_138.jpg",
+  "especie": "Microlophus bivittatus",
+  "comun": "Lagartija de Lava de San Cristóbal",
+  "grupo": "Reptiles",
+  "fotos": 200,
+  "autor": "David LaMagna",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "5008257330_45.jpg",
+  "especie": "Microlophus delanonis",
+  "comun": "Lagartija de Lava de Española",
+  "grupo": "Reptiles",
+  "fotos": 88,
+  "autor": "Adam Jackson",
+  "licencia": "CC0"
+ },
+ {
+  "archivo": "5087040759_109.jpg",
+  "especie": "Microlophus indefatigabilis",
+  "comun": "",
+  "grupo": "Reptiles",
+  "fotos": 200,
+  "autor": "Susan Murphy",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "6159360562_10.jpg",
+  "especie": "Mimosa albida",
+  "comun": "Dormilona grande",
+  "grupo": "Plantas",
+  "fotos": 99,
+  "autor": "Sebastián Ordóñez",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "4987522391_127.jpg",
+  "especie": "Mimus parvulus",
+  "comun": "Cucuve de Galápagos",
+  "grupo": "Aves",
+  "fotos": 200,
+  "autor": "Ingvild Riska",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "3903244250_91.jpg",
+  "especie": "Myiarchus magnirostris",
+  "comun": "\"Copetón de Galápagos, Papamoscas \"",
+  "grupo": "Aves",
+  "fotos": 200,
+  "autor": "Andrew Meeds",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "5198480370_151.jpg",
+  "especie": "Nyctanassa violacea",
+  "comun": "Garza Nocturna Cangrejera",
+  "grupo": "Aves",
+  "fotos": 200,
+  "autor": "Tyler Vogel",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "4852790290_168.jpg",
+  "especie": "Ocreatus underwoodii",
+  "comun": "Colaespátula Zamarrito (Colibrí Colaraqueta)",
+  "grupo": "Aves",
+  "fotos": 200,
+  "autor": "Attila Oláh",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "5006995464_90.jpg",
+  "especie": "Opisthocomus hoazin",
+  "comun": "Chenchena",
+  "grupo": "Aves",
+  "fotos": 199,
+  "autor": "Attila Oláh",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "5063369228_17.jpg",
+  "especie": "Opuntia galapageia",
+  "comun": "tuna gigante",
+  "grupo": "Plantas",
+  "fotos": 200,
+  "autor": "Theo Summer",
+  "licencia": "CC0"
+ },
+ {
+  "archivo": "4112127032_18.jpg",
+  "especie": "Passiflora cumbalensis",
+  "comun": "Gullán",
+  "grupo": "Plantas",
+  "fotos": 68,
+  "autor": "Nolan Exe",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "5176368614_3.jpg",
+  "especie": "Passiflora mixta",
+  "comun": "Castilla taxo",
+  "grupo": "Plantas",
+  "fotos": 51,
+  "autor": "Eric Schmidt",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "5206026590_73.jpg",
+  "especie": "Pelecanus occidentalis",
+  "comun": "Alcatraz",
+  "grupo": "Aves",
+  "fotos": 200,
+  "autor": "Melissa Meadows",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "4607487817_27.jpg",
+  "especie": "Phlegmariurus crassus",
+  "comun": "",
+  "grupo": "Lycopodiopsida",
+  "fotos": 77,
+  "autor": "Bill Levine",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "4597507034_73.jpg",
+  "especie": "Phoenicopterus ruber",
+  "comun": "\"Flamenco Americano, Flamenco de Galápagos \"",
+  "grupo": "Aves",
+  "fotos": 200,
+  "autor": "Bill Levine",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "4522677162_64.jpg",
+  "especie": "Prionurus laticlavius",
+  "comun": "Cirujano Barbero",
+  "grupo": "Chordata",
+  "fotos": 200,
+  "autor": "Rob Foster",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "4891729600_86.jpg",
+  "especie": "Pyrocephalus rubinus",
+  "comun": "Atrapamoscas pechirrojo",
+  "grupo": "Aves",
+  "fotos": 200,
+  "autor": "Victor E. Chocho",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "4863531113_34.jpg",
+  "especie": "Ramphocelus icteronotus",
+  "comun": "Tangara culigualda",
+  "grupo": "Aves",
+  "fotos": 152,
+  "autor": "Diego Inclan",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "4046669669_177.jpg",
+  "especie": "Rhizophora mangle",
+  "comun": "Manglar rojo",
+  "grupo": "Plantas",
+  "fotos": 181,
+  "autor": "avocat",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "4987675063_45.jpg",
+  "especie": "Rockhausenia nubigena",
+  "comun": "Chicoria blanca",
+  "grupo": "Plantas",
+  "fotos": 87,
+  "autor": "Zoltán Stekkelpak",
+  "licencia": "CC0"
+ },
+ {
+  "archivo": "4405369692_98.jpg",
+  "especie": "Scarus ghobban",
+  "comun": "Loro",
+  "grupo": "Chordata",
+  "fotos": 200,
+  "autor": "gwar",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "5205955404_89.jpg",
+  "especie": "Sciurus granatensis",
+  "comun": "Ardilla colorada",
+  "grupo": "Mamíferos",
+  "fotos": 172,
+  "autor": "Attila Oláh",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "5063595814_49.jpg",
+  "especie": "Setophaga petechia",
+  "comun": "Canario de Manglar",
+  "grupo": "Aves",
+  "fotos": 200,
+  "autor": "Theo Summer",
+  "licencia": "CC0"
+ },
+ {
+  "archivo": "5007479316_155.jpg",
+  "especie": "Sicalis flaveola",
+  "comun": "Canario coronado",
+  "grupo": "Aves",
+  "fotos": 199,
+  "autor": "Attila Oláh",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "5070061343_155.jpg",
+  "especie": "Spheniscus mendiculus",
+  "comun": "Pingüino de Galápagos",
+  "grupo": "Aves",
+  "fotos": 200,
+  "autor": "Deep Marine Scenes",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "5063518837_40.jpg",
+  "especie": "Sula granti",
+  "comun": "Bobo de Nazca",
+  "grupo": "Aves",
+  "fotos": 200,
+  "autor": "Theo Summer",
+  "licencia": "CC0"
+ },
+ {
+  "archivo": "5936251670_189.jpg",
+  "especie": "Sula nebouxii",
+  "comun": "Bobo pata azul",
+  "grupo": "Aves",
+  "fotos": 200,
+  "autor": "Jenni Ly",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "5008137312_139.jpg",
+  "especie": "Tangara arthus",
+  "comun": "Tangara Dorada",
+  "grupo": "Aves",
+  "fotos": 199,
+  "autor": "Carrie Seltzer",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "5007876474_196.jpg",
+  "especie": "Thalurania colombica",
+  "comun": "Colibrí Ninfa Verde-Violeta",
+  "grupo": "Aves",
+  "fotos": 197,
+  "autor": "Esteban Poveda",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "5760071856_63.jpg",
+  "especie": "Thraupis episcopus",
+  "comun": "Azulejo",
+  "grupo": "Aves",
+  "fotos": 200,
+  "autor": "Charlotte Kirchner",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "4852664284_18.jpg",
+  "especie": "Tradescantia zanonia",
+  "comun": "Cañagua",
+  "grupo": "Plantas",
+  "fotos": 53,
+  "autor": "Bill Levine",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "4596870283_47.jpg",
+  "especie": "Triaenodon obesus",
+  "comun": "Tiburón Puntas Blancas de Arrecife",
+  "grupo": "Tiburones y rayas",
+  "fotos": 197,
+  "autor": "Bill Levine",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "4400302962_29.jpg",
+  "especie": "Tricerma octogonum",
+  "comun": "",
+  "grupo": "Plantas",
+  "fotos": 115,
+  "autor": "Nicolás Baresch Uribe",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "5007328072_85.jpg",
+  "especie": "Turdus fuscater",
+  "comun": "Mirla negra",
+  "grupo": "Aves",
+  "fotos": 200,
+  "autor": "Esteban Poveda",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "5176808953_53.jpg",
+  "especie": "Tyrannus melancholicus",
+  "comun": "Benteveo real",
+  "grupo": "Aves",
+  "fotos": 200,
+  "autor": "Raúl A. Ruiz M.",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "4600087518_72.jpg",
+  "especie": "Uranomitra franciae",
+  "comun": "Amazilia andina",
+  "grupo": "Aves",
+  "fotos": 200,
+  "autor": "Bill Levine",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "6163379115_10.jpg",
+  "especie": "Vaccinium floribundum",
+  "comun": "Joyapa chiquito",
+  "grupo": "Plantas",
+  "fotos": 98,
+  "autor": "Sebastián Ordóñez",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "6159640751_89.jpg",
+  "especie": "Valeriana microphylla",
+  "comun": "Caja valeriana",
+  "grupo": "Plantas",
+  "fotos": 162,
+  "autor": "Zihao Wang",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "4516428583_31.jpg",
+  "especie": "Waltheria ovata",
+  "comun": "lucraco",
+  "grupo": "Plantas",
+  "fotos": 91,
+  "autor": "Zihao Wang",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "3112513267_90.jpg",
+  "especie": "Xylocopa darwini",
+  "comun": "Abejorro de Galápagos",
+  "grupo": "Insectos",
+  "fotos": 200,
+  "autor": "Juan Carlos Caicedo Hernández",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "6413112713_19.jpg",
+  "especie": "Zalophus wollebaeki",
+  "comun": "Leon Marino de Galápagos",
+  "grupo": "Mamíferos",
+  "fotos": 200,
+  "autor": "Slunky",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "5134305356_26.jpg",
+  "especie": "Zenaida auriculata",
+  "comun": "\"Tórtola Orejuda, Paloma Sabanera \"",
+  "grupo": "Aves",
+  "fotos": 200,
+  "autor": "Edoardo Nardelli",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "4133670990_63.jpg",
+  "especie": "Zenaida galapagoensis",
+  "comun": "\"Tórtola de Galápagos , Paloma de Galápagos \"",
+  "grupo": "Aves",
+  "fotos": 162,
+  "autor": "Millie Basden",
+  "licencia": "CC-BY"
+ },
+ {
+  "archivo": "5108341556_45.jpg",
+  "especie": "Zonotrichia capensis",
+  "comun": "Afrechito",
+  "grupo": "Aves",
+  "fotos": 200,
+  "autor": "Edoardo Nardelli",
+  "licencia": "CC-BY"
+ }
+]

@@ -63,12 +63,12 @@ GRUPOS = {
 }
 
 
-def muestras(datos, clases, comunes, cuantas=24):
-    """Fotos de portada, con su autor, su licencia y su grupo.
+def galeria(datos, clases, comunes, ancho=480):
+    """Una foto por especie para el catálogo de la web, con su crédito.
 
-    Se reparten a lo largo del listado en vez de tomar las primeras: alfabético
-    seguido saldrían ocho plantas del mismo género. Y cada una viaja con su
-    crédito, que en CC-BY la atribución no es opcional.
+    Se guardan reducidas a 480 px y no las originales: cien fotos de 150 KB
+    serían 15 MB en el repositorio para verse en tarjetas de 250 px. Cada una
+    viaja con su autor y su licencia, que en CC-BY la atribución no es opcional.
     """
     creditos = {}
     ruta_creditos = datos / "creditos.csv"
@@ -84,34 +84,40 @@ def muestras(datos, clases, comunes, cuantas=24):
             for fila in csv.DictReader(fh):
                 grupos[fila["especie"].replace(" ", "_")] = GRUPOS.get(fila["grupo"], fila["grupo"])
 
-    destino = WEB / "muestras"
+    destino = WEB / "catalogo"
     destino.mkdir(exist_ok=True)
     for viejo in destino.glob("*.jpg"):
         viejo.unlink()
 
-    paso = max(1, len(clases) // cuantas)
     salida = []
-    for nombre in clases[::paso][:cuantas]:
+    for nombre in clases:
         fotos = sorted((datos / "imagenes" / nombre).glob("*.jpg"))
         if not fotos:
             continue
+        # La del medio y no la primera: las primeras de cada especie suelen ser
+        # de la misma observación y salen casi iguales entre sí.
         foto = fotos[len(fotos) // 2]
-        shutil.copy(foto, destino / foto.name)
+        im = Image.open(foto).convert("RGB")
+        if im.width > ancho:
+            im = im.resize((ancho, round(im.height * ancho / im.width)), Image.LANCZOS)
+        im.save(destino / foto.name, quality=82, optimize=True)
+
         autor, licencia = creditos.get(foto.name, ("", ""))
         salida.append({
             "archivo": foto.name,
             "especie": nombre.replace("_", " "),
             "comun": comunes.get(nombre, ""),
             "grupo": grupos.get(nombre, ""),
+            "fotos": len(fotos),
             "autor": autor,
             "licencia": "CC0" if "zero" in licencia else "CC-BY",
         })
-    (destino / "muestras.json").write_text(
+    (destino / "catalogo.json").write_text(
         json.dumps(salida, ensure_ascii=False, indent=1), encoding="utf-8")
 
     # Nombre fijo para la imagen que comparten Facebook, WhatsApp o Telegram:
-    # og:image no puede apuntar a un archivo que cambia de nombre en cada
-    # regeneración del dataset.
+    # og:image no puede apuntar a un archivo que cambia de nombre cada vez que
+    # se regenera el dataset.
     if salida:
         shutil.copy(destino / salida[0]["archivo"], WEB / "portada.jpg")
     return salida
@@ -143,8 +149,8 @@ def main():
         json.dumps(comunes, ensure_ascii=False, indent=1), encoding="utf-8")
     print(f"comunes.json · {len(comunes)}/{len(clases)} especies con nombre en español")
 
-    galeria = muestras(datos, clases, comunes)
-    print(f"muestras · {len(galeria)} fotos de portada con crédito")
+    catalogo = galeria(datos, clases, comunes)
+    print(f"catálogo · {len(catalogo)} fotos reducidas con crédito")
 
     # Una foto real, no un tensor sintético: el fallo que se busca está en el
     # camino JPEG → píxeles, y con ruido aleatorio no aparece.
