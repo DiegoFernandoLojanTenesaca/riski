@@ -281,8 +281,11 @@ def main():
     datos = Path(args.datos)
 
     (WEB / "modelo").mkdir(parents=True, exist_ok=True)
-    for f in ("riksi-int8.onnx", "clases.json", "preprocesado.json"):
-        shutil.copy(origen / f, WEB / "modelo" / f)
+    # metricas.json viaja con el modelo: si se queda la medición del anterior,
+    # la portada publica cifras de un modelo que ya no es el que corre.
+    for f in ("riksi-int8.onnx", "clases.json", "preprocesado.json", "metricas.json"):
+        if (origen / f).exists():
+            shutil.copy(origen / f, WEB / "modelo" / f)
     print(f"modelo de {origen} → docs/modelo/")
 
     clases = json.loads((WEB / "modelo" / "clases.json").read_text(encoding="utf-8"))

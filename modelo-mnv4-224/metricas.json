@@ -1,0 +1,21 @@
+{
+ "arquitectura": "mobilenetv4_conv_small",
+ "tam": 224,
+ "clases": 100,
+ "imagenes_validacion": 1000,
+ "pytorch": {
+  "top1": 0.724,
+  "top3": 0.853
+ },
+ "fp32": {
+  "mb": 10.220966339111328,
+  "top1": 0.722,
+  "top3": 0.853
+ },
+ "int8": {
+  "mb": 2.893813133239746,
+  "top1": 0.633,
+  "top3": 0.812
+ },
+ "coste_top1": 0.08899999999999997
+}

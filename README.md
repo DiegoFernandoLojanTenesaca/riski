@@ -34,12 +34,48 @@ observación. El modelo que corre en la web:
 
 | | int8 | top1 | top3 |
 |---|---|---|---|
-| **EfficientNet-Lite0 · 100 especies** | **3,8 MB** | **75,0%** | **89,6%** |
+| **EfficientNet-Lite0 · 288 px · 100 especies** | **3,8 MB** | **79,2%** | **91,5%** |
 
-Con 56 especies daba 79,2%. Bajar cuatro puntos al casi duplicar las clases es
-lo esperable, y es el precio de cubrir más de lo que alguien se va a encontrar.
-Las cifras salen de `modelo-efficientnet_lite0/metricas.json`, que escribe
-`exportar.py` en cada corrida.
+Las cifras salen de `metricas.json`, que escribe `exportar.py` en cada corrida.
+
+### Lo que se probó para llegar ahí
+
+Mismas 100 especies y mismas imágenes de validación para todos:
+
+| configuración | int8 | top1 | top3 | coste de cuantizar |
+|---|---|---|---|---|
+| **EfficientNet-Lite0 · 288 px** | **3,8 MB** | **79,2%** | **91,5%** | 0,1 pts |
+| EfficientNet-Lite0 · 224 px | 3,8 MB | 75,0% | 89,6% | 0 |
+| MobileNetV4-conv-small · 224 px | 2,9 MB | 63,3% | 81,2% | **8,9 pts** |
+
+**Subir la resolución salió gratis en descarga.** Los pesos son los mismos 3,8 MB
+a 224 que a 288, porque una CNN no cambia de tamaño con la entrada: solo cuesta
+cómputo, un 65% más, que en un teléfono son unos 100 ms en vez de 61. Cuatro
+puntos por eso es el mejor cambio de todo el proyecto.
+
+**MobileNetV4 es de 2024 y quedó último**, con 8,9 puntos perdidos al cuantizar.
+Repite lo que ya pasó con MobileNetV3: las arquitecturas que buscan precisión en
+coma flotante meten capas que el int8 destroza. Cuando el entregable es un modelo
+cuantizado, eso pesa más que el año de publicación.
+
+**Promediar la imagen con su espejo no compensa**: +0,2 puntos por duplicar el
+tiempo de respuesta, medido sobre 500 imágenes con `comprobar.py --espejo`.
+
+### Cuándo dice "no lo sé"
+
+El umbral no está puesto a ojo. `comprobar.py --calibrar` mide, para cada corte
+de confianza, cuántas respuestas se dan y cuántas de esas aciertan, y elige el
+corte más bajo que llega al 85%:
+
+| umbral | responde | acierta |
+|---|---|---|
+| 0,20 | 92% | 82% |
+| **0,30** | **82%** | **86%** |
+| 0,40 | 71% | 90% |
+
+Bajo es mejor, porque cada punto de umbral de más es un acierto que la
+aplicación se calla. La web lee ese valor de `umbral.json`, así que al
+reentrenar se ajusta solo.
 
 ### Por qué esta arquitectura
 

@@ -1,94 +1,94 @@
 {
- "umbral": 0.4,
- "precision": 0.8549,
- "cobertura": 0.703,
+ "umbral": 0.3,
+ "precision": 0.8575,
+ "cobertura": 0.821,
  "objetivo": 0.85,
  "imagenes": 1000,
  "curva": [
   {
    "umbral": 0.1,
-   "cobertura": 0.993,
-   "precision": 0.7221
+   "cobertura": 0.994,
+   "precision": 0.7787
   },
   {
    "umbral": 0.15,
-   "cobertura": 0.961,
-   "precision": 0.7388
+   "cobertura": 0.97,
+   "precision": 0.7938
   },
   {
    "umbral": 0.2,
-   "cobertura": 0.914,
-   "precision": 0.7604
+   "cobertura": 0.925,
+   "precision": 0.8151
   },
   {
    "umbral": 0.25,
-   "cobertura": 0.858,
-   "precision": 0.7867
+   "cobertura": 0.871,
+   "precision": 0.8381
   },
   {
    "umbral": 0.3,
-   "cobertura": 0.8,
-   "precision": 0.815
+   "cobertura": 0.821,
+   "precision": 0.8575
   },
   {
    "umbral": 0.35,
-   "cobertura": 0.743,
-   "precision": 0.8385
+   "cobertura": 0.783,
+   "precision": 0.8736
   },
   {
    "umbral": 0.4,
-   "cobertura": 0.703,
-   "precision": 0.8549
+   "cobertura": 0.743,
+   "precision": 0.8964
   },
   {
    "umbral": 0.45,
-   "cobertura": 0.652,
-   "precision": 0.8773
+   "cobertura": 0.704,
+   "precision": 0.9134
   },
   {
    "umbral": 0.5,
-   "cobertura": 0.613,
-   "precision": 0.8923
+   "cobertura": 0.657,
+   "precision": 0.9239
   },
   {
    "umbral": 0.55,
-   "cobertura": 0.558,
-   "precision": 0.9122
+   "cobertura": 0.614,
+   "precision": 0.9365
   },
   {
    "umbral": 0.6,
-   "cobertura": 0.517,
-   "precision": 0.9265
+   "cobertura": 0.572,
+   "precision": 0.9458
   },
   {
    "umbral": 0.65,
-   "cobertura": 0.479,
-   "precision": 0.9332
+   "cobertura": 0.52,
+   "precision": 0.9596
   },
   {
    "umbral": 0.7,
-   "cobertura": 0.432,
-   "precision": 0.9421
+   "cobertura": 0.468,
+   "precision": 0.9658
   },
   {
    "umbral": 0.75,
-   "cobertura": 0.38,
-   "precision": 0.9605
+   "cobertura": 0.417,
+   "precision": 0.9712
   },
   {
    "umbral": 0.8,
-   "cobertura": 0.321,
-   "precision": 0.9782
+   "cobertura": 0.363,
+   "precision": 0.9807
   },
   {
    "umbral": 0.85,
-   "cobertura": 0.262,
-   "precision": 0.9771
+   "cobertura": 0.296,
+   "precision": 0.9865
   },
   {
    "umbral": 0.9,
-   "cobertura": 0.181,
-   "precision": 0.9834
+   "cobertura": 0.199,
+   "precision": 1.0
   }
  ],
  "nota": "por debajo de este umbral la ficha sale con cf."
