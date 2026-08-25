@@ -1,0 +1,95 @@
+{
+ "umbral": 0.4,
+ "precision": 0.8549,
+ "cobertura": 0.703,
+ "objetivo": 0.85,
+ "imagenes": 1000,
+ "curva": [
+  {
+   "umbral": 0.1,
+   "cobertura": 0.993,
+   "precision": 0.7221
+  },
+  {
+   "umbral": 0.15,
+   "cobertura": 0.961,
+   "precision": 0.7388
+  },
+  {
+   "umbral": 0.2,
+   "cobertura": 0.914,
+   "precision": 0.7604
+  },
+  {
+   "umbral": 0.25,
+   "cobertura": 0.858,
+   "precision": 0.7867
+  },
+  {
+   "umbral": 0.3,
+   "cobertura": 0.8,
+   "precision": 0.815
+  },
+  {
+   "umbral": 0.35,
+   "cobertura": 0.743,
+   "precision": 0.8385
+  },
+  {
+   "umbral": 0.4,
+   "cobertura": 0.703,
+   "precision": 0.8549
+  },
+  {
+   "umbral": 0.45,
+   "cobertura": 0.652,
+   "precision": 0.8773
+  },
+  {
+   "umbral": 0.5,
+   "cobertura": 0.613,
+   "precision": 0.8923
+  },
+  {
+   "umbral": 0.55,
+   "cobertura": 0.558,
+   "precision": 0.9122
+  },
+  {
+   "umbral": 0.6,
+   "cobertura": 0.517,
+   "precision": 0.9265
+  },
+  {
+   "umbral": 0.65,
+   "cobertura": 0.479,
+   "precision": 0.9332
+  },
+  {
+   "umbral": 0.7,
+   "cobertura": 0.432,
+   "precision": 0.9421
+  },
+  {
+   "umbral": 0.75,
+   "cobertura": 0.38,
+   "precision": 0.9605
+  },
+  {
+   "umbral": 0.8,
+   "cobertura": 0.321,
+   "precision": 0.9782
+  },
+  {
+   "umbral": 0.85,
+   "cobertura": 0.262,
+   "precision": 0.9771
+  },
+  {
+   "umbral": 0.9,
+   "cobertura": 0.181,
+   "precision": 0.9834
+  }
+ ],
+ "nota": "por debajo de este umbral la ficha sale con cf."
+}

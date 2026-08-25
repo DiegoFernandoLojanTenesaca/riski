@@ -18,6 +18,7 @@ confunde con "el modelo es malo" y se buscan meses en el sitio equivocado.
 import argparse
 import csv
 import json
+import random
 import shutil
 import sys
 from pathlib import Path
@@ -124,6 +125,70 @@ def galeria(datos, clases, comunes, ancho=480):
     return salida
 
 
+def indices_validacion(datos, clases, minimo=50):
+    """Las mismas imágenes de validación que usó el entrenamiento, barajadas.
+
+    Los índices vienen agrupados por clase, así que cortar sin barajar daba las
+    primeras especies del alfabeto y nada más. Semilla fija para que dos
+    corridas se puedan comparar entre sí.
+    """
+    from torchvision.datasets import ImageFolder
+    from entrenar import filtrar_clases, partir_por_observacion
+
+    base = filtrar_clases(ImageFolder(datos / "imagenes", allow_empty=True), minimo)
+    assert base.classes == clases, "las clases del disco no son las del modelo"
+    _, idx_va = partir_por_observacion(base)
+    idx_va = list(idx_va)
+    random.Random(7).shuffle(idx_va)
+    return base, idx_va
+
+
+def calibrar(datos, clases, pre, ses, cuantas=1000, objetivo=0.85, minimo=50):
+    """A partir de qué confianza se puede afirmar una determinación.
+
+    El umbral estaba puesto a ojo en 0,40 y eso es una decisión con
+    consecuencias: demasiado alto y la aplicación duda de aciertos buenos,
+    demasiado bajo y afirma barbaridades. Aquí se mide de verdad: para cada
+    corte se calcula cuántas respuestas se dan (cobertura) y qué porcentaje de
+    esas es correcto (precisión), y se elige el corte más bajo que llegue al
+    objetivo. Bajo es mejor: cada punto de umbral de más es una respuesta
+    correcta que se calla.
+    """
+    base, idx_va = indices_validacion(datos, clases, minimo)
+    entrada = ses.get_inputs()[0].name
+
+    casos = []
+    for i in idx_va[:cuantas]:
+        ruta, verdadera = base.samples[i]
+        probs = softmax(ses.run(None, {entrada: preparar(Path(ruta), pre)})[0][0])
+        casos.append((float(probs.max()), int(probs.argmax()) == verdadera))
+
+    curva = []
+    for corte in [c / 100 for c in range(10, 95, 5)]:
+        aceptados = [ok for p, ok in casos if p >= corte]
+        if not aceptados:
+            continue
+        curva.append({
+            "umbral": corte,
+            "cobertura": round(len(aceptados) / len(casos), 4),
+            "precision": round(sum(aceptados) / len(aceptados), 4),
+        })
+
+    bueno = next((c for c in curva if c["precision"] >= objetivo), curva[-1])
+    salida = {
+        "umbral": bueno["umbral"],
+        "precision": bueno["precision"],
+        "cobertura": bueno["cobertura"],
+        "objetivo": objetivo,
+        "imagenes": len(casos),
+        "curva": curva,
+        "nota": "por debajo de este umbral la ficha sale con cf.",
+    }
+    (WEB / "modelo" / "umbral.json").write_text(
+        json.dumps(salida, ensure_ascii=False, indent=1), encoding="utf-8")
+    return salida
+
+
 def banco(datos, clases, pre, ses, cuantas, minimo=50, ancho=480):
     """Deja un lote de validación servible por HTTP con su veredicto de Python.
 
@@ -136,12 +201,7 @@ def banco(datos, clases, pre, ses, cuantas, minimo=50, ancho=480):
     El banco NO va al repositorio (lo excluye .gitignore): son megas que solo
     sirven para medir en local.
     """
-    from torchvision.datasets import ImageFolder
-    from entrenar import filtrar_clases, partir_por_observacion
-
-    base = filtrar_clases(ImageFolder(datos / "imagenes", allow_empty=True), minimo)
-    assert base.classes == clases, "las clases del disco no son las del modelo"
-    _, idx_va = partir_por_observacion(base)
+    base, idx_va = indices_validacion(datos, clases, minimo)
 
     destino = WEB / "banco"
     destino.mkdir(exist_ok=True)
@@ -187,6 +247,8 @@ def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--modelo", default="modelo-efficientnet_lite0")
     p.add_argument("--datos", default="C:/datos/riksi")
+    p.add_argument("--calibrar", type=int, default=0,
+                   help="imágenes para elegir el umbral del cf. con datos")
     p.add_argument("--banco", type=int, default=0,
                    help="imágenes de validación para medir el navegador contra Python")
     args = p.parse_args()
@@ -238,6 +300,12 @@ def main():
 
     assert clases[i] == carpeta.name, f"el modelo falla su propia clase: {clases[i]} != {carpeta.name}"
     print(f"prueba · {muestra.name} → {clases[i]} {probs[i]:.3f}")
+
+    if args.calibrar:
+        u = calibrar(datos, clases, pre, ses, args.calibrar)
+        print(f"umbral · {u['umbral']:.2f} → responde en el {u['cobertura']:.0%} "
+              f"de los casos y acierta el {u['precision']:.0%} de esas veces "
+              f"({u['imagenes']} imágenes)")
 
     if args.banco:
         acierto, n = banco(datos, clases, pre, ses, args.banco)

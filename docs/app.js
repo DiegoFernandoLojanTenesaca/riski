@@ -8,9 +8,12 @@
 // escribe un taxónomo cuando la determinación es probable pero no firme. En el
 // campo, una identificación equivocada dicha con seguridad hace más daño que
 // un "no lo sé".
-// ponytail: umbral fijo elegido a ojo; medir la curva de confianza sobre el
-// conjunto de validación y ajustarlo cuando haya datos de uso real.
-const UMBRAL = 0.40;
+//
+// El valor sale medido de `comprobar.py --calibrar`: es el corte más bajo con
+// el que las respuestas dadas aciertan el 85% de las veces. Bajo es mejor,
+// porque cada punto de más es un acierto que la aplicación se calla. Este 0,40
+// es solo el respaldo por si falta umbral.json.
+let UMBRAL = 0.40;
 
 const $ = (s) => document.querySelector(s);
 const video = $("#camara"), foto = $("#foto"), mira = $("#mira"), aviso = $("#aviso");
@@ -23,7 +26,7 @@ const cx = lienzo.getContext("2d", { willReadFrequently: true });
 // escribir el mismo canvas (asignarle width lo borra).
 const bufer = [document.createElement("canvas"), document.createElement("canvas")];
 
-let sesion, clases, comunes = {}, pre;
+let sesion, clases, comunes = {}, pre, certeza = null;
 
 /** Estado en la barra. Con punto verde solo cuando de verdad puede trabajar. */
 function estado(texto, listo = true) {
@@ -42,6 +45,8 @@ async function arrancar() {
   pre = await (await fetch("modelo/preprocesado.json")).json();
   clases = await (await fetch("modelo/clases.json")).json();
   comunes = await fetch("modelo/comunes.json").then((r) => r.ok ? r.json() : {}).catch(() => ({}));
+  const calibrado = await fetch("modelo/umbral.json").then((r) => r.ok ? r.json() : null).catch(() => null);
+  if (calibrado) { UMBRAL = calibrado.umbral; certeza = calibrado; }
   // El peso sale de la última medición, no escrito a mano en el HTML: al
   // reentrenar cambia solo.
   fetch("modelo/metricas.json").then((r) => r.ok ? r.json() : null).then((m) => {
@@ -228,7 +233,11 @@ function pintar(top, ms) {
       </div>
       ${dudoso ? `<p class="nota"><b>cf.</b> es «parecido a». La confianza no llega
         al ${(UMBRAL * 100).toFixed(0)}% y solo conozco ${clases.length} especies:
-        puede no ser ninguna de estas.</p>` : ""}
+        puede no ser ninguna de estas.</p>`
+      : certeza ? `<p class="nota">Por encima del ${(UMBRAL * 100).toFixed(0)}%
+        de confianza, este modelo acierta el ${(certeza.precision * 100).toFixed(0)}%
+        de las veces. Medido sobre ${certeza.imagenes} fotos que no vio al
+        aprender.</p>` : ""}
     </div>
 
     <div class="alternativas">
