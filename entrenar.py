@@ -148,11 +148,14 @@ def main():
     p.add_argument("--epocas-todo", type=int, default=12)
     p.add_argument("--salida", default="modelo")
     p.add_argument("--minimo", type=int, default=50, help="fotos mínimas para admitir una especie")
+    # Subir la resolución no engorda el modelo (los pesos son los mismos), pero
+    # multiplica el cómputo en el teléfono: 288 px cuesta un 65% más que 224.
+    p.add_argument("--tam", type=int, default=224, help="lado de la imagen de entrada")
     args = p.parse_args()
 
     disp = "cuda" if torch.cuda.is_available() else "cpu"
     raiz = Path(args.datos) / "imagenes"
-    t_entreno, t_prueba = transformaciones()
+    t_entreno, t_prueba = transformaciones(args.tam)
 
     # allow_empty: 15 especies se quedaron sin ninguna foto de campo, y sin esto
     # ImageFolder revienta en el constructor antes de que filtrar_clases actúe.
@@ -204,7 +207,7 @@ def main():
         if a1 > mejor:
             mejor = a1
             torch.save({"modelo": modelo.state_dict(), "clases": base.classes,
-                        "arquitectura": args.modelo}, salida / "riksi.pt")
+                        "arquitectura": args.modelo, "tam": args.tam}, salida / "riksi.pt")
             marca = "  <-- mejor"
         print(f"todo   {e+1}/{args.epocas_todo}  pérdida {perdida:.3f}  "
               f"top1 {a1:.1%}  top3 {a3:.1%}  ({time.time()-t:.0f}s){marca}")

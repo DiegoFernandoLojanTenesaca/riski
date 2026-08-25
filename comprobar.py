@@ -189,6 +189,29 @@ def calibrar(datos, clases, pre, ses, cuantas=1000, objetivo=0.85, minimo=50):
     return salida
 
 
+def medir_espejo(datos, clases, pre, ses, cuantas=500, minimo=50):
+    """¿Compensa preguntarle también por la imagen volteada?
+
+    Promediar la predicción de la foto y la de su espejo es lo más barato que
+    hay para arañar precisión: no toca el modelo ni engorda la descarga, solo
+    duplica el tiempo de respuesta. Duplicar 60 ms se puede permitir; ganar
+    medio punto por ese precio, quizá no. Por eso se mide antes de ponerlo.
+    """
+    base, idx_va = indices_validacion(datos, clases, minimo)
+    entrada = ses.get_inputs()[0].name
+
+    solo = ambas = n = 0
+    for i in idx_va[:cuantas]:
+        ruta, verdadera = base.samples[i]
+        x = preparar(Path(ruta), pre)
+        p1 = softmax(ses.run(None, {entrada: x})[0][0])
+        p2 = softmax(ses.run(None, {entrada: x[..., ::-1].copy()})[0][0])
+        solo += int(p1.argmax()) == verdadera
+        ambas += int((p1 + p2).argmax()) == verdadera
+        n += 1
+    return solo / n, ambas / n, n
+
+
 def banco(datos, clases, pre, ses, cuantas, minimo=50, ancho=480):
     """Deja un lote de validación servible por HTTP con su veredicto de Python.
 
@@ -249,6 +272,8 @@ def main():
     p.add_argument("--datos", default="C:/datos/riksi")
     p.add_argument("--calibrar", type=int, default=0,
                    help="imágenes para elegir el umbral del cf. con datos")
+    p.add_argument("--espejo", type=int, default=0,
+                   help="imágenes para ver si promediar con la imagen volteada compensa")
     p.add_argument("--banco", type=int, default=0,
                    help="imágenes de validación para medir el navegador contra Python")
     args = p.parse_args()
@@ -306,6 +331,11 @@ def main():
         print(f"umbral · {u['umbral']:.2f} → responde en el {u['cobertura']:.0%} "
               f"de los casos y acierta el {u['precision']:.0%} de esas veces "
               f"({u['imagenes']} imágenes)")
+
+    if args.espejo:
+        solo, ambas, n = medir_espejo(datos, clases, pre, ses, args.espejo)
+        print(f"espejo · {n} imágenes · sola {solo:.1%} · promediando con su espejo "
+              f"{ambas:.1%} · gana {100 * (ambas - solo):+.1f} puntos por el doble de tiempo")
 
     if args.banco:
         acierto, n = banco(datos, clases, pre, ses, args.banco)

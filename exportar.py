@@ -92,9 +92,12 @@ def main():
     modelo = timm.create_model(ckpt["arquitectura"], pretrained=False, num_classes=len(clases))
     modelo.load_state_dict(ckpt["modelo"])
     modelo.eval()
+    # La resolución viaja en el checkpoint: exportar a 224 un modelo entrenado
+    # a 288 no da error, solo destroza la precisión sin decir por qué.
+    tam = ckpt.get("tam", 224)
 
     raiz = Path(args.datos) / "imagenes"
-    _, t_prueba = transformaciones()
+    _, t_prueba = transformaciones(tam)
     # Mismo filtro que en el entrenamiento, o las clases no coinciden.
     base = filtrar_clases(ImageFolder(raiz, allow_empty=True), args.minimo)
     assert base.classes == clases, "las clases del disco no son las del checkpoint"
@@ -110,7 +113,7 @@ def main():
     print(f"{len(clases)} clases · {len(idx_va):,} imágenes de validación\n")
 
     torch.onnx.export(
-        modelo, torch.randn(1, 3, 224, 224), str(fp32),
+        modelo, torch.randn(1, 3, tam, tam), str(fp32),
         input_names=["imagen"], output_names=["logits"],
         dynamic_axes={"imagen": {0: "lote"}, "logits": {0: "lote"}},
         opset_version=17,
@@ -141,6 +144,7 @@ def main():
     # se copia a mano al README y a la siguiente ya no se sabe qué se comparaba.
     (salida / "metricas.json").write_text(json.dumps({
         "arquitectura": ckpt["arquitectura"],
+        "tam": tam,
         "clases": len(clases),
         "imagenes_validacion": len(idx_va),
         "pytorch": {"top1": float(a1_t), "top3": float(a3_t)},
@@ -151,7 +155,7 @@ def main():
 
     (salida / "clases.json").write_text(json.dumps(clases, ensure_ascii=False, indent=1), encoding="utf-8")
     (salida / "preprocesado.json").write_text(json.dumps({
-        "tam": 224, "resize": 256,
+        "tam": tam, "resize": tam * 256 // 224,
         "media": [0.485, 0.456, 0.406], "desv": [0.229, 0.224, 0.225],
         "nota": "la web tiene que hacer exactamente esto antes de invocar el modelo",
     }, indent=1), encoding="utf-8")
