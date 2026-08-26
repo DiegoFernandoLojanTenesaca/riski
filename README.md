@@ -197,7 +197,8 @@ día para otro.
       por observación y no por foto.
 - [x] **3 · ONNX**. Exportar, cuantizar a 8 bits y medir cuánta precisión cuesta.
 - [x] **4 · La web**. Página estática con cámara, publicada en GitHub Pages.
-- [ ] **5 · El oído**. Lo mismo para cantos de aves, con xeno-canto.
+- [ ] **5 · El oído**. Lo mismo para cantos de aves, con xeno-canto. En marcha,
+      con una licencia distinta: ver más abajo.
 
 ## Decisiones tomadas
 
@@ -240,8 +241,31 @@ carácter fuera de esa tabla. Los scripts llaman a
 `sys.stdout.reconfigure(encoding="utf-8", errors="replace")` al arrancar; una
 flecha en un `print` costó doce épocas de entrenamiento.
 
-## Licencia
+## Licencias
 
-Código bajo MIT. Las fotos son de sus autores, bajo CC0 o CC-BY 4.0 según cada
-caso, y el detalle está en el `creditos.csv` que genera `datos.py`. El dataset y
-el modelo derivados se publican bajo CC-BY 4.0.
+Código bajo **MIT**.
+
+**El modelo de fotos, CC-BY 4.0.** Las imágenes son de sus autores, bajo CC0 o
+CC-BY 4.0 según cada caso, y el detalle está en el `creditos.csv` que genera
+`datos.py`. Se filtró a esas dos licencias justamente para poder publicar
+dataset y modelo sin ataduras.
+
+**El modelo de cantos, CC-BY-NC 4.0.** Aquí no hubo elección. Medido sobre las
+17.857 grabaciones de aves de Ecuador con calidad A que hay en xeno-canto,
+**ninguna** tiene licencia libre:
+
+| familia | grabaciones | qué permite |
+|---|---|---|
+| no comercial | 12.546 | usar y derivar, sin fines comerciales |
+| sin derivadas | 3.812 | **nada**: prohíbe obras derivadas, y un modelo lo es |
+| compartir igual | 1.499 | uso comercial, pero el derivado hereda la licencia |
+| libre | **0** | |
+
+Quedarse solo con las de compartir igual dejaba **una** especie con suficientes
+grabaciones, así que no era una opción real. Se aceptan las no comerciales y el
+modelo de audio se publica como tal, separado del de fotos. Las de sin derivadas
+no se tocan.
+
+Es la decisión que toma también BirdNET y casi toda la bioacústica, por el mismo
+motivo. `python audio.py --licencias` recalcula este reparto cuando se quiera,
+sin descargar nada.
