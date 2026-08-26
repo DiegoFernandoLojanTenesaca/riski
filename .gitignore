@@ -19,6 +19,7 @@ datos/
 # Salvo lo que la web necesita para funcionar en GitHub Pages. Sin estas
 # excepciones se publica una página incapaz de cargar su propio modelo.
 !docs/modelo/riksi-int8.onnx
+!docs/modelo-audio/riksi-audio-fp16.onnx
 !docs/catalogo/*.jpg
 !docs/prueba/*.jpg
 !docs/portada.jpg

@@ -339,9 +339,11 @@ async function escuchar() {
         .then((r) => r.ok ? r.json() : null).catch(() => null);
       oido = {
         clases: await (await fetch("modelo-audio/clases.json")).json(),
+        comunes: await fetch("modelo-audio/comunes.json")
+          .then((r) => r.ok ? r.json() : {}).catch(() => ({})),
         certeza: calibrado,
         umbral: calibrado ? calibrado.umbral : 0.4,
-        sesion: await ort.InferenceSession.create("modelo-audio/riksi-audio-int8.onnx",
+        sesion: await ort.InferenceSession.create("modelo-audio/riksi-audio-fp16.onnx",
           { executionProviders: ["wasm"] }),
       };
     }
@@ -357,7 +359,8 @@ async function escuchar() {
     // La ficha se pinta con los nombres de las aves, no con los de las fotos.
     // Sin certeza: el modelo de cantos todavía no tiene su propia calibración,
     // y prestarle la de las fotos sería inventarse el dato.
-    conVocabulario({ clases: oido.clases, certeza: oido.certeza, umbral: oido.umbral },
+    conVocabulario({ clases: oido.clases, comunes: oido.comunes,
+                     certeza: oido.certeza, umbral: oido.umbral },
       () => pintar(top, Math.round(performance.now() - t0)));
   } catch (err) {
     estado("no pude grabar: " + err.message, false);

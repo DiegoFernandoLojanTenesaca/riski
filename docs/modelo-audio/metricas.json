@@ -1,0 +1,28 @@
+{
+ "arquitectura": "efficientnet_lite0",
+ "frecuencia": 32000,
+ "segundos": 5,
+ "clases": 60,
+ "ventanas_validacion": 400,
+ "publicado": "fp16",
+ "pytorch": {
+  "top1": 0.4675,
+  "top3": 0.6375
+ },
+ "fp32": {
+  "mb": 13.6340970993042,
+  "top1": 0.4675,
+  "top3": 0.6375
+ },
+ "fp16": {
+  "mb": 6.9184722900390625,
+  "top1": 0.4575,
+  "top3": 0.6175
+ },
+ "int8": {
+  "mb": 4.167054176330566,
+  "top1": 0.385,
+  "top3": 0.525
+ },
+ "coste_top1": 0.010000000000000009
+}
