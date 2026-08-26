@@ -267,9 +267,11 @@ anterior.
 |---|---|---|
 | 12 | 45,3% | 61,0% |
 | **24** | **55,2%** | **70,3%** |
+| 40 | 56,4% | 70,0% |
 
-Casi diez puntos por dejarlo correr el doble, y la pérdida seguía bajando al
-acabar. Las doce épocas venían heredadas del modelo de fotos, donde sí bastan:
+Casi diez puntos por dejarlo correr el doble. Pero de 24 a 40 no hay nada:
+exportados a 16 bits, los dos dan el mismo 54,5%, así que se publica el de 24 y
+la otra mitad del cómputo se ahorra. Las doce épocas venían heredadas del modelo de fotos, donde sí bastan:
 con 25.878 imágenes se ve cada ejemplo muchas veces, pero con 2.228 grabaciones
 el modelo apenas había empezado. **Los ajustes no se heredan entre problemas
 aunque el código sea el mismo.**

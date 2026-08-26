@@ -1,0 +1,95 @@
+{
+ "umbral": 0.6,
+ "cobertura": 0.3825,
+ "precision": 0.8627,
+ "objetivo": 0.85,
+ "imagenes": 400,
+ "curva": [
+  {
+   "umbral": 0.1,
+   "cobertura": 0.98,
+   "precision": 0.5536
+  },
+  {
+   "umbral": 0.15,
+   "cobertura": 0.93,
+   "precision": 0.5726
+  },
+  {
+   "umbral": 0.2,
+   "cobertura": 0.865,
+   "precision": 0.6012
+  },
+  {
+   "umbral": 0.25,
+   "cobertura": 0.775,
+   "precision": 0.6387
+  },
+  {
+   "umbral": 0.3,
+   "cobertura": 0.6975,
+   "precision": 0.6703
+  },
+  {
+   "umbral": 0.35,
+   "cobertura": 0.63,
+   "precision": 0.7222
+  },
+  {
+   "umbral": 0.4,
+   "cobertura": 0.555,
+   "precision": 0.7703
+  },
+  {
+   "umbral": 0.45,
+   "cobertura": 0.515,
+   "precision": 0.7913
+  },
+  {
+   "umbral": 0.5,
+   "cobertura": 0.4675,
+   "precision": 0.8182
+  },
+  {
+   "umbral": 0.55,
+   "cobertura": 0.4225,
+   "precision": 0.8166
+  },
+  {
+   "umbral": 0.6,
+   "cobertura": 0.3825,
+   "precision": 0.8627
+  },
+  {
+   "umbral": 0.65,
+   "cobertura": 0.3375,
+   "precision": 0.9185
+  },
+  {
+   "umbral": 0.7,
+   "cobertura": 0.3025,
+   "precision": 0.9504
+  },
+  {
+   "umbral": 0.75,
+   "cobertura": 0.2625,
+   "precision": 0.9619
+  },
+  {
+   "umbral": 0.8,
+   "cobertura": 0.225,
+   "precision": 0.9667
+  },
+  {
+   "umbral": 0.85,
+   "cobertura": 0.18,
+   "precision": 0.9861
+  },
+  {
+   "umbral": 0.9,
+   "cobertura": 0.115,
+   "precision": 1.0
+  }
+ ],
+ "nota": "por debajo de este umbral la ficha del canto sale con cf."
+}
