@@ -31,3 +31,7 @@ docs/banco/
 # repositorio si la medición justifica doblar la descarga.
 docs/vendor/*jsep*
 docs/vendor/ort.webgpu.min.js
+
+# La clave de la API de xeno-canto nunca va al repositorio: la revocan si
+# aparece publicada.
+xc-clave.txt
