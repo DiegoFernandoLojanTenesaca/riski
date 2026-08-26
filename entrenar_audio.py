@@ -105,10 +105,17 @@ class Oido(nn.Module):
                                      num_classes=n_clases, in_chans=1)
 
     def forward(self, x):
-        z = torch.log(self.mel(x) + 1e-6)
-        # Normalizar cada ventana con su propia media evita depender de
-        # estadísticas globales que habría que llevar al navegador aparte.
-        z = (z - z.mean(dim=(1, 2), keepdim=True)) / (z.std(dim=(1, 2), keepdim=True) + 1e-5)
+        # El espectrograma va SIEMPRE en float32, aunque el resto entrene en
+        # media precisión. Un canto de ave es un tono casi puro y concentra
+        # toda la energía en pocos bins: medido, un silbido de 4 kHz llega a
+        # 55.000 y desborda el techo de fp16 (65.504) en los pasos intermedios
+        # del STFT. El resultado es `inf`, luego log(inf), luego NaN, y el
+        # entrenamiento entero se queda en el azar sin dar ningún error.
+        with torch.autocast(x.device.type, enabled=False):
+            z = torch.log(self.mel(x.float()) + 1e-6)
+            # Normalizar cada ventana con su propia media evita depender de
+            # estadísticas globales que habría que llevar al navegador aparte.
+            z = (z - z.mean(dim=(1, 2), keepdim=True)) / (z.std(dim=(1, 2), keepdim=True) + 1e-5)
         return self.cnn(z.unsqueeze(1))
 
 
@@ -225,6 +232,18 @@ def prueba():
     with torch.no_grad():
         y = m(torch.randn(2, FRECUENCIA * SEGUNDOS))
     assert y.shape == (2, 5), y.shape
+
+    # Con un TONO, no con ruido. Un canto concentra la energía en pocas
+    # frecuencias y desborda el espectrograma en media precisión; con ruido
+    # aleatorio no pasa, y por eso esta prueba dejó pasar el fallo la primera
+    # vez. Si vuelve, aquí sale NaN.
+    if torch.cuda.is_available():
+        t = torch.arange(FRECUENCIA * SEGUNDOS, device="cuda") / FRECUENCIA
+        tono = torch.sin(2 * torch.pi * 4000 * t).unsqueeze(0)
+        with torch.no_grad(), torch.autocast("cuda", dtype=torch.float16):
+            y = m.cuda()(tono)
+        assert not torch.isnan(y).any(), "el espectrograma desbordó en media precisión"
+        m.cpu()
 
     corta = Cantos([(Path("no-existe.mp3"), 0)], ["x"], False)
     x, c = corta[0]
