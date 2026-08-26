@@ -1,93 +1,93 @@
 {
- "umbral": 0.3,
- "precision": 0.8575,
- "cobertura": 0.821,
+ "umbral": 0.2,
+ "precision": 0.8591,
+ "cobertura": 0.93,
  "objetivo": 0.85,
  "imagenes": 1000,
  "curva": [
   {
    "umbral": 0.1,
-   "cobertura": 0.994,
-   "precision": 0.7787
+   "cobertura": 0.993,
+   "precision": 0.8298
   },
   {
    "umbral": 0.15,
-   "cobertura": 0.97,
-   "precision": 0.7938
+   "cobertura": 0.965,
+   "precision": 0.8435
   },
   {
    "umbral": 0.2,
-   "cobertura": 0.925,
-   "precision": 0.8151
+   "cobertura": 0.93,
+   "precision": 0.8591
   },
   {
    "umbral": 0.25,
-   "cobertura": 0.871,
-   "precision": 0.8381
+   "cobertura": 0.891,
+   "precision": 0.8777
   },
   {
    "umbral": 0.3,
-   "cobertura": 0.821,
-   "precision": 0.8575
+   "cobertura": 0.873,
+   "precision": 0.8855
   },
   {
    "umbral": 0.35,
-   "cobertura": 0.783,
-   "precision": 0.8736
+   "cobertura": 0.834,
+   "precision": 0.9017
   },
   {
    "umbral": 0.4,
-   "cobertura": 0.743,
-   "precision": 0.8964
+   "cobertura": 0.794,
+   "precision": 0.9169
   },
   {
    "umbral": 0.45,
-   "cobertura": 0.704,
-   "precision": 0.9134
+   "cobertura": 0.758,
+   "precision": 0.9301
   },
   {
    "umbral": 0.5,
-   "cobertura": 0.657,
-   "precision": 0.9239
+   "cobertura": 0.724,
+   "precision": 0.942
   },
   {
    "umbral": 0.55,
-   "cobertura": 0.614,
-   "precision": 0.9365
+   "cobertura": 0.683,
+   "precision": 0.9546
   },
   {
    "umbral": 0.6,
-   "cobertura": 0.572,
-   "precision": 0.9458
+   "cobertura": 0.645,
+   "precision": 0.9597
   },
   {
    "umbral": 0.65,
-   "cobertura": 0.52,
-   "precision": 0.9596
+   "cobertura": 0.604,
+   "precision": 0.9652
   },
   {
    "umbral": 0.7,
-   "cobertura": 0.468,
-   "precision": 0.9658
+   "cobertura": 0.548,
+   "precision": 0.969
   },
   {
    "umbral": 0.75,
-   "cobertura": 0.417,
-   "precision": 0.9712
+   "cobertura": 0.474,
+   "precision": 0.9747
   },
   {
    "umbral": 0.8,
-   "cobertura": 0.363,
-   "precision": 0.9807
+   "cobertura": 0.412,
+   "precision": 0.983
   },
   {
    "umbral": 0.85,
-   "cobertura": 0.296,
-   "precision": 0.9865
+   "cobertura": 0.345,
+   "precision": 0.9855
   },
   {
    "umbral": 0.9,
-   "cobertura": 0.199,
+   "cobertura": 0.24,
    "precision": 1.0
   }
  ],

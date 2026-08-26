@@ -26,9 +26,9 @@ Medido sobre 1.000 imágenes de validación que el modelo no vio al entrenar:
 
 | | int8 | acierta | entre tres |
 |---|---|---|---|
-| **el modelo publicado** | **3,8 MB** | **79,2%** | **91,5%** |
+| **el modelo publicado** | **3,8 MB** | **79,8%** | **92,3%** |
 
-Dataset: 16.872 fotos, 13.485 de entrenamiento y 3.387 de validación, partidas
+Dataset: 25.878 fotos, 20.778 de entrenamiento y 5.100 de validación, partidas
 por observación. Las cifras salen de `metricas.json`, que escribe `exportar.py`
 en cada corrida, y la web las lee de ahí: no se copian a mano a ningún sitio.
 
@@ -76,6 +76,31 @@ diseñado justo para eso, sin *squeeze-excite* y con ReLU6 en lugar de
 *hard-swish*, que son las capas más hostiles al int8.
 </details>
 
+### Más fotos casi no suben el acierto, pero sí la confianza
+
+El dataset pasó de 16.872 a 25.878 fotos, un 53% más. El resultado:
+
+| | 16.872 fotos | 25.878 fotos |
+|---|---|---|
+| acierta | 79,2% | **79,8%** |
+| entre tres | 91,5% | **92,3%** |
+| umbral calibrado | 0,30 | **0,20** |
+| casos en los que responde | 82% | **93%** |
+
+**Medio punto de acierto por un 53% más de datos.** Ahí no está el problema: el
+techo lo pone lo mucho que se parecen entre sí las especies, no la cantidad de
+ejemplos. Seguir descargando fotos no iba a arreglarlo, y ahora está medido en
+vez de supuesto.
+
+Lo que sí mejoró de verdad no aparece en el top1: **el modelo quedó mejor
+calibrado**. Con el umbral recalculado responde en el 93% de los casos en vez
+del 82%, acertando lo mismo. Once puntos más de preguntas contestadas es un
+cambio que se nota usándolo, y el porcentaje de acierto ni se entera.
+
+(La validación creció con el dataset, así que las dos columnas no se miden sobre
+exactamente las mismas fotos. La diferencia es demasiado pequeña para que eso
+importe, y demasiado pequeña para justificar más descargas.)
+
 **Promediar la imagen con su espejo no compensa**: 0,2 puntos por duplicar el
 tiempo de respuesta, sobre 500 imágenes. Medido con `comprobar.py --espejo` y no
 implementado.
@@ -88,9 +113,10 @@ corte más bajo que llega al 85%:
 
 | umbral | responde | acierta |
 |---|---|---|
-| 0,20 | 92% | 82% |
-| **0,30** | **82%** | **86%** |
-| 0,40 | 71% | 90% |
+| 0,15 | 96% | 84% |
+| **0,20** | **93%** | **86%** |
+| 0,25 | 89% | 88% |
+| 0,30 | 87% | 89% |
 
 Bajo es mejor, porque cada punto de umbral de más es un acierto que la
 aplicación se calla. Por debajo del corte la ficha sale marcada con **cf.**, que
@@ -153,9 +179,17 @@ no es opcional.
 
 | Versión | Especies | Fotos por especie | Total |
 |---|---|---|---|
-| **v1 (hecha)** | 100 | hasta 200 | 16.872 |
-| v2 | 300 | 300 | ~90.000 |
-| v3 | 500+ | 300 | ~150.000 |
+| v1 | 100 | hasta 200 | 16.872 |
+| **v1.1 (la publicada)** | 100 | hasta 600 | **25.878** |
+| v2 (descartada) | 300 | 300 | no existen los datos |
+
+**No hay 300 especies del Ecuador que se puedan entrenar.** Se intentó, y la
+propia descarga lo dijo: de las 175 candidatas más fotografiadas solo 79 llegan
+a 50 fotos utilizables, y las descartadas dejan una mediana de **4**.
+*Nephrolepis pectinata* anuncia 212 y deja 0. El techo real ronda las 110-130
+especies, y subir de ahí exige bajar el mínimo a 25 fotos por clase, aceptar
+licencias no comerciales o admitir fotos de cámara trampa. Ninguna de las tres
+sale gratis.
 
 **Las especies no se eligen por lo que anuncia GBIF.** El conteo del facet es de
 ocurrencias, no de fotos utilizables, y no sobrevive al filtro por proveedor ni
