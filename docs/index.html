@@ -45,6 +45,7 @@
     <a href="#como">Cómo usarla</a>
     <a href="especies.html">Las especies</a>
     <a href="#oido">El oído</a>
+    <a href="#hallazgos">Hallazgos</a>
     <a href="#herramientas">Herramientas</a>
     <a href="#colaborar">Colaborar</a>
     <a href="#acerca">Acerca de</a>
@@ -312,6 +313,59 @@
       de uso no comercial, así que el modelo de cantos se publica con esa misma
       condición, separado del de fotos, y dicho de frente en vez de escondido en
       la letra pequeña.</p>
+  </section>
+
+  <section id="hallazgos" class="asoma">
+    <span class="etiqueta">Lo que salió al medir</span>
+    <h2>Seis cosas que no se sabían hasta comprobarlas.</h2>
+    <p>Cada decisión de este proyecto salió de una medición, no de lo que dicen
+      los tutoriales. Varias contradijeron lo que parecía obvio.</p>
+
+    <div class="demuestra">
+      <div>
+        <b>Mirar más grande salió gratis</b>
+        <p>Pasar de 224 a 288 píxeles dio <b>4 puntos</b> sin engordar la
+          descarga: el tamaño de un modelo no depende de la imagen que se le
+          dé. Fue el mejor cambio de todo el proyecto y no costó un byte.</p>
+      </div>
+      <div>
+        <b>Lo más nuevo no es lo mejor</b>
+        <p>MobileNetV4, de 2024, quedó último: pierde <b>8,9 puntos</b> al
+          encogerlo a enteros. Lo que se entrega aquí es un modelo encogido, así
+          que eso pesa más que el año de publicación.</p>
+      </div>
+      <div>
+        <b>Más fotos casi no suben el acierto</b>
+        <p>Un 53&nbsp;% más de material dio <b>medio punto</b>. Pero el modelo
+          aprendió a medir mejor su confianza, y con eso pasó a responder en el
+          93&nbsp;% de los casos en vez del 82&nbsp;%. Lo que mejora no siempre
+          es lo que se estaba mirando.</p>
+      </div>
+      <div>
+        <b>Lo aprendido no se hereda</b>
+        <p>Encoger a 8 bits salía gratis en las fotos y cuesta <b>14 puntos</b>
+          en los cantos. Y las épocas heredadas del modelo de imágenes dejaban
+          al de sonido a medio entrenar: diez puntos tirados.</p>
+      </div>
+      <div>
+        <b>El catálogo prometía el triple</b>
+        <p>El conteo que anuncia la base de datos internacional no sobrevive al
+          filtrado: hubo que <b>descartar 118 especies</b> para llenar 100
+          plazas. Una anunciaba 212 fotos y dejaba cero.</p>
+      </div>
+      <div>
+        <b>Dos fallos sin ningún error</b>
+        <p>El sonido desbordaba un límite interno y el entrenamiento se quedaba
+          en el azar sin avisar. La prueba no lo detectaba porque usaba ruido, y
+          <b>el ruido es la única señal que no puede fallar</b>.</p>
+      </div>
+    </div>
+
+    <p style="margin-top:34px;font-size:14.5px;color:var(--tenue)">Las
+      comprobaciones no son un adorno del final: hay una página interna que pasa
+      un lote de fotos por el modelo dentro del navegador y lo compara con lo
+      que da el mismo modelo en Python, para cazar diferencias que no producen
+      ningún error y solo se notan en el porcentaje de acierto.</p>
   </section>
 
   <section id="colaborar" class="asoma">
