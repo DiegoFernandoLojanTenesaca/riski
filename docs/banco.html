@@ -28,6 +28,31 @@
       El banco se genera en local con <code>python comprobar.py --banco 200</code>
       y no se publica.</p>
 
+    <h3 class="sub">Los dos motores</h3>
+    <div class="versus" style="margin-top:1px">
+      <div class="propia">
+        <h3>WASM · el que está publicado</h3>
+        <ul>
+          <li>Corre en el procesador, como cualquier programa</li>
+          <li>14 MB de descarga la primera vez</li>
+          <li>Funciona en cualquier navegador, viejo o nuevo</li>
+          <li>Un solo hilo: GitHub Pages no da las cabeceras que piden los hilos</li>
+        </ul>
+      </div>
+      <div class="otra">
+        <h3>WebGPU · a prueba</h3>
+        <ul>
+          <li>Usa la tarjeta gráfica del teléfono o del portátil</li>
+          <li><b>28 MB</b>, el doble, en una aplicación que presume de ir sin señal</li>
+          <li>Necesita navegador reciente; si no está, se vuelve a WASM solo</li>
+          <li>No cubre todas las operaciones de un modelo de 8 bits como este</li>
+        </ul>
+      </div>
+    </div>
+    <p style="margin-top:20px">Por eso esto se mide en vez de decidirse a ojo:
+      doblar la descarga solo se justifica si el tiempo por foto baja de verdad.
+      Ejecuta el lote con los dos y quedan comparados aquí abajo.</p>
+
     <p style="margin-top:30px">
       <button class="boton" id="correr">Ejecutar el lote</button>
       <a class="boton hueco" id="cambiar" href="?gpu=1">Probar con WebGPU</a>
@@ -44,6 +69,7 @@
       <div class="cifra"><b id="m-motor">·</b><span class="etiqueta">motor de ejecución</span></div>
     </div>
 
+    <div id="comparativa"></div>
     <div id="discrepancias"></div>
   </section>
 </div>
@@ -170,6 +196,17 @@ async function correr() {
   $("#m-px").textContent = pre.tam + " px";
   $("#m-motor").textContent = motor;
 
+  // El resultado de cada motor se guarda para poder verlos juntos: nadie
+  // recuerda los milisegundos del otro después de recargar la página.
+  const previo = JSON.parse(localStorage.getItem("riksi-banco") || "{}");
+  previo[conGpu ? "webgpu" : "wasm"] = {
+    ms: Math.round(tiempos[Math.floor(tiempos.length / 2)]),
+    acierta: aciertosWeb / total, acuerdo: acuerdos / total,
+    px: pre.tam, imagenes: total,
+  };
+  localStorage.setItem("riksi-banco", JSON.stringify(previo));
+  comparar(previo);
+
   $("#discrepancias").innerHTML = discrepan.length ? `
     <h2 style="margin-top:46px">Las ${discrepan.length} que no coinciden</h2>
     <p>Son las fotos donde el navegador eligió otra especie que Python. Si la
@@ -188,6 +225,35 @@ async function correr() {
   $("#correr").disabled = false;
 }
 
+function comparar(datos) {
+  const filas = Object.entries(datos);
+  if (filas.length < 2) {
+    $("#comparativa").innerHTML = `<p style="margin-top:30px;color:var(--tenue)">
+      Ejecuta el lote también con el otro motor y aparecerá la comparación.</p>`;
+    return;
+  }
+  const pct = (v) => (v * 100).toFixed(1).replace(".", ",") + " %";
+  const mejor = filas.reduce((a, b) => (a[1].ms <= b[1].ms ? a : b))[0];
+  const [lento, rapido] = filas.map((f) => f[1].ms).sort((a, b) => b - a);
+  $("#comparativa").innerHTML = `
+    <h3 class="sub" style="margin-top:46px">Los dos, uno al lado del otro</h3>
+    <table class="medidas">
+      <thead><tr><th>motor</th><th>descarga</th><th>por foto</th><th>acierta</th><th>coincide con python</th></tr></thead>
+      <tbody>${filas.map(([nombre, d]) => `
+        <tr class="${nombre === mejor ? "gana" : ""}">
+          <td>${nombre}</td>
+          <td>${nombre === "webgpu" ? "28 MB" : "14 MB"}</td>
+          <td>${d.ms} ms</td>
+          <td>${pct(d.acierta)}</td>
+          <td>${pct(d.acuerdo)}</td>
+        </tr>`).join("")}</tbody>
+    </table>
+    <p style="margin-top:16px">El más rápido va <b>${(lento / rapido).toFixed(1)} veces</b>
+      por delante. Aciertan casi lo mismo porque es el mismo modelo: lo que
+      cambia es dónde se ejecuta, no lo que sabe.</p>`;
+}
+
+comparar(JSON.parse(localStorage.getItem("riksi-banco") || "{}"));
 $("#cambiar").textContent = conGpu ? "Volver a WASM" : "Probar con WebGPU";
 $("#cambiar").href = conGpu ? "?" : "?gpu=1";
 $("#correr").addEventListener("click", correr);
