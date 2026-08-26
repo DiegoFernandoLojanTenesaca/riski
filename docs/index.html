@@ -44,7 +44,7 @@
   <nav class="menu">
     <a href="#como">Cómo usarla</a>
     <a href="especies.html">Las especies</a>
-    <a href="#oido">Lo que viene</a>
+    <a href="#oido">El oído</a>
     <a href="#herramientas">Herramientas</a>
     <a href="#colaborar">Colaborar</a>
     <a href="#acerca">Acerca de</a>
@@ -277,18 +277,39 @@
   </section>
 
   <section id="oido" class="asoma">
-    <span class="etiqueta">Lo que viene</span>
-    <h2>Y lo mismo, pero de oído.</h2>
-    <p>En el bosque se oyen diez aves por cada una que se ve. La siguiente pieza
-      graba cinco segundos, los convierte en una imagen del sonido y la
-      reconoce con el mismo tipo de modelo pequeño. Las grabaciones vienen de
+    <span class="etiqueta">También de oído</span>
+    <h2>En el bosque se oyen diez aves por cada una que se ve.</h2>
+    <p>Por eso la aplicación también escucha. Grabas cinco segundos, el sonido
+      se convierte en una imagen del espectro y la reconoce el mismo tipo de
+      modelo pequeño. Las grabaciones con las que aprendió vienen de
       <a href="https://xeno-canto.org">xeno-canto</a>, el archivo de sonidos de
       naturaleza más grande que existe.</p>
-    <p><b>Y ahí apareció un problema que no es técnico.</b> De las 17.857
+
+    <div class="cifras" style="margin:30px 0;border:1px solid var(--marea)">
+      <div class="cifra"><b>60</b><span class="etiqueta">aves que distingue</span></div>
+      <div class="cifra"><b>6.9 MB</b><span class="etiqueta">pesa el modelo</span></div>
+      <div class="cifra"><b>46 %</b><span class="etiqueta">acierta a la primera</span></div>
+      <div class="cifra"><b>87 %</b><span class="etiqueta">cuando se atreve a responder</span></div>
+    </div>
+
+    <p><b>Es mucho menos seguro que el de fotos, y lo dice.</b> Para acertar
+      87 de cada 100 veces necesita estar bastante
+      convencido, y a ese nivel solo se atreve en el
+      30&nbsp;% de los casos. El resto de las veces
+      contesta con un «se parece a». Un canto suelto, con viento y otras aves
+      de fondo, es mucho más difícil que una foto.</p>
+
+    <p><b>Aquí los 8 bits no valieron.</b> En las fotos encoger el modelo a
+      enteros salía gratis; en los cantos cuesta ocho puntos, porque un canto se
+      distingue por diferencias muy finas en el espectro y ese redondeo se las
+      come. Se probaron cuatro formas de encogerlo y todas fallaban igual, así
+      que el modelo de sonido usa el paso intermedio: la mitad de tamaño por un
+      solo punto.</p>
+    <p><b>Y hay un problema que no es técnico.</b> De las 17.857
       grabaciones de aves del Ecuador con la mejor calidad, <b>ninguna</b> tiene
       licencia libre: 3.812 prohíben directamente crear obras derivadas, que es
       exactamente lo que es un modelo entrenado. Esas no se tocan. El resto son
-      de uso no comercial, así que el modelo de cantos se publicará con esa misma
+      de uso no comercial, así que el modelo de cantos se publica con esa misma
       condición, separado del de fotos, y dicho de frente en vez de escondido en
       la letra pequeña.</p>
   </section>

@@ -231,11 +231,36 @@ día para otro.
       por observación y no por foto.
 - [x] **3 · ONNX**. Exportar, cuantizar a 8 bits y medir cuánta precisión cuesta.
 - [x] **4 · La web**. Página estática con cámara, publicada en GitHub Pages.
-- [ ] **5 · El oído**. Lo mismo para cantos de aves, con xeno-canto. La cadena
-      está montada y probada de punta a punta; falta terminar de descargar. Con
-      una licencia distinta: ver más abajo.
+- [x] **5 · El oído**. 60 aves del Ecuador, 6,9 MB, publicado con una licencia
+      distinta al de fotos: ver más abajo.
 
 ## El oído
+
+**60 aves, 2.753 grabaciones, 6,9 MB.** Acierta el 45,8% a la primera y el 61,8%
+entre tres. Con su umbral calibrado en 0,50 responde solo en el 30% de los
+casos, acertando el 87% de esas veces: es bastante menos seguro que el de fotos
+y la aplicación lo dice con su `cf.` en vez de disimularlo. Un canto suelto, con
+viento y otras aves de fondo, es mucho más difícil que una foto.
+
+### Aquí los 8 bits no sirven
+
+| variante | tamaño | acierta | coste |
+|---|---|---|---|
+| float32 | 13,6 MB | 46,8% | |
+| **float16 · el publicado** | **6,9 MB** | **45,8%** | 1,0 pts |
+| int8 | 4,2 MB | 38,5% | **8,3 pts** |
+
+Justo lo contrario que en las fotos, donde el int8 salía gratis. Y no es la
+calibración: se probaron activaciones con y sin signo y cuatro veces más
+muestras, y las cuatro combinaciones pierden entre 9 y 10 puntos.
+
+**Un canto se distingue por diferencias finas en el espectro** y la resolución
+de 8 bits no da para tanto; una textura de plumaje tolera mucho más redondeo. La
+lección general se mantiene, solo que al revés de como se aprendió: el formato
+se elige midiendo sobre el problema concreto, no por lo que funcionó en el
+anterior.
+
+### Cómo está hecho
 
 Misma receta que las fotos, con una diferencia de fondo: **el espectrograma va
 dentro del modelo**. El `.onnx` recibe el audio crudo y él mismo lo convierte en
