@@ -236,9 +236,9 @@ día para otro.
 
 ## El oído
 
-**60 aves, 2.753 grabaciones, 6,9 MB.** Acierta el 45,8% a la primera y el 61,8%
-entre tres. Con su umbral calibrado en 0,50 responde solo en el 30% de los
-casos, acertando el 87% de esas veces: es bastante menos seguro que el de fotos
+**60 aves, 2.753 grabaciones, 6,9 MB.** Acierta el 54,5% a la primera y el 70,5%
+entre tres. Con su umbral calibrado en 0,50 responde en el 40% de los casos,
+acertando el 85% de esas veces: es bastante menos seguro que el de fotos
 y la aplicación lo dice con su `cf.` en vez de disimularlo. Un canto suelto, con
 viento y otras aves de fondo, es mucho más difícil que una foto.
 
@@ -246,19 +246,33 @@ viento y otras aves de fondo, es mucho más difícil que una foto.
 
 | variante | tamaño | acierta | coste |
 |---|---|---|---|
-| float32 | 13,6 MB | 46,8% | |
-| **float16 · el publicado** | **6,9 MB** | **45,8%** | 1,0 pts |
-| int8 | 4,2 MB | 38,5% | **8,3 pts** |
+| float32 | 13,6 MB | 55,2% | |
+| **float16 · el publicado** | **6,9 MB** | **54,5%** | 0,7 pts |
+| int8 | 4,2 MB | 41,2% | **14,0 pts** |
 
 Justo lo contrario que en las fotos, donde el int8 salía gratis. Y no es la
 calibración: se probaron activaciones con y sin signo y cuatro veces más
-muestras, y las cuatro combinaciones pierden entre 9 y 10 puntos.
+muestras, y las cuatro combinaciones pierden entre 9 y 10 puntos. Con el modelo mejor
+entrenado la brecha se ensancha todavía más, hasta 14 puntos.
 
 **Un canto se distingue por diferencias finas en el espectro** y la resolución
 de 8 bits no da para tanto; una textura de plumaje tolera mucho más redondeo. La
 lección general se mantiene, solo que al revés de como se aprendió: el formato
 se elige midiendo sobre el problema concreto, no por lo que funcionó en el
 anterior.
+
+### Entrenar el doble valió diez puntos
+
+| épocas | acierta | entre tres |
+|---|---|---|
+| 12 | 45,3% | 61,0% |
+| **24** | **55,2%** | **70,3%** |
+
+Casi diez puntos por dejarlo correr el doble, y la pérdida seguía bajando al
+acabar. Las doce épocas venían heredadas del modelo de fotos, donde sí bastan:
+con 25.878 imágenes se ve cada ejemplo muchas veces, pero con 2.228 grabaciones
+el modelo apenas había empezado. **Los ajustes no se heredan entre problemas
+aunque el código sea el mismo.**
 
 ### Cómo está hecho
 

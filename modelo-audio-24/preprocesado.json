@@ -1,0 +1,5 @@
+{
+ "frecuencia": 32000,
+ "segundos": 5,
+ "nota": "el navegador solo tiene que mandar audio mono a esta frecuencia; el espectrograma lo hace el propio modelo"
+}
