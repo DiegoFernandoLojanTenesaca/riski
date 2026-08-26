@@ -286,13 +286,18 @@ volver.addEventListener("click", abrirCamara);
  */
 let oido = null, oidoPre = null;
 
-/** Presta el vocabulario de otro modelo a las funciones que pintan la ficha.
- *  Con `finally` para que un fallo no deje la aplicación mostrando nombres de
- *  aves sobre fotos de plantas. */
-function conVocabulario(otrasClases, otrosComunes, fn) {
-  const c = clases, m = comunes;
-  clases = otrasClases; comunes = otrosComunes;
-  try { fn(); } finally { clases = c; comunes = m; }
+/** Presta a la ficha todo lo que depende del modelo, no solo los nombres.
+ *
+ * El umbral y la frase de «acierta el 86% de las veces» salen de haber medido
+ * el modelo de FOTOS. Pintar una determinación de audio con esos datos sería
+ * publicar un número que nadie ha comprobado para los cantos, así que el
+ * intercambio los incluye. Con `finally`, para que un fallo a media función no
+ * deje la aplicación enseñando nombres de aves sobre fotos de plantas.
+ */
+function conVocabulario({ clases: c2, comunes: m2 = {}, certeza: z2 = null, umbral: u2 = 0.4 }, fn) {
+  const c = clases, m = comunes, z = certeza, u = UMBRAL;
+  clases = c2; comunes = m2; certeza = z2; UMBRAL = u2;
+  try { fn(); } finally { clases = c; comunes = m; certeza = z; UMBRAL = u; }
 }
 
 async function grabar(segundos, frecuencia) {
@@ -330,8 +335,12 @@ async function escuchar() {
     if (!oido) {
       estado("cargando el modelo de cantos", false);
       oidoPre = await (await fetch("modelo-audio/preprocesado.json")).json();
+      const calibrado = await fetch("modelo-audio/umbral.json")
+        .then((r) => r.ok ? r.json() : null).catch(() => null);
       oido = {
         clases: await (await fetch("modelo-audio/clases.json")).json(),
+        certeza: calibrado,
+        umbral: calibrado ? calibrado.umbral : 0.4,
         sesion: await ort.InferenceSession.create("modelo-audio/riksi-audio-int8.onnx",
           { executionProviders: ["wasm"] }),
       };
@@ -346,7 +355,10 @@ async function escuchar() {
     const top = probs.map((p, i) => [p, i]).sort((a, b) => b[0] - a[0]).slice(0, 3);
 
     // La ficha se pinta con los nombres de las aves, no con los de las fotos.
-    conVocabulario(oido.clases, {}, () => pintar(top, Math.round(performance.now() - t0)));
+    // Sin certeza: el modelo de cantos todavía no tiene su propia calibración,
+    // y prestarle la de las fotos sería inventarse el dato.
+    conVocabulario({ clases: oido.clases, certeza: oido.certeza, umbral: oido.umbral },
+      () => pintar(top, Math.round(performance.now() - t0)));
   } catch (err) {
     estado("no pude grabar: " + err.message, false);
   }
