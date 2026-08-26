@@ -26,3 +26,8 @@ datos/
 # El banco de medición se genera en local y no se publica: son megas que solo
 # sirven para comparar el navegador con Python.
 docs/banco/
+
+# El paquete de WebGPU son 28 MB de wasm. Se prueba en local; solo entra al
+# repositorio si la medición justifica doblar la descarga.
+docs/vendor/*jsep*
+docs/vendor/ort.webgpu.min.js

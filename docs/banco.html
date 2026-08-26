@@ -28,7 +28,10 @@
       El banco se genera en local con <code>python comprobar.py --banco 200</code>
       y no se publica.</p>
 
-    <p style="margin-top:30px"><button class="boton" id="correr">Ejecutar el lote</button></p>
+    <p style="margin-top:30px">
+      <button class="boton" id="correr">Ejecutar el lote</button>
+      <a class="boton hueco" id="cambiar" href="?gpu=1">Probar con WebGPU</a>
+    </p>
     <p class="cuenta" id="avance"></p>
 
     <div class="cifras" id="marcador" hidden style="margin-top:30px;border:1px solid var(--marea)">
@@ -38,13 +41,13 @@
       <div class="cifra"><b id="m-desvio">·</b><span class="etiqueta">desvío medio de confianza</span></div>
       <div class="cifra"><b id="m-ms">·</b><span class="etiqueta">mediana por foto</span></div>
       <div class="cifra"><b id="m-px">·</b><span class="etiqueta">resolución de entrada</span></div>
+      <div class="cifra"><b id="m-motor">·</b><span class="etiqueta">motor de ejecución</span></div>
     </div>
 
     <div id="discrepancias"></div>
   </section>
 </div>
 
-<script src="vendor/ort.wasm.min.js"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const lienzo = document.createElement("canvas");
@@ -92,15 +95,37 @@ const cargar = (src) => new Promise((ok, mal) => {
   im.onload = () => ok(im); im.onerror = mal; im.src = src;
 });
 
+/* El paquete de WebGPU trae un wasm de 27,8 MB, el doble que el normal. En una
+   aplicación que presume de funcionar sin conexión eso no se mete sin medir
+   antes qué se gana, así que aquí se cargan uno u otro según ?gpu=1. */
+const conGpu = new URLSearchParams(location.search).has("gpu");
+
+const cargarScript = (src) => new Promise((ok, mal) => {
+  const e = document.createElement("script");
+  e.onload = ok; e.onerror = mal; e.src = src;
+  document.head.append(e);
+});
+
 async function correr() {
   $("#correr").disabled = true;
+  $("#avance").textContent = "cargando el motor";
+  await cargarScript(conGpu ? "vendor/ort.webgpu.min.js" : "vendor/ort.wasm.min.js");
   ort.env.wasm.numThreads = 1;
   ort.env.wasm.wasmPaths = new URL("vendor/", location.href).href;
 
   pre = await (await fetch("modelo/preprocesado.json")).json();
   clases = await (await fetch("modelo/clases.json")).json();
   lienzo.width = lienzo.height = pre.tam;
-  sesion = await ort.InferenceSession.create("modelo/riksi-int8.onnx", { executionProviders: ["wasm"] });
+  let motor = conGpu ? "webgpu" : "wasm";
+  try {
+    sesion = await ort.InferenceSession.create("modelo/riksi-int8.onnx",
+      { executionProviders: conGpu ? ["webgpu"] : ["wasm"] });
+  } catch (err) {
+    // WebGPU no cubre todos los operadores cuantizados. Si no puede, se dice y
+    // se sigue con wasm en vez de dejar la página muerta.
+    motor = "wasm (webgpu falló)";
+    sesion = await ort.InferenceSession.create("modelo/riksi-int8.onnx", { executionProviders: ["wasm"] });
+  }
 
   const banco = await fetch("banco/banco.json").then((r) => r.json()).catch(() => null);
   if (!banco) {
@@ -143,6 +168,7 @@ async function correr() {
   tiempos.sort((a, b) => a - b);
   $("#m-ms").textContent = Math.round(tiempos[Math.floor(tiempos.length / 2)]) + " ms";
   $("#m-px").textContent = pre.tam + " px";
+  $("#m-motor").textContent = motor;
 
   $("#discrepancias").innerHTML = discrepan.length ? `
     <h2 style="margin-top:46px">Las ${discrepan.length} que no coinciden</h2>
@@ -162,6 +188,8 @@ async function correr() {
   $("#correr").disabled = false;
 }
 
+$("#cambiar").textContent = conGpu ? "Volver a WASM" : "Probar con WebGPU";
+$("#cambiar").href = conGpu ? "?" : "?gpu=1";
 $("#correr").addEventListener("click", correr);
 </script>
 </body>

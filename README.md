@@ -10,7 +10,7 @@ Apuntas la cámara a un animal o una planta y te dice qué es. Sin cuenta, sin
 instalar nada y **sin internet**: el modelo se descarga una vez y a partir de ahí
 corre entero dentro del navegador.
 
-*Riksiy*, en kichwa, es reconocer — saber quién es alguien.
+*Riksiy*, en kichwa, es reconocer. Saber quién es alguien.
 
 ## Por qué sin conexión
 
@@ -19,54 +19,68 @@ alguien necesita identificar lo que está viendo, y exactamente donde falla
 cualquier herramienta que dependa de un servidor. Por eso el modelo va dentro del
 dispositivo y no en la nube: no es una restricción técnica, es el punto.
 
-## Cómo funciona
+## Estado
 
-El modelo es pequeño a propósito: **EfficientNet-Lite0, 3,4 millones de
-parámetros, 3,8 MB cuantizado a 8 bits**. Se ejecuta con ONNX Runtime Web sobre
-WebAssembly, así que va fluido incluso en un teléfono modesto. La página es
-estática: no hay backend, no hay coste, no hay nada que se caiga dentro de un
-año.
+**EfficientNet-Lite0 a 288 px, 100 especies, 3,8 MB cuantizado a 8 bits.**
+Medido sobre 1.000 imágenes de validación que el modelo no vio al entrenar:
 
-## Estado: v1 entrenada, 100 especies
-
-16.872 fotos, 13.485 de entrenamiento y 3.387 de validación, partidas por
-observación. El modelo que corre en la web:
-
-| | int8 | top1 | top3 |
+| | int8 | acierta | entre tres |
 |---|---|---|---|
-| **EfficientNet-Lite0 · 288 px · 100 especies** | **3,8 MB** | **79,2%** | **91,5%** |
+| **el modelo publicado** | **3,8 MB** | **79,2%** | **91,5%** |
 
-Las cifras salen de `metricas.json`, que escribe `exportar.py` en cada corrida.
+Dataset: 16.872 fotos, 13.485 de entrenamiento y 3.387 de validación, partidas
+por observación. Las cifras salen de `metricas.json`, que escribe `exportar.py`
+en cada corrida, y la web las lee de ahí: no se copian a mano a ningún sitio.
 
-### Lo que se probó para llegar ahí
+## Lo que se probó para llegar ahí
 
-Mismas 100 especies y mismas imágenes de validación para todos:
+Todo con las mismas 100 especies y las mismas imágenes de validación, que es la
+única forma de que la comparación signifique algo:
 
-| configuración | int8 | top1 | top3 | coste de cuantizar |
+| configuración | int8 | acierta | entre tres | coste de cuantizar |
 |---|---|---|---|---|
 | EfficientNet-Lite0 · 320 px | 3,8 MB | 79,6% | 92,3% | 0,2 pts |
 | **EfficientNet-Lite0 · 288 px** | **3,8 MB** | **79,2%** | **91,5%** | 0,1 pts |
 | EfficientNet-Lite0 · 224 px | 3,8 MB | 75,0% | 89,6% | 0 |
 | MobileNetV4-conv-small · 224 px | 2,9 MB | 63,3% | 81,2% | **8,9 pts** |
 
-**La curva se aplana en 288.** De 224 a 288 hay 4,2 puntos; de 288 a 320, solo
-0,4, y eso cuesta un 23% más de cómputo. Se publica el de 288: 320 gana dentro
-del margen de ruido y se paga en cada foto que alguien haga en el campo.
-
 **Subir la resolución salió gratis en descarga.** Los pesos son los mismos 3,8 MB
 a 224 que a 288, porque una CNN no cambia de tamaño con la entrada: solo cuesta
-cómputo, un 65% más, que en un teléfono son unos 100 ms en vez de 61. Cuatro
-puntos por eso es el mejor cambio de todo el proyecto.
+cómputo, un 65% más, que en el banco del navegador son 99 ms por foto en vez de
+61. Cuatro puntos por eso es el mejor cambio de todo el proyecto.
+
+**La curva se aplana en 288.** De 224 a 288 hay 4,2 puntos; de 288 a 320, solo
+0,4, y eso cuesta un 23% más de cómputo en cada foto que alguien haga en el
+campo. Se publica el de 288.
 
 **MobileNetV4 es de 2024 y quedó último**, con 8,9 puntos perdidos al cuantizar.
-Repite lo que ya pasó con MobileNetV3: las arquitecturas que buscan precisión en
-coma flotante meten capas que el int8 destroza. Cuando el entregable es un modelo
-cuantizado, eso pesa más que el año de publicación.
+Es la tercera vez que pasa lo mismo: las arquitecturas que persiguen precisión en
+coma flotante meten capas que el int8 destroza. Con MobileNetV3 fueron 7,1
+puntos. Cuando el entregable es un modelo cuantizado, **la arquitectura se elige
+por cómo cuantiza, no por su año ni por su precisión en float**.
 
-**Promediar la imagen con su espejo no compensa**: +0,2 puntos por duplicar el
-tiempo de respuesta, medido sobre 500 imágenes con `comprobar.py --espejo`.
+<details>
+<summary>La comparación de arquitecturas que llevó a EfficientNet-Lite0 (56 especies)</summary>
 
-### Cuándo dice "no lo sé"
+Hecha antes de completar el dataset, con las 56 especies que había entonces:
+
+| arquitectura | int8 | acierta | entre tres | coste de cuantizar |
+|---|---|---|---|---|
+| **EfficientNet-Lite0** | **3,8 MB** | **79,2%** | **90,9%** | **0,0 pts** |
+| MobileNetV2 | 2,7 MB | 75,2% | 90,2% | 1,1 pts |
+| MobileNetV3-Large | 4,7 MB | 69,5% | 85,5% | 7,1 pts |
+
+Las tres rondaban el 76-79% en float32: para la precisión pura daba casi igual
+cuál elegir, y la diferencia aparecía solo al cuantizar. EfficientNet-Lite0 está
+diseñado justo para eso, sin *squeeze-excite* y con ReLU6 en lugar de
+*hard-swish*, que son las capas más hostiles al int8.
+</details>
+
+**Promediar la imagen con su espejo no compensa**: 0,2 puntos por duplicar el
+tiempo de respuesta, sobre 500 imágenes. Medido con `comprobar.py --espejo` y no
+implementado.
+
+## Cuándo dice "no lo sé"
 
 El umbral no está puesto a ojo. `comprobar.py --calibrar` mide, para cada corte
 de confianza, cuántas respuestas se dan y cuántas de esas aciertan, y elige el
@@ -79,42 +93,38 @@ corte más bajo que llega al 85%:
 | 0,40 | 71% | 90% |
 
 Bajo es mejor, porque cada punto de umbral de más es un acierto que la
-aplicación se calla. La web lee ese valor de `umbral.json`, así que al
-reentrenar se ajusta solo.
-
-### Por qué esta arquitectura
-
-Comparación con las mismas 56 especies para las tres, que es la única forma de
-que signifique algo:
-
-| arquitectura | int8 | top1 | top3 | coste de cuantizar |
-|---|---|---|---|---|
-| **EfficientNet-Lite0** | **3,8 MB** | **79,2%** | **90,9%** | **0,0 pts** |
-| MobileNetV2 | 2,7 MB | 75,2% | 90,2% | −1,1 pts |
-| MobileNetV3-Large | 4,7 MB | 69,5% | 85,5% | −7,1 pts |
-
-Las tres rondan el 76-79% en float32: para la precisión pura da casi igual cuál
-elijas. La diferencia aparece **al cuantizar**. EfficientNet-Lite0 está diseñado
-justo para eso, sin *squeeze-excite* y con ReLU6 en lugar de *hard-swish*, que
-son las capas que peor se llevan con int8. Cuando lo que se entrega es un modelo
-cuantizado, la arquitectura se elige por cómo cuantiza, no por su precisión en
-coma flotante.
+aplicación se calla. Por debajo del corte la ficha sale marcada con **cf.**, que
+es lo que escribe un taxónomo cuando la determinación es probable pero no firme.
+La web lee ese valor de `umbral.json`, así que al reentrenar se ajusta solo.
 
 ## La web
 
 ```bash
-python comprobar.py            # copia el modelo a web/ y deja la prueba de referencia
+python comprobar.py                  # deja docs/ listo y la prueba de referencia
 python -m http.server 8080 -d docs
 ```
 
-`http://127.0.0.1:8080` es la portada; `/app.html` la cámara, con tres candidatos con su confianza y un
-`?test=1` que compara el resultado del navegador contra el de Python.
+| página | qué es |
+|---|---|
+| `index.html` | portada: qué es, cómo funciona, las cifras y de dónde salen los datos |
+| `app.html` | la cámara. `?test=1` compara el resultado del navegador con el de Python |
+| `especies.html` | catálogo de las 100 especies, con buscador y filtro por grupo |
+| `banco.html` | herramienta interna: mide el navegador contra Python sobre un lote |
+
+Todo se sirve desde la propia carpeta `docs/`, incluido `onnxruntime-web`, y un
+*service worker* guarda el conjunto en la primera visita. Sin eso, "funciona sin
+conexión" sería falso: el modelo se volvería a pedir en cada carga. El reparto es
+por peso: modelo, wasm y fotos van de caché primero; el código y los JSON van de
+red primero con la copia local de respaldo, porque con caché primero una
+corrección nunca llega a quien ya visitó la página.
+
+`docs/` y no `web/` porque GitHub Pages publica esa carpeta directamente, sin
+workflow de Actions.
 
 ### Lo que mide el navegador
 
 `banco.html` pasa un lote de validación por el modelo dentro del navegador y lo
-compara con lo que dio Python sobre esas mismas fotos. Medido con 200 imágenes a
-288 px:
+compara con lo que dio Python sobre esas mismas fotos. Con 200 imágenes a 288 px:
 
 | | |
 |---|---|
@@ -126,24 +136,19 @@ compara con lo que dio Python sobre esas mismas fotos. Medido con 200 imágenes 
 
 **El `canvas` no cuesta precisión.** Las discrepancias se concentran en
 predicciones de confianza baja, donde el modelo duda y un píxel decide el
-ganador; de hecho en ocho de las catorce el que acertó fue el navegador. El
-banco se genera con `--banco N` y no se publica.
+ganador; en ocho de las catorce el que acertó fue el navegador.
 
-Esa comprobación existe por un motivo: si el preprocesado del navegador no
-replica exactamente el del entrenamiento (otro *resize*, otro orden de canales,
-la normalización olvidada), **el modelo no falla, solo acierta menos** — y eso se
-confunde con "el modelo es malo". Se toleran 5 puntos de diferencia, que es lo
-que separa la interpolación del `canvas` de la de PIL.
-
-Todo se sirve desde la propia carpeta `docs/` —`onnxruntime-web` incluido— y un
-*service worker* cachea el conjunto en la primera visita. Sin eso, "funciona sin
-conexión" sería falso: el modelo se volvería a pedir en cada carga.
+Esta comprobación existe porque es el único fallo del proyecto que no da error:
+si el preprocesado del navegador no replica el del entrenamiento (otro *resize*,
+otro orden de canales, la normalización olvidada), **el modelo no falla, solo
+acierta menos**, y eso se confunde con "el modelo es malo". El banco se genera
+con `--banco N` y no se publica.
 
 ## Los datos
 
-De GBIF, filtrando a **licencias CC0 y CC-BY** — 749.952 fotos de Ecuador sin
+De GBIF, filtrando a **licencias CC0 y CC-BY**: 749.952 fotos de Ecuador sin
 restricción de uso comercial, de un total de 1.445.889 con foto. Cada imagen
-conserva su autor y su licencia en el fichero de créditos: en CC-BY la atribución
+conserva su autor y su licencia en `creditos.csv`, porque en CC-BY la atribución
 no es opcional.
 
 | Versión | Especies | Fotos por especie | Total |
@@ -159,15 +164,40 @@ candidatas**: *Anthurium microspadix* anuncia 181 fotos y deja 0, *Cinchona
 pubescens* 179 y deja 4. `datos.py` pide el triple de candidatas y acepta solo
 las que de verdad llegan al mínimo.
 
+Además, solo se quedan las fotos de iNaturalist. GBIF mezcla proveedores muy
+distintos y una cuarta parte son cámaras trampa: fotos nocturnas en infrarrojo o
+pliegos de herbario prensados son otro dominio, y meterlos empeora el modelo en
+vez de mejorarlo.
+
+## Los comandos
+
+```bash
+python datos.py --especies 100 --fotos 200      # fase 1: dataset desde GBIF
+python datos.py --prueba                        # comprobación de las consultas
+
+python entrenar.py --tam 288                    # fase 2: fine-tuning
+python entrenar.py --prueba                     # comprobación de la partición
+
+python exportar.py --modelo modelo/riksi.pt     # fase 3: ONNX, int8 y medición
+
+python comprobar.py --calibrar 1000             # elige el umbral del cf.
+python comprobar.py --banco 200                 # lote para medir el navegador
+python comprobar.py --espejo 500                # ¿compensa promediar con el espejo?
+```
+
+`datos.py` reanuda: las fotos ya descargadas no se vuelven a pedir, y las
+candidatas se guardan en disco porque son unas 900 consultas que no cambian de un
+día para otro.
+
 ## Plan
 
-- [x] **1 · Dataset** — Consultar GBIF, filtrar por licencia, bajar las fotos en
-      paralelo, dejarlas por especie con sus créditos.
-- [x] **2 · Modelo de visión** — Fine-tuning de EfficientNet-Lite0. Partición por
-      observación, no por foto.
-- [x] **3 · ONNX** — Exportar, cuantizar a 8 bits y medir cuánta precisión cuesta.
-- [x] **4 · La web** — Página estática con cámara, publicada en GitHub Pages.
-- [ ] **5 · El oído** — Lo mismo para cantos de aves, con xeno-canto.
+- [x] **1 · Dataset**. Consultar GBIF, filtrar por licencia, bajar las fotos en
+      paralelo y dejarlas por especie con sus créditos.
+- [x] **2 · Modelo de visión**. Fine-tuning de EfficientNet-Lite0, con partición
+      por observación y no por foto.
+- [x] **3 · ONNX**. Exportar, cuantizar a 8 bits y medir cuánta precisión cuesta.
+- [x] **4 · La web**. Página estática con cámara, publicada en GitHub Pages.
+- [ ] **5 · El oído**. Lo mismo para cantos de aves, con xeno-canto.
 
 ## Decisiones tomadas
 
@@ -175,14 +205,18 @@ las que de verdad llegan al mínimo.
 animal en el mismo sitio son casi duplicados; repartidas entre entrenamiento y
 prueba inflarían el resultado y lo volverían mentira.
 
-**El modelo tiene que poder decir "no lo sé".** Umbral de confianza y clase de
-rechazo. En una herramienta de campo, una identificación equivocada dada con
-seguridad hace más daño que no dar ninguna.
+**El modelo tiene que poder decir "no lo sé".** En una herramienta de campo, una
+identificación equivocada dada con seguridad hace más daño que no dar ninguna.
 
 **Se empieza con cien clases y se crece midiendo.** Distinguir una iguana marina
 de un lobo marino es trivial; separar dos atrapamoscas pardos es difícil hasta
 para un ornitólogo. Estirar el número de especies degrada el modelo, así que cada
 salto se valida antes de darlo.
+
+**Cada cifra publicada viene de un fichero medido.** Ni el README ni la web
+tienen números escritos a mano: salen de `metricas.json` y `umbral.json`, que se
+regeneran al reentrenar. Es la única manera de que no se queden desfasados sin
+que nadie se entere.
 
 ## Entorno
 
@@ -201,8 +235,13 @@ import torch
 print(torch.cuda.is_available(), torch.cuda.get_device_capability(0))  # (12, 0)
 ```
 
+Windows: la consola viene en cp1252 y tumba el proceso al imprimir cualquier
+carácter fuera de esa tabla. Los scripts llaman a
+`sys.stdout.reconfigure(encoding="utf-8", errors="replace")` al arrancar; una
+flecha en un `print` costó doce épocas de entrenamiento.
+
 ## Licencia
 
 Código bajo MIT. Las fotos son de sus autores, bajo CC0 o CC-BY 4.0 según cada
-caso — el detalle está en `datos/creditos.csv`. El dataset y el modelo derivados
-se publican bajo CC-BY 4.0.
+caso, y el detalle está en el `creditos.csv` que genera `datos.py`. El dataset y
+el modelo derivados se publican bajo CC-BY 4.0.
