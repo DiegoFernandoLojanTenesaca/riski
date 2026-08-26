@@ -73,16 +73,43 @@ def todas(consulta, tope=None):
         pagina += 1
 
 
-def libre(lic):
-    """CC0 o CC-BY a secas, el mismo criterio que el dataset de fotos.
+def familia(lic):
+    """En qué se puede usar una grabación, según su licencia.
 
-    En xeno-canto abundan las licencias con -NC, que obligarían a publicar el
-    modelo como no comercial. Antes de bajar nada conviene ver el reparto real
-    con `--licencias`: si casi todo es NC, hay que decidir a conciencia y no
-    descubrirlo cuando ya está entrenado.
+    Medido sobre las 17.857 grabaciones de aves de Ecuador con calidad A:
+    **ninguna** es CC0 ni CC-BY a secas. El reparto obliga a elegir, y cada
+    opción tiene un precio distinto:
+
+    - `libre`: se puede publicar el modelo sin ataduras. Aquí no hay ninguna.
+    - `compartir-igual` (BY-SA): permite uso comercial, pero el derivado tiene
+      que llevar la misma licencia.
+    - `no-comercial` (NC): el modelo quedaría marcado como no comercial.
+    - `sin-derivadas` (ND): prohíbe obras derivadas, y un modelo entrenado lo
+      es. Estas no se tocan.
     """
     l = (lic or "").lower()
-    return "publicdomain/zero" in l or "/licenses/by/" in l
+    if "publicdomain/zero" in l or "/licenses/by/" in l:
+        return "libre"
+    if "-nd" in l:
+        return "sin-derivadas"
+    if "-nc" in l:
+        return "no-comercial"
+    if "-sa" in l:
+        return "compartir-igual"
+    return "sin-derivadas"          # lo que no se reconoce, no se usa
+
+
+# Qué familias entran según lo que se acepte. `--licencias` enseña el precio de
+# cada escalón antes de descargar nada.
+PERMISOS = {
+    "libre": {"libre"},
+    "comercial": {"libre", "compartir-igual"},
+    "todo": {"libre", "compartir-igual", "no-comercial"},
+}
+
+
+def libre(lic, permiso="libre"):
+    return familia(lic) in PERMISOS[permiso]
 
 
 def nombre_de(r):
@@ -110,7 +137,8 @@ def main():
     p.add_argument("--segundos", type=int, default=120, help="descarta las grabaciones más largas")
     p.add_argument("--salida", default="C:/datos/riksi-audio")
     p.add_argument("--hilos", type=int, default=8)
-    p.add_argument("--nc", action="store_true", help="acepta también licencias no comerciales")
+    p.add_argument("--permiso", choices=list(PERMISOS), default="libre",
+                   help="qué licencias se aceptan: libre, comercial (añade BY-SA) o todo (añade NC)")
     p.add_argument("--licencias", action="store_true", help="solo cuenta qué hay, no baja nada")
     args = p.parse_args()
 
@@ -120,16 +148,18 @@ def main():
         print(f"Consultando {base} …")
         rs = todas(base)
         cuenta = Counter(r.get("lic", "") for r in rs)
-        especies = Counter(nombre_de(r) for r in rs)
-        print(f"\n{len(rs):,} grabaciones · {len(especies)} especies\n")
+        print(f"\n{len(rs):,} grabaciones · {len(set(nombre_de(r) for r in rs))} especies\n")
         for lic, n in cuenta.most_common():
-            marca = "libre " if libre(lic) else "atada "
-            print(f"  {marca} {n:>6,}  {lic}")
-        libres = sum(n for lic, n in cuenta.items() if libre(lic))
-        print(f"\n{libres:,} grabaciones sin la atadura de «no comercial» "
-              f"({libres / max(1, len(rs)):.0%})")
-        sirven = [e for e, n in especies.items() if n >= args.minimo]
-        print(f"{len(sirven)} especies llegan a {args.minimo} grabaciones contando todas")
+            print(f"  {familia(lic):<16} {n:>6,}  {lic}")
+
+        print(f"\n{'lo que se acepta':<26}{'grabaciones':>13}{'especies con ' + str(args.minimo) + '+':>20}")
+        for permiso in PERMISOS:
+            usables = [r for r in rs if libre(r.get("lic"), permiso)]
+            porespecie = Counter(nombre_de(r) for r in usables)
+            sirven = sum(1 for n in porespecie.values() if n >= args.minimo)
+            print(f"  {permiso:<24}{len(usables):>13,}{sirven:>20}")
+        print("\n«sin-derivadas» no entra en ninguna: prohíbe obras derivadas, "
+              "y un modelo entrenado lo es.")
         return
 
     raiz = Path(args.salida)
@@ -137,8 +167,7 @@ def main():
 
     print(f"Buscando {base} …")
     rs = todas(base)
-    if not args.nc:
-        rs = [r for r in rs if libre(r.get("lic"))]
+    rs = [r for r in rs if libre(r.get("lic"), args.permiso)]
     rs = [r for r in rs if r.get("file")]          # las especies protegidas vienen sin audio
 
     por_especie = {}
@@ -198,12 +227,18 @@ def main():
 
 def prueba():
     """Lo único con lógica propia aquí es el filtro de licencias."""
-    assert libre("https://creativecommons.org/publicdomain/zero/1.0/")
-    assert libre("//creativecommons.org/licenses/by/4.0/")
-    assert not libre("https://creativecommons.org/licenses/by-nc-sa/4.0/")
-    assert not libre("https://creativecommons.org/licenses/by-nc-nd/4.0/")
-    assert not libre("https://creativecommons.org/licenses/by-sa/4.0/")
-    assert not libre("")
+    assert familia("https://creativecommons.org/publicdomain/zero/1.0/") == "libre"
+    assert familia("//creativecommons.org/licenses/by/4.0/") == "libre"
+    assert familia("https://creativecommons.org/licenses/by-sa/4.0/") == "compartir-igual"
+    assert familia("https://creativecommons.org/licenses/by-nc-sa/4.0/") == "no-comercial"
+    assert familia("https://creativecommons.org/licenses/by-nc/4.0/") == "no-comercial"
+    # -nd manda sobre todo lo demás: prohíbe obras derivadas
+    assert familia("https://creativecommons.org/licenses/by-nc-nd/4.0/") == "sin-derivadas"
+    assert familia("") == "sin-derivadas"
+    assert libre("//creativecommons.org/licenses/by-sa/4.0/", "comercial")
+    assert not libre("//creativecommons.org/licenses/by-sa/4.0/", "libre")
+    assert libre("//creativecommons.org/licenses/by-nc-sa/4.0/", "todo")
+    assert not libre("//creativecommons.org/licenses/by-nc-nd/4.0/", "todo")
     assert nombre_de({"gen": "Pheucticus", "sp": "chrysogaster"}) == "Pheucticus_chrysogaster"
     print("ok · filtro de licencias y nombres correctos")
 
