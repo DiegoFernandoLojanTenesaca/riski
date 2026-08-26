@@ -302,7 +302,8 @@ body.app .barra { position: static; flex: none; }
 .obturador:active { transform: scale(.93); }
 .obturador:disabled { opacity: .3; cursor: default; }
 .secundario {
-  background: none; border: 0; color: var(--tenue); cursor: pointer; width: 96px;
+  background: none; border: 0; color: var(--tenue); cursor: pointer;
+  min-width: 74px; flex: 1;
   font-family: var(--mono); font-size: 11px; letter-spacing: .12em;
   text-transform: uppercase; padding: 12px 0;
 }

@@ -65,6 +65,7 @@ async function arrancar() {
   // La guía se enseña hasta la primera determinación: quien llega desde la
   // portada no tiene por qué adivinar que hay que encuadrar dentro del marco.
   if (!localStorage.getItem("riksi-guia-vista")) $("#guia").hidden = false;
+  prepararOido();
   abrirCamara();
   if (new URLSearchParams(location.search).has("test")) autocomprobar();
 }
@@ -272,6 +273,96 @@ $("#archivo").addEventListener("change", (e) => {
 
 boton.addEventListener("click", () => identificar());
 volver.addEventListener("click", abrirCamara);
+
+/* ── el oído ─────────────────────────────────────────────────────────
+ *
+ * El modelo de cantos recibe el audio crudo y calcula él mismo el
+ * espectrograma, así que aquí no hay ninguna transformación que replicar: solo
+ * hay que entregarle cinco segundos de mono a la frecuencia que espera.
+ *
+ * Y ese remuestreo tampoco se escribe a mano. El micrófono suele dar 48 kHz;
+ * un OfflineAudioContext creado a 32 kHz devuelve el audio ya convertido, con
+ * el remuestreador del propio navegador.
+ */
+let oido = null, oidoPre = null;
+
+/** Presta el vocabulario de otro modelo a las funciones que pintan la ficha.
+ *  Con `finally` para que un fallo no deje la aplicación mostrando nombres de
+ *  aves sobre fotos de plantas. */
+function conVocabulario(otrasClases, otrosComunes, fn) {
+  const c = clases, m = comunes;
+  clases = otrasClases; comunes = otrosComunes;
+  try { fn(); } finally { clases = c; comunes = m; }
+}
+
+async function grabar(segundos, frecuencia) {
+  const flujo = await navigator.mediaDevices.getUserMedia({ audio: true });
+  const trozos = [];
+  const grabadora = new MediaRecorder(flujo);
+  grabadora.ondataavailable = (e) => trozos.push(e.data);
+  grabadora.start();
+
+  for (let n = segundos; n > 0; n--) {
+    estado(`escuchando, ${n} s`, false);
+    await new Promise((ok) => setTimeout(ok, 1000));
+  }
+  grabadora.stop();
+  await new Promise((ok) => (grabadora.onstop = ok));
+  flujo.getTracks().forEach((t) => t.stop());
+
+  const bytes = await new Blob(trozos).arrayBuffer();
+  const largo = segundos * frecuencia;
+  const ctx = new OfflineAudioContext(1, largo, frecuencia);
+  const buffer = await ctx.decodeAudioData(bytes);
+
+  const datos = new Float32Array(largo);
+  datos.set(buffer.getChannelData(0).subarray(0, largo));
+  let pico = 0;
+  for (const v of datos) pico = Math.max(pico, Math.abs(v));
+  if (pico > 0) for (let i = 0; i < datos.length; i++) datos[i] /= pico;
+  return datos;
+}
+
+async function escuchar() {
+  const boton = $("#oir");
+  boton.disabled = true;
+  try {
+    if (!oido) {
+      estado("cargando el modelo de cantos", false);
+      oidoPre = await (await fetch("modelo-audio/preprocesado.json")).json();
+      oido = {
+        clases: await (await fetch("modelo-audio/clases.json")).json(),
+        sesion: await ort.InferenceSession.create("modelo-audio/riksi-audio-int8.onnx",
+          { executionProviders: ["wasm"] }),
+      };
+    }
+    const audio = await grabar(oidoPre.segundos, oidoPre.frecuencia);
+    estado("escuchando la grabación", false);
+    const t0 = performance.now();
+    const salida = await oido.sesion.run({
+      [oido.sesion.inputNames[0]]: new ort.Tensor("float32", audio, [1, audio.length]),
+    });
+    const probs = probabilidades(Array.from(salida[oido.sesion.outputNames[0]].data));
+    const top = probs.map((p, i) => [p, i]).sort((a, b) => b[0] - a[0]).slice(0, 3);
+
+    // La ficha se pinta con los nombres de las aves, no con los de las fotos.
+    conVocabulario(oido.clases, {}, () => pintar(top, Math.round(performance.now() - t0)));
+  } catch (err) {
+    estado("no pude grabar: " + err.message, false);
+  }
+  boton.disabled = false;
+}
+
+async function prepararOido() {
+  // El botón solo existe si el modelo existe. Nada de enseñar una función que
+  // todavía no está.
+  const hay = await fetch("modelo-audio/clases.json", { method: "HEAD" })
+    .then((r) => r.ok).catch(() => false);
+  if (hay) {
+    $("#oir").hidden = false;
+    $("#oir").addEventListener("click", escuchar);
+  }
+}
 
 function cerrarGuia() {
   $("#guia").hidden = true;
