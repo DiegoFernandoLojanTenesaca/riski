@@ -24,28 +24,13 @@ from pathlib import Path
 import numpy as np
 import onnxruntime as ort
 import torch
-from onnxruntime.quantization import CalibrationDataReader, QuantFormat, QuantType, quantize_static
+from onnxruntime.quantization import QuantFormat, QuantType, quantize_static
 from torch.utils.data import DataLoader, Subset
 
+# Reutilizadas tal cual del exportador de fotos: la lectora de calibración y la
+# cuenta del tamaño real no cambian porque la entrada sea audio.
+from exportar import Calibracion, mb
 from entrenar_audio import Cantos, Oido, catalogar, partir_por_grabacion
-
-
-class Calibracion(CalibrationDataReader):
-    """Unas cuantas ventanas reales para fijar las escalas de la cuantización."""
-
-    def __init__(self, cargador, entrada, maximo=100):
-        self.entrada = entrada
-        lotes, vistas = [], 0
-        for x, _ in cargador:
-            lotes.append(x.numpy())
-            vistas += len(x)
-            if vistas >= maximo:
-                break
-        self.it = iter(lotes)
-
-    def get_next(self):
-        lote = next(self.it, None)
-        return None if lote is None else {self.entrada: lote}
 
 
 def medir(ses_o_modelo, cargador, disp="cpu", k=3):
@@ -66,15 +51,6 @@ def medir(ses_o_modelo, cargador, disp="cpu", k=3):
         tk += (top == y[:, None]).any(axis=1).sum()
         n += len(y)
     return t1 / n, tk / n
-
-
-def mb(ruta):
-    ruta = Path(ruta)
-    total = ruta.stat().st_size
-    datos = ruta.with_suffix(ruta.suffix + ".data")
-    if datos.exists():
-        total += datos.stat().st_size
-    return total / 1024 ** 2
 
 
 def main():
@@ -115,7 +91,7 @@ def main():
 
     quantize_static(
         str(fp32), str(int8),
-        Calibracion(cargador, "audio"),
+        Calibracion(cargador, "audio", maximo=100),
         quant_format=QuantFormat.QDQ,
         activation_type=QuantType.QUInt8,
         weight_type=QuantType.QInt8,
