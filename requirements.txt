@@ -12,3 +12,5 @@ pillow
 pandas
 scikit-learn
 tqdm
+soundfile
+torchaudio  # va con la misma variante cu128 que torch
