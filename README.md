@@ -236,9 +236,9 @@ día para otro.
 
 ## El oído
 
-**60 aves, 2.753 grabaciones, 6,9 MB.** Acierta el 54,5% a la primera y el 70,5%
-entre tres. Con su umbral calibrado en 0,50 responde en el 40% de los casos,
-acertando el 85% de esas veces: es bastante menos seguro que el de fotos
+**74 aves, 4.307 grabaciones, 7,0 MB.** Acierta el 52,2% a la primera y el 69,0%
+entre tres. Con su umbral calibrado en 0,50 responde en el 35% de los casos,
+acertando el 86% de esas veces: es bastante menos seguro que el de fotos
 y la aplicación lo dice con su `cf.` en vez de disimularlo. Un canto suelto, con
 viento y otras aves de fondo, es mucho más difícil que una foto.
 
@@ -260,6 +260,22 @@ de 8 bits no da para tanto; una textura de plumaje tolera mucho más redondeo. L
 lección general se mantiene, solo que al revés de como se aprendió: el formato
 se elige midiendo sobre el problema concreto, no por lo que funcionó en el
 anterior.
+
+### Bajar el listón de calidad trajo catorce especies más
+
+Al aceptar también grabaciones de calidad B, el material pasó de 2.753 a 4.307 y
+**entraron 14 especies nuevas** que antes no llegaban al mínimo:
+
+| | 60 aves | 74 aves |
+|---|---|---|
+| grabaciones | 2.753 | 4.307 |
+| acierta | 54,5% | 52,2% |
+| entre tres | 70,5% | 69,0% |
+
+Dos puntos menos por reconocer catorce aves más. Es el mismo cambio que se hizo
+en las fotos al pasar de 56 a 100 especies, y se resuelve igual: **en el campo
+sirve más cubrir lo que te vas a encontrar que afinar en una lista corta**. Una
+especie que el modelo no conoce no falla poco, falla siempre.
 
 ### Entrenar el doble valió diez puntos
 
