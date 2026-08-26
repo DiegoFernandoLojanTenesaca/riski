@@ -44,6 +44,7 @@
   <nav class="menu">
     <a href="#como">Cómo usarla</a>
     <a href="especies.html">Las especies</a>
+    <a href="#oido">Lo que viene</a>
     <a href="#herramientas">Herramientas</a>
     <a href="#colaborar">Colaborar</a>
     <a href="#acerca">Acerca de</a>
@@ -162,8 +163,8 @@
 
   <section class="asoma">
     <span class="etiqueta">Qué tan bien lo hace</span>
-    <h2>De cada cien fotos, acierta setenta y nueve a la primera.</h2>
-    <p>Y noventa y una si se le permite dar tres opciones, que es como funciona una
+    <h2>De cada cien fotos, acierta casi ochenta a la primera.</h2>
+    <p>Y noventa y dos si se le permite dar tres opciones, que es como funciona una
       guía de campo de verdad: te deja dos o tres candidatas y tú decides
       mirando el pico, la hoja o la cola. Las fotos con las que se midió son de
       campo, torcidas y con mala luz, no de estudio.</p>
@@ -190,8 +191,28 @@
     </table>
     <p style="margin-top:20px;font-size:14.5px;color:var(--tenue)">Las cuatro
       pruebas usan las mismas 100 especies y las mismas fotos de examen, que es
-      la única forma de que la comparación signifique algo. El que está
-      funcionando ahora es el ganador.</p>
+      la única forma de que la comparación signifique algo.</p>
+
+    <h3 class="sub" style="margin-top:52px">¿Y si le damos más fotos?</h3>
+    <p style="margin-top:18px">Es la pregunta obvia, así que se midió en vez de
+      suponerla. El material de aprendizaje pasó de 16.872 fotos a 25.878, un
+      53&nbsp;% más:</p>
+    <table class="medidas">
+      <thead><tr><th></th><th>16.872 fotos</th><th>25.878 fotos</th></tr></thead>
+      <tbody>
+        <tr><td>acierta</td><td>79,2 %</td><td>79,8 %</td></tr>
+        <tr><td>entre tres</td><td>91,5 %</td><td>92,3 %</td></tr>
+        <tr class="gana"><td>responde en</td><td>82 % de los casos</td><td>93 % de los casos</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:22px"><b>Medio punto de acierto por la mitad más de
+      fotos.</b> Ahí no estaba el problema: el techo lo pone lo mucho que se
+      parecen las especies entre sí, no la cantidad de ejemplos.</p>
+    <p>Pero lo que sí mejoró no sale en ese porcentaje. El modelo aprendió a
+      medir mejor su propia confianza, y con eso <b>pasa de contestar en el
+      82&nbsp;% de los casos a hacerlo en el 93&nbsp;%</b>, acertando lo mismo.
+      Once puntos más de preguntas respondidas se notan usándola; el porcentaje
+      de acierto ni se entera.</p>
   </section>
 
   <section id="herramientas" class="asoma">
@@ -253,6 +274,23 @@
       atrapamoscas pardos es difícil incluso para un ornitólogo con la foto
       delante. Por eso se empezó con pocas especies y se va creciendo midiendo
       cada paso.</p>
+  </section>
+
+  <section id="oido" class="asoma">
+    <span class="etiqueta">Lo que viene</span>
+    <h2>Y lo mismo, pero de oído.</h2>
+    <p>En el bosque se oyen diez aves por cada una que se ve. La siguiente pieza
+      graba cinco segundos, los convierte en una imagen del sonido y la
+      reconoce con el mismo tipo de modelo pequeño. Las grabaciones vienen de
+      <a href="https://xeno-canto.org">xeno-canto</a>, el archivo de sonidos de
+      naturaleza más grande que existe.</p>
+    <p><b>Y ahí apareció un problema que no es técnico.</b> De las 17.857
+      grabaciones de aves del Ecuador con la mejor calidad, <b>ninguna</b> tiene
+      licencia libre: 3.812 prohíben directamente crear obras derivadas, que es
+      exactamente lo que es un modelo entrenado. Esas no se tocan. El resto son
+      de uso no comercial, así que el modelo de cantos se publicará con esa misma
+      condición, separado del de fotos, y dicho de frente en vez de escondido en
+      la letra pequeña.</p>
   </section>
 
   <section id="colaborar" class="asoma">

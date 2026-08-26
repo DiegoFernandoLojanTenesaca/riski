@@ -231,8 +231,54 @@ día para otro.
       por observación y no por foto.
 - [x] **3 · ONNX**. Exportar, cuantizar a 8 bits y medir cuánta precisión cuesta.
 - [x] **4 · La web**. Página estática con cámara, publicada en GitHub Pages.
-- [ ] **5 · El oído**. Lo mismo para cantos de aves, con xeno-canto. En marcha,
-      con una licencia distinta: ver más abajo.
+- [ ] **5 · El oído**. Lo mismo para cantos de aves, con xeno-canto. La cadena
+      está montada y probada de punta a punta; falta terminar de descargar. Con
+      una licencia distinta: ver más abajo.
+
+## El oído
+
+Misma receta que las fotos, con una diferencia de fondo: **el espectrograma va
+dentro del modelo**. El `.onnx` recibe el audio crudo y él mismo lo convierte en
+la imagen de tiempo por frecuencia que la red sabe leer.
+
+Si se calculara fuera, el navegador tendría que reproducir en JavaScript la
+misma transformada, la misma ventana y la misma escala mel. Y ahí una diferencia
+no da error: da otro resultado. Metiéndolo en el grafo solo existe una
+implementación. Hace falta el exportador nuevo de PyTorch (`dynamo=True`); el
+antiguo no sabe exportar el STFT porque trabaja con números complejos.
+
+Lo demás se hereda: partición **por grabación** en vez de por observación (dos
+trozos del mismo audio son casi el mismo sonido), y cuantización **parcial**,
+solo `Conv` y `Gemm`. El banco de filtros mel se queda en coma flotante, porque
+redondear a enteros una transformada de Fourier estropea justo la información
+fina que separa dos cantos y encima no ahorra nada.
+
+```bash
+python audio.py --licencias                 # qué hay antes de bajar nada
+python audio.py --permiso todo --especies 60
+python entrenar_audio.py
+python exportar_audio.py
+```
+
+### El fallo que no daba ningún error
+
+La primera corrida entrenó con la pérdida en NaN y el acierto clavado en el azar,
+sin una sola excepción por ninguna parte.
+
+Un canto de ave es un tono casi puro: concentra la energía en muy pocas
+frecuencias. Medido, un silbido de 4 kHz llega a **55.000** en el espectrograma
+y revienta el techo de la media precisión (**65.504**) en los pasos intermedios
+del STFT. De ahí sale `inf`, luego `log(inf)`, luego NaN, y el entrenamiento
+entero a la basura en silencio.
+
+El espectrograma va ahora siempre en float32 y solo la red entrena en media
+precisión. Con el arreglo, tres épocas sobre datos a medio descargar pasan de
+3,5% (el azar con 42 clases) a **34,9%**.
+
+Lo interesante es por qué la comprobación no lo detectó: probaba con
+`torch.randn`, o sea ruido, y el ruido reparte la energía por todo el espectro y
+nunca desborda. **Estaba probando con la única señal que no podía fallar.** Ahora
+prueba con un tono.
 
 ## Decisiones tomadas
 
