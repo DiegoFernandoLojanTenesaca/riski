@@ -36,3 +36,6 @@ docs/vendor/ort.webgpu.min.js
 # La clave de la API de xeno-canto nunca va al repositorio: la revocan si
 # aparece publicada.
 xc-clave.txt
+
+# Indice de CodeGraph: se regenera, no se versiona.
+.codegraph/
