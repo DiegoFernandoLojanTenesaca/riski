@@ -13,23 +13,116 @@
 .yq.yq-sinred { display: none; }
 
 .yq-boton {
-  width: 56px; height: 56px;
+  position: relative;
+  width: 60px; height: 60px;
   border: 0; border-radius: 50%;
-  background: var(--liquen); color: var(--basalto);
+  background: var(--marea); color: var(--basalto);
+  border: 2px solid var(--liquen);
   display: grid; place-items: center;
   cursor: pointer;
   box-shadow: 0 6px 22px rgba(0,0,0,.32);
   transition: transform .18s ease, box-shadow .18s ease;
 }
+
+/* ── la mascota ────────────────────────────────────────────────────────── */
+
+.yq-pajaro { width: 42px; height: 42px; overflow: visible; }
+
+/* El ala gira desde el hombro, no desde su centro: por el centro parecería una
+   hélice en vez de un ala. */
+.yq-ala {
+  transform-origin: 26px 30px;
+  animation: yq-aletea 1.6s ease-in-out infinite;
+}
+@keyframes yq-aletea {
+  0%, 100% { transform: rotate(0deg)   scaleY(1);   }
+  50%      { transform: rotate(-26deg) scaleY(.82); }
+}
+
+/* Un colibrí de verdad bate tan rápido que no se ve; aquí bate despacio salvo
+   cuando está pensando, que es cuando el movimiento significa algo. */
+.yq-ocupado .yq-ala { animation-duration: .28s; }
+
+.yq-cabeza { transform-origin: 40px 24px; }
+
+/* Las patas azules son lo que hace reconocible al piquero, así que en el saludo
+   dan el paso del cortejo: levantan alternando, que es exactamente lo que hace
+   el animal de verdad. */
+.yq-patas { transform-origin: 31px 47px; }
+.yq-saluda .yq-patas { animation: yq-paso .55s ease-in-out 4; }
+@keyframes yq-paso {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  50%      { transform: translateX(-1.5px) rotate(-5deg); }
+}
+.yq-ojo { transform-origin: 45px 17px; animation: yq-parpadea 5.5s infinite; }
+@keyframes yq-parpadea {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95%           { transform: scaleY(.1); }
+}
+
+/* Saluda: dos cabezadas y el globo. Solo una vez por sesión. */
+.yq-saluda .yq-cabeza { animation: yq-saluda 1.1s ease-in-out 2; }
+@keyframes yq-saluda {
+  0%, 100% { transform: rotate(0deg); }
+  30%      { transform: rotate(-13deg); }
+  60%      { transform: rotate(7deg); }
+}
+.yq-saluda .yq-boton { animation: yq-bota 1.1s ease-in-out 2; }
+@keyframes yq-bota {
+  0%, 100% { transform: translateY(0); }
+  35%      { transform: translateY(-7px); }
+}
+
+.yq-globo {
+  position: absolute; right: 70px; top: 50%;
+  transform: translateY(-50%) scale(.85);
+  white-space: nowrap;
+  background: var(--liquen); color: var(--basalto);
+  font-size: 12.5px; font-weight: 600;
+  padding: 7px 12px; border-radius: 999px;
+  opacity: 0; pointer-events: none;
+  transition: opacity .25s ease, transform .25s ease;
+  box-shadow: 0 4px 14px rgba(0,0,0,.3);
+}
+.yq-saluda .yq-globo { opacity: 1; transform: translateY(-50%) scale(1); }
+.yq-activo .yq-globo { display: none; }
+
+.yq-avatar {
+  flex-shrink: 0;
+  width: 38px; height: 38px;
+  display: grid; place-items: center;
+  background: var(--basalto); border-radius: 50%;
+  border: 1px solid rgba(199,194,75,.3);
+}
+.yq-avatar .yq-pajaro { width: 26px; height: 26px; }
+.yq-titulo { flex: 1; min-width: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .yq-ala, .yq-ojo, .yq-patas,
+  .yq-saluda .yq-cabeza, .yq-saluda .yq-boton, .yq-saluda .yq-patas { animation: none; }
+}
 .yq-boton:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,0,0,.4); }
 .yq-boton:focus-visible { outline: 3px solid var(--agua); outline-offset: 3px; }
 .yq-activo .yq-boton { transform: scale(.86); opacity: .75; }
 
+/* `fixed` y no `absolute`. Esta era la causa de que el panel saliera cortado:
+   colgaba de `.yq`, que es una caja de 60px, así que se posicionaba respecto al
+   botón y no respecto a la ventana. Anclado a la ventana con las cuatro
+   distancias, el navegador ya sabe exactamente cuánto sitio hay y el panel
+   nunca se sale ni deja huecos. */
+/* El widget vive dentro de la página, así que hereda sus reglas de etiqueta.
+   `estilo.css` tiene `section { padding: 84px 0 }` para las secciones del sitio,
+   y eso se aplicaba también a este `<section>`: 84px de hueco arriba y 85 abajo
+   dentro del panel, medidos igual en las tres resoluciones. Se neutraliza aquí
+   en vez de renombrar la etiqueta, porque `<section>` es lo correcto para una
+   región con su propio título. */
 .yq-panel {
-  position: absolute;
-  right: 0; bottom: 70px;
+  padding: 0; border-top: 0; margin: 0;
+  position: fixed;
+  right: clamp(12px, 3vw, 28px);
+  bottom: calc(clamp(12px, 3vw, 28px) + 72px);
   width: min(384px, calc(100vw - 24px));
-  height: min(560px, calc(100vh - 120px));
+  max-height: min(560px, calc(100dvh - 150px));
   display: flex; flex-direction: column;
   background: var(--basalto);
   color: var(--texto);
@@ -45,9 +138,13 @@
   .yq-boton { transition: none; }
 }
 
+/* La cabecera y el pie no encogen: sin `flex-shrink: 0` el navegador los
+   aplasta cuando el hilo crece, y la cabecera acababa pintada encima de los
+   mensajes. */
 .yq-cab {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 12px; padding: 14px 16px;
+  flex-shrink: 0;
+  display: flex; align-items: center;
+  gap: 11px; padding: 13px 15px;
   border-bottom: 1px solid rgba(199,194,75,.18);
   background: var(--marea);
 }
@@ -59,8 +156,12 @@
 }
 .yq-cerrar:hover { color: var(--papel); }
 
+/* `min-height: 0` es lo que permite que este hijo se encoja dentro del flex y
+   saque su propia barra de scroll. Sin eso, un mensaje largo empuja el panel
+   entero y el final queda fuera de la ventana. */
 .yq-hilo {
-  flex: 1; overflow-y: auto;
+  flex: 1 1 auto; min-height: 0;
+  overflow-y: auto; overscroll-behavior: contain;
   padding: 16px; display: flex; flex-direction: column; gap: 12px;
   scrollbar-width: thin; scrollbar-color: var(--marea) transparent;
 }
@@ -113,6 +214,7 @@
 }
 
 .yq-sugerencias {
+  flex-shrink: 0;
   display: flex; flex-wrap: wrap; gap: 6px;
   padding: 0 16px 12px;
 }
@@ -126,6 +228,7 @@
 .yq-sugerencias button:hover { border-color: var(--liquen); color: var(--liquen); }
 
 .yq-pie {
+  flex-shrink: 0;
   display: flex; gap: 8px; padding: 12px 14px;
   border-top: 1px solid rgba(199,194,75,.18);
   background: var(--marea);
@@ -144,5 +247,5 @@
 .yq-pie button:hover { filter: brightness(1.1); }
 
 @media (max-width: 480px) {
-  .yq-panel { height: min(72vh, calc(100vh - 100px)); }
+  .yq-panel { max-height: min(74dvh, calc(100dvh - 110px)); }
 }

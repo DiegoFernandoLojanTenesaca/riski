@@ -13,6 +13,35 @@
 
 const YACHAQ = window.YACHAQ_API || "";   // lo fija index.html; vacío = apagado
 
+/* La mascota va en línea y no como <img>: así el CSS puede animar la cabeza, el
+   ala y las patas por separado.
+
+   Un piquero patiazul, que es la especie de la que más habla el proyecto. Está
+   dibujado para leerse a 40 píxeles, que es el tamaño real en el botón: formas
+   grandes, pocas piezas y las patas bien azules, que es lo que lo hace
+   reconocible de un vistazo. La primera versión tenía el detalle de un dibujo a
+   tamaño completo y a 40px era una mancha gris. */
+const PIQUERO = `
+  <svg class="yq-pajaro" viewBox="0 0 64 64" aria-hidden="true">
+    <g class="yq-patas" stroke="#3d9be0" stroke-width="4.5" stroke-linecap="round" fill="none">
+      <path d="M25 46 L22 56"/><path d="M22 56 L16 58"/><path d="M22 56 L26 59"/>
+      <path d="M36 46 L39 56"/><path d="M39 56 L34 59"/><path d="M39 56 L45 58"/>
+    </g>
+
+    <ellipse cx="30" cy="35" rx="16" ry="12.5" fill="#f2f3ee"/>
+    <path class="yq-ala" d="M24 27 Q13 25 20 38 Q28 42 32 33 Z" fill="#7d8a92"/>
+
+    <g class="yq-cabeza">
+      <circle cx="43" cy="19" r="11" fill="#f2f3ee"/>
+      <path d="M34 12 Q43 6 52 13 Q43 10 34 12 Z" fill="#b8a878"/>
+      <path d="M53 16 L64 21 L53 25 Z" fill="#6b757c"/>
+      <g class="yq-ojo">
+        <circle cx="45" cy="17" r="4" fill="#14181b"/>
+        <circle cx="46.4" cy="15.6" r="1.4" fill="#ffffff"/>
+      </g>
+    </g>
+  </svg>`;
+
 const chat = {
   abierto: false,
   conversacion: null,
@@ -68,6 +97,7 @@ async function enviar(texto) {
   const pensando = nodo("div", "yq-msj yq-el yq-pensando");
   pensando.innerHTML = "<span></span><span></span><span></span>";
   pintar(pensando);
+  document.querySelector(".yq")?.classList.add("yq-ocupado");
 
   try {
     const r = await fetch(`${YACHAQ}/preguntar`, {
@@ -89,6 +119,7 @@ async function enviar(texto) {
       : "Sin conexión. El chat necesita red; el identificador de la cámara no."));
   } finally {
     chat.esperando = false;
+    document.querySelector(".yq")?.classList.remove("yq-ocupado");
   }
 }
 
@@ -98,15 +129,13 @@ function montar() {
   const raiz = nodo("div", "yq");
   raiz.innerHTML = `
     <button class="yq-boton" aria-label="Preguntar a Yachaq" aria-expanded="false">
-      <svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true">
-        <path d="M6 32C17 14 47 14 58 32 47 50 17 50 6 32Z" fill="none"
-              stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/>
-        <circle cx="32" cy="32" r="7.5" fill="currentColor"/>
-      </svg>
+      ${PIQUERO}
+      <span class="yq-globo">¿te ayudo?</span>
     </button>
     <section class="yq-panel" hidden aria-label="Chat con Yachaq">
       <header class="yq-cab">
-        <div>
+        <span class="yq-avatar">${PIQUERO}</span>
+        <div class="yq-titulo">
           <strong>Yachaq</strong>
           <span class="yq-sub">pregunta sobre las 100 especies</span>
         </div>
@@ -164,6 +193,18 @@ function montar() {
       enviar(b.textContent);
     });
   });
+
+  // Saluda una vez, a los cuatro segundos, y no vuelve a insistir: un globo que
+  // reaparece cada poco es de las cosas que hacen cerrar una página.
+  if (!sessionStorage.getItem("yq-saludo")) {
+    setTimeout(() => {
+      if (!chat.abierto) {
+        raiz.classList.add("yq-saluda");
+        setTimeout(() => raiz.classList.remove("yq-saluda"), 5200);
+      }
+      sessionStorage.setItem("yq-saludo", "1");
+    }, 4000);
+  }
 
   // El chat necesita red y el resto de la página no. Se apaga y se enciende
   // solo, en vez de dejar un botón que falla al pulsarlo.
