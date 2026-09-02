@@ -2,6 +2,12 @@
   <img src="icono.svg" width="96" alt="Riksi">
   <h1>Riksi</h1>
   <p><strong>Reconoce la naturaleza del Ecuador, sin conexión.</strong></p>
+
+  <p>
+    <a href="https://diegofernandolojantenesaca.github.io/riski/"><b>Abrir la app</b></a>
+    ·
+    <a href="https://github.com/DiegoFernandoLojanTenesaca/yachaq">Yachaq, el agente</a>
+  </p>
 </div>
 
 ---
@@ -11,6 +17,21 @@ instalar nada y **sin internet**: el modelo se descarga una vez y a partir de ah
 corre entero dentro del navegador.
 
 *Riksiy*, en kichwa, es reconocer. Saber quién es alguien.
+
+## Y un chat, que es lo contrario
+
+En la página hay una burbuja: [Yachaq](https://github.com/DiegoFernandoLojanTenesaca/yachaq),
+un agente que responde por qué el piquero tiene los pies azules o dónde se ha
+registrado el cóndor. Toma el mismo modelo de aquí y le añade consultas a GBIF
+en vivo y 691 fichas de especies.
+
+**Es lo contrario de esta página y hay que decirlo:** el identificador corre en
+tu navegador y funciona en el páramo; el chat habla con un servidor y sin señal
+no hay chat. Por eso el widget se apaga solo cuando no hay red, en vez de dejar
+un botón que falla al pulsarlo.
+
+Cada respuesta enseña qué herramientas usó. No es depuración: es la diferencia
+entre algo que consultó los registros y algo que se lo inventó.
 
 ## Por qué sin conexión
 
