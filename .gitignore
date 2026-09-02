@@ -39,3 +39,7 @@ xc-clave.txt
 
 # Indice de CodeGraph: se regenera, no se versiona.
 .codegraph/
+
+# MLflow: el registro se regenera de los metricas.json.
+mlflow.db
+mlruns/
