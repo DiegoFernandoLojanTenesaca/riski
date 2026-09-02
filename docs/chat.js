@@ -11,7 +11,15 @@
  * inventó, y quien lee tiene derecho a distinguirlas.
  */
 
-const YACHAQ = window.YACHAQ_API || "";   // lo fija index.html; vacío = apagado
+/* Dónde vive el agente. En local apunta al servidor de desarrollo y en
+   producción a lo que diga `YACHAQ_API` en index.html.
+ *
+ * Se decide aquí y no a mano porque durante el desarrollo hubo que ir cambiando
+ * esa constante en cada prueba, y una de las veces se quedó vacía: el widget
+ * dejó de pintarse y parecía que había desaparecido. Que el código lo deduzca
+ * quita ese paso. */
+const LOCAL = ["localhost", "127.0.0.1"].includes(location.hostname);
+const YACHAQ = window.YACHAQ_API || (LOCAL ? "http://127.0.0.1:8000" : "");
 
 /* La mascota va en línea y no como <img>: así el CSS puede animar la cabeza, el
    ala y las patas por separado.
@@ -99,6 +107,14 @@ async function enviar(texto) {
   pintar(pensando);
   document.querySelector(".yq")?.classList.add("yq-ocupado");
 
+  // Un servidor gratuito puede estar dormido y tardar un minuto en despertar.
+  // Sin avisar, eso se lee como que el chat está roto, así que a los seis
+  // segundos se dice lo que pasa en vez de dejar los puntitos girando.
+  const aviso = setTimeout(() => {
+    pensando.classList.add("yq-lento");
+    pensando.setAttribute("data-nota", "despertando el servidor…");
+  }, 6000);
+
   try {
     const r = await fetch(`${YACHAQ}/preguntar`, {
       method: "POST",
@@ -118,6 +134,7 @@ async function enviar(texto) {
       ? `No pude preguntar: ${e.message}. El identificador de la cámara sigue funcionando, que ese va dentro del navegador.`
       : "Sin conexión. El chat necesita red; el identificador de la cámara no."));
   } finally {
+    clearTimeout(aviso);
     chat.esperando = false;
     document.querySelector(".yq")?.classList.remove("yq-ocupado");
   }

@@ -201,7 +201,12 @@
   padding: 2px 6px; border-radius: 5px;
 }
 
-.yq-pensando { display: flex; gap: 5px; padding: 15px 14px; }
+.yq-pensando { display: flex; gap: 5px; padding: 15px 14px; align-items: center; }
+/* Cuando tarda, los puntitos dejan de bastar: hay que decir por qué. */
+.yq-pensando[data-nota]::after {
+  content: attr(data-nota);
+  margin-left: 6px; font-size: 12px; color: var(--tenue);
+}
 .yq-pensando span {
   width: 6px; height: 6px; border-radius: 50%;
   background: var(--tenue); animation: yq-late 1.2s infinite;
