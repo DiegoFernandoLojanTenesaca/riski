@@ -1,0 +1,148 @@
+/* El chat de Yachaq. Misma paleta que el resto: basalto, liquen, papel. */
+
+.yq {
+  position: fixed;
+  right: clamp(12px, 3vw, 28px);
+  bottom: clamp(12px, 3vw, 28px);
+  z-index: 60;
+  font-family: var(--sans);
+}
+
+/* Sin red el chat no puede funcionar, así que desaparece en vez de quedarse
+   como un botón que falla al pulsarlo. */
+.yq.yq-sinred { display: none; }
+
+.yq-boton {
+  width: 56px; height: 56px;
+  border: 0; border-radius: 50%;
+  background: var(--liquen); color: var(--basalto);
+  display: grid; place-items: center;
+  cursor: pointer;
+  box-shadow: 0 6px 22px rgba(0,0,0,.32);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.yq-boton:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,0,0,.4); }
+.yq-boton:focus-visible { outline: 3px solid var(--agua); outline-offset: 3px; }
+.yq-activo .yq-boton { transform: scale(.86); opacity: .75; }
+
+.yq-panel {
+  position: absolute;
+  right: 0; bottom: 70px;
+  width: min(384px, calc(100vw - 24px));
+  height: min(560px, calc(100vh - 120px));
+  display: flex; flex-direction: column;
+  background: var(--basalto);
+  color: var(--texto);
+  border: 1px solid rgba(199,194,75,.22);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,.5);
+  animation: yq-entra .2s ease;
+}
+@keyframes yq-entra { from { opacity: 0; transform: translateY(10px); } }
+@media (prefers-reduced-motion: reduce) {
+  .yq-panel { animation: none; }
+  .yq-boton { transition: none; }
+}
+
+.yq-cab {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; padding: 14px 16px;
+  border-bottom: 1px solid rgba(199,194,75,.18);
+  background: var(--marea);
+}
+.yq-cab strong { color: var(--liquen); font-size: 15px; letter-spacing: .01em; }
+.yq-sub { display: block; color: var(--tenue); font-size: 12px; margin-top: 2px; }
+.yq-cerrar {
+  background: none; border: 0; color: var(--suave);
+  font-size: 26px; line-height: 1; cursor: pointer; padding: 0 4px;
+}
+.yq-cerrar:hover { color: var(--papel); }
+
+.yq-hilo {
+  flex: 1; overflow-y: auto;
+  padding: 16px; display: flex; flex-direction: column; gap: 12px;
+  scrollbar-width: thin; scrollbar-color: var(--marea) transparent;
+}
+
+.yq-msj {
+  max-width: 88%;
+  padding: 10px 13px;
+  border-radius: 13px;
+  font-size: 14px; line-height: 1.55;
+  word-wrap: break-word;
+}
+.yq-yo {
+  align-self: flex-end;
+  background: var(--liquen); color: var(--basalto);
+  border-bottom-right-radius: 4px;
+}
+.yq-el {
+  align-self: flex-start;
+  background: var(--marea);
+  border-bottom-left-radius: 4px;
+}
+.yq-texto strong { color: inherit; font-weight: 650; }
+.yq-el .yq-texto strong { color: var(--liquen); }
+
+/* Qué herramientas usó. Se ve siempre, porque es la diferencia entre un dato
+   consultado y uno inventado. */
+.yq-usos {
+  margin-top: 9px; padding-top: 8px;
+  border-top: 1px solid rgba(199,194,75,.16);
+  display: flex; flex-wrap: wrap; gap: 5px; align-items: center;
+}
+.yq-usos-t { color: var(--tenue); font-size: 11px; }
+.yq-uso {
+  font-family: var(--mono); font-size: 10.5px;
+  color: var(--agua); background: rgba(121,176,168,.1);
+  border: 1px solid rgba(121,176,168,.22);
+  padding: 2px 6px; border-radius: 5px;
+}
+
+.yq-pensando { display: flex; gap: 5px; padding: 15px 14px; }
+.yq-pensando span {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--tenue); animation: yq-late 1.2s infinite;
+}
+.yq-pensando span:nth-child(2) { animation-delay: .18s; }
+.yq-pensando span:nth-child(3) { animation-delay: .36s; }
+@keyframes yq-late { 0%, 60%, 100% { opacity: .25; } 30% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .yq-pensando span { animation: none; opacity: .6; }
+}
+
+.yq-sugerencias {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  padding: 0 16px 12px;
+}
+.yq-sugerencias button {
+  background: none; color: var(--suave);
+  border: 1px solid rgba(199,194,75,.28);
+  border-radius: 999px; padding: 6px 11px;
+  font-size: 12px; font-family: inherit; cursor: pointer;
+  text-align: left;
+}
+.yq-sugerencias button:hover { border-color: var(--liquen); color: var(--liquen); }
+
+.yq-pie {
+  display: flex; gap: 8px; padding: 12px 14px;
+  border-top: 1px solid rgba(199,194,75,.18);
+  background: var(--marea);
+}
+.yq-pie input {
+  flex: 1; background: var(--basalto); color: var(--texto);
+  border: 1px solid rgba(199,194,75,.22); border-radius: 9px;
+  padding: 9px 12px; font-size: 14px; font-family: inherit;
+}
+.yq-pie input:focus { outline: none; border-color: var(--liquen); }
+.yq-pie button {
+  background: var(--liquen); color: var(--basalto);
+  border: 0; border-radius: 9px; width: 40px;
+  font-size: 17px; cursor: pointer;
+}
+.yq-pie button:hover { filter: brightness(1.1); }
+
+@media (max-width: 480px) {
+  .yq-panel { height: min(72vh, calc(100vh - 100px)); }
+}

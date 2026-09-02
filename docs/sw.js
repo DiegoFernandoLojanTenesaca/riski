@@ -8,9 +8,9 @@
  * JSON, que son 60 KB, van network-first con la copia local de respaldo. Sin
  * red se comportan igual que antes; con red siempre se ve lo último.
  */
-const VERSION = "riksi-v25";
+const VERSION = "riksi-v26";
 const ARCHIVOS = [
-  "./", "index.html", "app.html", "especies.html", "banco.html", "estilo.css", "app.js", "icono.svg",
+  "./", "index.html", "app.html", "especies.html", "banco.html", "estilo.css", "app.js", "chat.css", "chat.js", "icono.svg",
   "vendor/ort.wasm.min.js", "vendor/ort-wasm-simd-threaded.mjs", "vendor/ort-wasm-simd-threaded.wasm",
   "modelo/riksi-int8.onnx", "modelo/clases.json", "manifest.json", "modelo/preprocesado.json", "modelo/metricas.json", "modelo/comunes.json", "modelo/umbral.json", "catalogo/catalogo.json",
 ];

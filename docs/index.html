@@ -21,6 +21,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Riksi">
 <link rel="stylesheet" href="estilo.css">
+<link rel="stylesheet" href="chat.css">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -575,5 +576,12 @@ if ("serviceWorker" in navigator && location.protocol !== "file:") {
   navigator.serviceWorker.register("sw.js").catch(() => {});
 }
 </script>
+
+<!-- El chat de Yachaq. A diferencia del identificador, este SÍ necesita red:
+     el modelo de la cámara corre dentro del navegador, pero el agente vive en
+     un servidor. Sin YACHAQ_API el widget no se pinta, así que la página
+     funciona igual mientras el servidor no esté publicado. -->
+<script>window.YACHAQ_API = "";</script>
+<script src="chat.js" defer></script>
 </body>
 </html>
