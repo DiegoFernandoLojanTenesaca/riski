@@ -7,6 +7,8 @@
     <a href="https://diegofernandolojantenesaca.github.io/riski/"><b>Abrir la app</b></a>
     ·
     <a href="https://github.com/DiegoFernandoLojanTenesaca/yachaq">Yachaq, el agente</a>
+    ·
+    <a href="https://github.com/DiegoFernandoLojanTenesaca/riksi-radar">riksi-radar, el pipeline</a>
   </p>
 </div>
 
@@ -125,6 +127,59 @@ importe, y demasiado pequeña para justificar más descargas.)
 **Promediar la imagen con su espejo no compensa**: 0,2 puntos por duplicar el
 tiempo de respuesta, sobre 500 imágenes. Medido con `comprobar.py --espejo` y no
 implementado.
+
+## Cómo se porta fuera de su reparto
+
+Las cifras de arriba miden un mundo más estrecho de lo que parece: las imágenes
+de validación salen del mismo reparto que las de entrenamiento —mismas fuentes,
+mismos fotógrafos, mismo sesgo de encuadre—. El 79,8 % es real, pero responde a
+una pregunta acotada.
+
+[riksi-radar](https://github.com/DiegoFernandoLojanTenesaca/riksi-radar) mide la
+otra: toma observaciones que se subieron a GBIF **después**, de gente distinta y
+sin que nadie las eligiera, y pasa cada foto por este modelo sin dejarle ver la
+etiqueta.
+
+| | acierta |
+|---|---|
+| banco de validación · 200 imágenes | 78,0 % |
+| campo, vía el radar · 400 observaciones | **84,2 %** |
+
+**No cae: sube seis puntos.** Que suba no significa que el modelo haya mejorado
+—significa que al campo llegan sobre todo especies fáciles y muy fotografiadas—,
+pero sí significa que no hay deriva: el modelo aguanta fuera del reparto donde
+se entrenó.
+
+```bash
+python deriva.py        # la comparación, especie a especie
+```
+
+Por especie la lectura va con reservas y el propio informe lo dice: el banco
+reparte 200 imágenes entre 86 especies, seis como máximo cada una, porque se
+hizo para que la web enseñe ejemplos y no para medir. Aun así hay dos que caen
+más de veinte puntos y quedan marcadas.
+
+**Y los desacuerdos son lo interesante.** Cuando el modelo y GBIF discrepan hay
+tres explicaciones —el modelo se equivocó, la observación está mal identificada,
+o la foto no muestra lo que dice el registro— y el radar no decide cuál. Los
+casos que salen tienen sentido biológico: tres veces *Chelonoidis niger* contra
+*porteri*, dos tortugas de Galápagos con la taxonomía en disputa entre biólogos;
+la iguana marina contra la lagartija de lava, que comparten roca y postura.
+
+## Los nueve experimentos, en MLflow
+
+Las nueve configuraciones que se probaron dejaron cada una su `metricas.json`.
+`experimentos.py` las registra para poder compararlas sin abrir nueve ficheros:
+
+```bash
+python experimentos.py          # registra las nueve corridas
+python experimentos.py --ver    # la interfaz, en localhost:5000
+```
+
+Registrar a posteriori destapó algo útil: **los `metricas.json` de foto no
+guardan las épocas ni el tamaño del lote**, así que dos corridas de la misma
+arquitectura no se distinguen por sus hiperparámetros. Se marca con una etiqueta
+en vez de inventar los valores.
 
 ## Cuándo dice "no lo sé"
 
