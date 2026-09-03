@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Three projects, one lesson: almost every number I published was inflated</title>
+<style>
+:root { --tinta:#1a1a1a; --suave:#666; --linea:#e2e2e2; --fondo:#fff;
+        --acento:#0f766e; --codigo:#f6f8fa; }
+* { box-sizing: border-box }
+body { max-width: 46rem; margin: 0 auto; padding: 3rem 1.5rem 6rem;
+       font: 17px/1.7 Georgia, "Times New Roman", serif;
+       color: var(--tinta); background: var(--fondo); }
+h1 { font-size: 2.1rem; line-height: 1.2; margin: 0 0 .4em;
+     letter-spacing: -.02em; }
+h2 { font-size: 1.45rem; margin: 2.6em 0 .6em; padding-top: .3em;
+     letter-spacing: -.01em; }
+h3 { font-size: 1.15rem; margin: 2em 0 .5em; color: var(--suave); }
+p, li { margin: 0 0 1.1em }
+a { color: var(--acento) }
+strong { font-weight: 700 }
+hr { border: 0; border-top: 1px solid var(--linea); margin: 2.6em 0 }
+blockquote { margin: 1.6em 0; padding: .2em 0 .2em 1.2em;
+             border-left: 3px solid var(--acento); color: var(--suave);
+             font-style: italic; }
+code { font: 14px/1.5 "Cascadia Code", Consolas, monospace;
+       background: var(--codigo); padding: .12em .35em; border-radius: 3px; }
+pre { background: var(--codigo); border: 1px solid var(--linea);
+      border-radius: 6px; padding: 1rem 1.1rem; overflow-x: auto;
+      margin: 1.4em 0; }
+pre code { background: none; padding: 0; font-size: 13.5px; line-height: 1.55 }
+table { border-collapse: collapse; width: 100%; margin: 1.5em 0; font-size: 15px;
+        font-family: -apple-system, "Segoe UI", sans-serif; }
+th, td { border-bottom: 1px solid var(--linea); padding: .6em .7em;
+         text-align: left; vertical-align: top; }
+th { font-weight: 600; border-bottom-width: 2px }
+tr:last-child td { border-bottom: none }
+.cabecera { color: var(--suave); font-size: .92rem; margin: 0 0 3em;
+            font-family: -apple-system, "Segoe UI", sans-serif; }
+
+/* Para el PDF: que nada se parta por la mitad al imprimir. */
+@media print {
+  body { max-width: none; padding: 0; font-size: 11.5pt }
+  h1, h2, h3 { break-after: avoid }
+  pre, table, blockquote { break-inside: avoid }
+  a { color: var(--tinta); text-decoration: none }
+  a[href^="http"]::after { content: " (" attr(href) ")";
+                           font-size: .8em; color: var(--suave) }
+}
+</style>
+<h1>Three projects, one lesson: almost every number I published was inflated</h1><p class="cabecera">machinelearning, python, mlops, datascience · Ctrl+P to save as PDF</p>
+<p>I trained a classifier for 100 Ecuadorian species, built a pipeline to watch it work on real observations, and put an agent on top. Three repos, about three months.</p>
+<p>This post isn&#x27;t about how I built them. It&#x27;s about how <strong>every time I measured something properly, the number went down</strong> — and how that&#x27;s the job, not a setback.</p>
+<p>Four cases. In all four the first number was defensible, published, and misleading.</p>
+<hr>
+<h2>The setup</h2>
+<p>Just enough to follow the rest:</p>
+<table>
+<tr><td><strong><a href="https://github.com/DiegoFernandoLojanTenesaca/riksi">riksi</a></strong></td><td>EfficientNet-Lite0, 100 species, 3.8 MB in int8. Runs in the browser via ONNX Runtime Web</td></tr>
+<tr><td><strong><a href="https://github.com/DiegoFernandoLojanTenesaca/riksi-radar">riksi-radar</a></strong></td><td>Kafka → the model → DuckDB → dbt. Pulls new observations from <a href="https://www.gbif.org/">GBIF</a> and classifies them without seeing the label</td></tr>
+<tr><td><strong><a href="https://github.com/DiegoFernandoLojanTenesaca/yachaq">yachaq</a></strong></td><td>An agent over all of it: RAG, memory, MCP server</td></tr></table>
+<p>The model gets <strong>79.8 %</strong> top-1 on 1000 validation images. That one is measured correctly and isn&#x27;t among the numbers that fall apart.</p>
+<hr>
+<h2>Case 1 · &quot;The model does better outside its own split&quot;</h2>
+<p>Validation images come from the same split as training: same sources, same photographers, same framing bias. 79.8 % there answers a fairly narrow question.</p>
+<p>So I built the radar: take observations uploaded to GBIF <strong>afterwards</strong>, by different people, that nobody hand-picked, and run every photo through the model.</p>
+<p>400 observations. <strong>337 correct: 84.2 %.</strong></p>
+<p>Six points above the validation bank. I wrote it in the README with &quot;goes up&quot; in bold.</p>
+<p>It&#x27;s wrong. Not the arithmetic — the bias.</p>
+<pre><code>Amblyrhynchus cristatus (marine iguana)   128 of 400   32 %
+top three species combined                198 of 400   50 %
+distinct species, out of the 100 it knows          20</code></pre>
+<p>Citizen science doesn&#x27;t sample uniformly. People photograph what they see, and in the Galápagos they see marine iguanas. That 84.2 % is mostly the model&#x27;s grade on one species, repeated 128 times.</p>
+<p>Averaging per species instead of per observation — giving the iguana the same weight as the turtle that shows up three times:</p>
+<table>
+<tr><th></th><th>accuracy</th></tr>
+<tr><td>per observation</td><td>84.2 %</td></tr>
+<tr><td><strong>averaged over species</strong></td><td><strong>78.7 %</strong></td></tr></table>
+<p>And there&#x27;s the interesting part: <strong>78.7 % in the field against 78.0 % on the bank.</strong> The model doesn&#x27;t do better outside its split. It performs the same.</p>
+<p>Which is a more boring conclusion and a far more credible one. &quot;No drift&quot; is a result; &quot;improves in production&quot; was an artifact of how I averaged.</p>
+<blockquote><p>If you&#x27;re publishing one number over citizen-science data, average per class. The per-observation mean measures your data distribution as much as your model.</p></blockquote>
+<hr>
+<h2>Case 2 · The disagreements that weren&#x27;t the model&#x27;s fault</h2>
+<p>That left 63 observations where the model and GBIF disagreed. Three possible explanations: the model was wrong, the observation is misidentified, or the photo doesn&#x27;t show what the record claims.</p>
+<p>I wrote in the README that the pipeline doesn&#x27;t decide which, and that the Galápagos tortoises showing up repeatedly were &quot;taxonomy disputed among biologists.&quot;</p>
+<p>I made that up. It sounded plausible and I never checked.</p>
+<p>Turns out there&#x27;s a fourth explanation, and it&#x27;s checkable: <strong>GBIF publishes periodic snapshots, not a live mirror of iNaturalist.</strong> An observation iNaturalist already corrected can still sit in GBIF under the old identification.</p>
+<p>You verify it in two hops. GBIF stores the iNaturalist identifier in</p>
+<p><code>catalogNumber</code>, so you can ask what the identification is <strong>today</strong>:</p>
+<pre><code class="lenguaje-python">def _en_inaturalist(clave_gbif):
+    oc = _pedir(f&quot;{GBIF}/occurrence/{clave_gbif}&quot;)
+    id_inat = oc.get(&quot;catalogNumber&quot;)          # the link back to the source
+    d = _pedir(f&quot;{INAT}/observations/{id_inat}&quot;)
+    o = d[&quot;results&quot;][0]
+    return {&quot;taxon_hoy&quot;: (o.get(&quot;taxon&quot;) or {}).get(&quot;name&quot;),
+            &quot;grado&quot;: o.get(&quot;quality_grade&quot;),
+            &quot;identificaciones&quot;: o.get(&quot;identifications_count&quot;, 0)}</code></pre>
+<p>All 63, two minutes of requests. 24 carry a different label today.</p>
+<p>But there&#x27;s a trap I nearly walked into. Not every change means the same thing:</p>
+<table>
+<tr><th>change</th><th>what it is</th></tr>
+<tr><td><code>Anous stolidus</code> → <code>Anous stolidus galapagensis</code></td><td><strong>refinement</strong>: the population was narrowed down, the species is the same, the model was still wrong</td></tr>
+<tr><td><code>Chelonoidis porteri</code> → <code>Chelonoidis niger porteri</code></td><td><strong>a different species</strong>: it now hangs under <em>C. niger</em></td></tr></table>
+<p>In the second case the model had said <code>Chelonoidis niger</code>. Under today&#x27;s taxonomy, it was <strong>right</strong>. The Santa Cruz tortoise became a subspecies of <em>C. niger</em> and GBIF still had the previous version.</p>
+<p>Counting those separately is the whole difference between a finding and self-deception, so the judging logic is the one piece with a real test:</p>
+<pre><code class="lenguaje-python">def _juzgar(caso, hoy):
+    gbif, dice, ahora = caso[&quot;gbif&quot;], caso[&quot;modelo&quot;], hoy[&quot;taxon_hoy&quot;]
+    if ahora == gbif:                          return &quot;unchanged&quot;
+    if _es_hijo(ahora, gbif):                  return &quot;narrowed&quot;
+    if ahora == dice or _es_hijo(ahora, dice):  return &quot;the model was right&quot;
+    return &quot;species changed&quot;</code></pre>
+<p><code>_es_hijo</code> compares word by word rather than with <code>startswith</code>, which would accept a match halfway through a word:</p>
+<pre><code class="lenguaje-python">assert not _es_hijo(&quot;Anous stolidusa&quot;, &quot;Anous stolidus&quot;)
+assert not _es_hijo(&quot;Anous stolidus&quot;, &quot;Anous stolidus&quot;)   # nor its own child
+assert     _es_hijo(&quot;Chelonoidis niger porteri&quot;, &quot;Chelonoidis niger&quot;)</code></pre>
+<p>The result:</p>
+<table>
+<tr><th>of the 63 disagreements</th><th></th></tr>
+<tr><td>label unchanged</td><td>39</td></tr>
+<tr><td>narrowed to subspecies → still wrong</td><td>16</td></tr>
+<tr><td><strong>label was stale: the model was right</strong></td><td><strong>8</strong></td></tr></table>
+<p>Eight out of 63 weren&#x27;t errors. And all 63 are <em>research grade</em> on iNaturalist — identifications the community already confirmed — so the other 55 have nowhere to hide.</p>
+<p><strong>And it still needs discounting.</strong> All eight are the same taxon. Removing them lifts the per-species mean from 78.7 % to 81.2 %, but that fixes one species out of twenty and none of the rest: it&#x27;s the Case 1 bias coming back through another door. The number I&#x27;d still publish is 78.7 %.</p>
+<hr>
+<h2>Case 3 · The threshold I&#x27;d picked by eye</h2>
+<p>The agent has a RAG over the fact sheets for all 100 species. The usual question: above what similarity is a retrieved sheet actually relevant?</p>
+<p>I set 0.5. Round number, no reason behind it.</p>
+<p>What you need to measure isn&#x27;t the mean similarity, it&#x27;s <strong>whether the two populations separate</strong>: questions the corpus can answer versus questions it can&#x27;t. If their distributions overlap, no threshold is good — the number isn&#x27;t the problem.</p>
+<p>They did separate, with a 0.075 gap between them. The midpoint lands on <strong>0.44</strong>, not 0.5.</p>
+<p>The bonus came from trying to shrink the index, which took 235 MB:</p>
+<pre><code>vocabulary    disk     gap between the two populations
+   250,037    235 MB    +0.075   ← the current one
+   200,000    204 MB    +0.084   31 MB less; not worth the risk
+   120,000    140 MB    THEY OVERLAP
+    80,000    108 MB    THEY OVERLAP
+    40,000     75 MB    +0.017   barely survives</code></pre>
+<p>Prune to 120,000 terms and the index gets 40 % smaller while <strong>the threshold stops existing</strong>: there&#x27;s no gap left to split. Without measuring the separation that cut looks free — the system keeps answering, it just no longer knows when to stay quiet.</p>
+<hr>
+<h2>Case 4 · 671 MB in a 512 MB container</h2>
+<p>Not a measurement story, but the one that taught me most.</p>
+<p>The agent had to fit a free tier: 512 MB. With <code>fastembed</code>, the process hit <strong>671 MB</strong> just loading the encoder. Dead on arrival.</p>
+<p>The cause: <code>fastembed</code> loads the model weights into RAM and keeps them there.</p>
+<p>I rewrote inference by hand on ONNX Runtime. Two things fixed it. First, saving the weights as external data, which gets them memory-mapped instead of copied:</p>
+<pre><code class="lenguaje-python">onnx.save(modelo, str(LIGERO / &quot;modelo.onnx&quot;), save_as_external_data=True, ...)
+
+opciones = ort.SessionOptions()
+opciones.enable_cpu_mem_arena = False      # no arena that grows and never returns
+ort.InferenceSession(ruta, sess_options=opciones)</code></pre>
+<p>Second, releasing the session after each batch instead of holding it:</p>
+<pre><code class="lenguaje-python">def vectorizar(textos):
+    with _candado:
+        try:
+            return _vectorizar(textos)
+        finally:
+            if SOLTAR:
+                _sesion.cache_clear()
+                gc.collect()</code></pre>
+<p>671 → 457 → <strong>154 MB</strong>, with room to spare.</p>
+<p>Two traps along the way, both silent:</p>
+<ul><li><strong>Mean pooling is weighted by the attention mask.</strong> Average over the padding too and your vectors come out shifted. Nothing fails: the RAG just retrieves slightly worse results and you blame the model.</li><li><strong><code>enable_padding()</code> with no arguments pads to 512 tokens.</strong> Inference that takes 0.2 s starts taking a minute. You need <code>direction=&quot;right&quot;, pad_id=1, pad_token=&quot;&lt;pad&gt;&quot;</code>.</li></ul>
+<hr>
+<h2>What did work first try (not much)</h2>
+<p>So it doesn&#x27;t read like everything collapsed:</p>
+<ul><li><strong>int8 quantization</strong> costs 0.4 top-1 points and takes the model from 13.5 to 3.8 MB. Best trade in the project.</li><li><strong>Averaging an image with its mirror</strong> buys 0.2 points for double the response time. Measured, and <strong>not implemented</strong> — measuring to reject counts too.</li><li><strong>LangGraph versus hand-rolled orchestration</strong>: 95 statements against 55, 31.0 s against 18.4 s. But LangGraph resumes from its checkpoint in 0.0 s and mine doesn&#x27;t. With two nodes it isn&#x27;t worth it; with fifteen and expensive work you don&#x27;t want to repeat, it is. I kept mine and left the comparison in the repo.</li></ul>
+<hr>
+<h2>What I take from it</h2>
+<p><strong>A number that goes up is suspicious.</strong> All four times a number pleased me, I was measuring my dataset rather than my model.</p>
+<p><strong>Average per class.</strong> On citizen-science data, the per-observation mean is nearly a description of which animals are photogenic.</p>
+<p><strong>Check the anecdote that sounds good.</strong> &quot;Taxonomy disputed among biologists&quot; sounded like I knew what I was talking about. Two HTTP requests showed it was false, and the truth turned out more interesting.</p>
+<p><strong>Sort changes by kind before counting them.</strong> 24 changed labels looked like 24 errors that weren&#x27;t mine. It was 8. The other 16 were mine, dressed up as the same thing.</p>
+<p><strong>A threshold without a measured separation is decoration.</strong> And if the system still works with a useless threshold, nobody will ever find out.</p>
+<hr>
+<h2>Future work</h2>
+<p>The honest part is saying where this doesn&#x27;t reach:</p>
+<ul><li><strong>400 observations and 20 species</strong> say nothing about the other 80. The radar would need to run for weeks to have anything per species.</li><li><strong>One model, one country.</strong> None of this says whether the pattern holds anywhere else.</li><li><strong>The iNaturalist check is a single day&#x27;s snapshot.</strong> Re-running it in six months would give GBIF&#x27;s typical lag, which would be genuinely useful to anyone relying on that data.</li></ul>
+<p>All three repos are open, with the <code>--comprobar</code> self-checks behind the numbers: <a href="https://github.com/DiegoFernandoLojanTenesaca/riksi">riksi</a> · <a href="https://github.com/DiegoFernandoLojanTenesaca/riksi-radar">riksi-radar</a> · <a href="https://github.com/DiegoFernandoLojanTenesaca/yachaq">yachaq</a></p>
+</html>

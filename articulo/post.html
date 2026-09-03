@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tres proyectos, una lección: casi todas mis cifras estaban infladas</title>
+<style>
+:root { --tinta:#1a1a1a; --suave:#666; --linea:#e2e2e2; --fondo:#fff;
+        --acento:#0f766e; --codigo:#f6f8fa; }
+* { box-sizing: border-box }
+body { max-width: 46rem; margin: 0 auto; padding: 3rem 1.5rem 6rem;
+       font: 17px/1.7 Georgia, "Times New Roman", serif;
+       color: var(--tinta); background: var(--fondo); }
+h1 { font-size: 2.1rem; line-height: 1.2; margin: 0 0 .4em;
+     letter-spacing: -.02em; }
+h2 { font-size: 1.45rem; margin: 2.6em 0 .6em; padding-top: .3em;
+     letter-spacing: -.01em; }
+h3 { font-size: 1.15rem; margin: 2em 0 .5em; color: var(--suave); }
+p, li { margin: 0 0 1.1em }
+a { color: var(--acento) }
+strong { font-weight: 700 }
+hr { border: 0; border-top: 1px solid var(--linea); margin: 2.6em 0 }
+blockquote { margin: 1.6em 0; padding: .2em 0 .2em 1.2em;
+             border-left: 3px solid var(--acento); color: var(--suave);
+             font-style: italic; }
+code { font: 14px/1.5 "Cascadia Code", Consolas, monospace;
+       background: var(--codigo); padding: .12em .35em; border-radius: 3px; }
+pre { background: var(--codigo); border: 1px solid var(--linea);
+      border-radius: 6px; padding: 1rem 1.1rem; overflow-x: auto;
+      margin: 1.4em 0; }
+pre code { background: none; padding: 0; font-size: 13.5px; line-height: 1.55 }
+table { border-collapse: collapse; width: 100%; margin: 1.5em 0; font-size: 15px;
+        font-family: -apple-system, "Segoe UI", sans-serif; }
+th, td { border-bottom: 1px solid var(--linea); padding: .6em .7em;
+         text-align: left; vertical-align: top; }
+th { font-weight: 600; border-bottom-width: 2px }
+tr:last-child td { border-bottom: none }
+.cabecera { color: var(--suave); font-size: .92rem; margin: 0 0 3em;
+            font-family: -apple-system, "Segoe UI", sans-serif; }
+
+/* Para el PDF: que nada se parta por la mitad al imprimir. */
+@media print {
+  body { max-width: none; padding: 0; font-size: 11.5pt }
+  h1, h2, h3 { break-after: avoid }
+  pre, table, blockquote { break-inside: avoid }
+  a { color: var(--tinta); text-decoration: none }
+  a[href^="http"]::after { content: " (" attr(href) ")";
+                           font-size: .8em; color: var(--suave) }
+}
+</style>
+<h1>Tres proyectos, una lección: casi todas mis cifras estaban infladas</h1><p class="cabecera">machinelearning, python, mlops, datascience · Ctrl+P para guardar en PDF</p>
+<p>Entrené un clasificador de 100 especies de fauna ecuatoriana, monté un pipeline para verlo trabajar sobre observaciones reales, y le puse un agente encima. Tres repositorios, unos tres meses.</p>
+<p>Este post no va de cómo los construí. Va de que <strong>cada vez que medí algo en serio, el número bajó</strong> — y de que ese es el trabajo, no un contratiempo.</p>
+<p>Van cuatro casos. En los cuatro la primera cifra era defendible, estaba publicada y era engañosa.</p>
+<hr>
+<h2>El montaje</h2>
+<p>Lo justo para que se entienda el resto:</p>
+<table>
+<tr><td><strong><a href="https://github.com/DiegoFernandoLojanTenesaca/riksi">riksi</a></strong></td><td>EfficientNet-Lite0, 100 especies, 3,8 MB en int8. Corre en el navegador con ONNX Runtime Web</td></tr>
+<tr><td><strong><a href="https://github.com/DiegoFernandoLojanTenesaca/riksi-radar">riksi-radar</a></strong></td><td>Kafka → el modelo → DuckDB → dbt. Trae observaciones nuevas de <a href="https://www.gbif.org/">GBIF</a> y las clasifica sin ver la etiqueta</td></tr>
+<tr><td><strong><a href="https://github.com/DiegoFernandoLojanTenesaca/yachaq">yachaq</a></strong></td><td>Un agente sobre lo anterior: RAG, memoria, servidor MCP</td></tr></table>
+<p>El modelo acierta <strong>79,8 %</strong> top-1 sobre 1000 imágenes de validación. Esa cifra está bien medida y no es ninguna de las que van a caerse.</p>
+<hr>
+<h2>Caso 1 · «El modelo mejora fuera de su reparto»</h2>
+<p>Las imágenes de validación salen del mismo reparto que las de entrenamiento: mismas fuentes, mismos fotógrafos, mismo sesgo de encuadre. Un 79,8 % ahí responde a una pregunta bastante estrecha.</p>
+<p>Por eso monté el radar: coger observaciones que se subieron a GBIF <strong>después</strong>, de gente distinta, sin que nadie las eligiera, y pasar cada foto por el modelo.</p>
+<p>400 observaciones. <strong>337 aciertos: 84,2 %.</strong></p>
+<p>Seis puntos por encima del banco de validación. Lo escribí en el README con la palabra «sube» en negrita.</p>
+<p>Está mal. No la aritmética — el sesgo.</p>
+<pre><code>Amblyrhynchus cristatus (iguana marina)   128 de 400   32 %
+las tres primeras especies juntas         198 de 400   50 %
+especies distintas, de las 100 que conoce          20</code></pre>
+<p>La ciencia ciudadana no muestrea uniformemente. La gente fotografía lo que ve, y en Galápagos ve iguanas marinas. Ese 84,2 % es sobre todo la nota del modelo en una especie, repetida 128 veces.</p>
+<p>Promediando por especie en vez de por observación —dando el mismo peso a la iguana que a la tortuga que sale tres veces:</p>
+<table>
+<tr><th></th><th>acierto</th></tr>
+<tr><td>por observación</td><td>84,2 %</td></tr>
+<tr><td><strong>promediando especies</strong></td><td><strong>78,7 %</strong></td></tr></table>
+<p>Y ahí está lo interesante: <strong>78,7 % en campo contra 78,0 % en el banco.</strong> El modelo no mejora fuera de su reparto. Se comporta igual.</p>
+<p>Que es una conclusión más aburrida y mucho más creíble. «No hay deriva» es un resultado; «mejora en producción» era un artefacto de cómo promedié.</p>
+<blockquote><p>Si vas a publicar una sola cifra sobre datos de ciencia ciudadana, promedia por clase. La media por observación mide la distribución de tus datos tanto como tu modelo.</p></blockquote>
+<hr>
+<h2>Caso 2 · Los desacuerdos que no eran del modelo</h2>
+<p>Quedaban 63 observaciones donde el modelo y GBIF discrepaban. Tres explicaciones posibles: falló el modelo, la observación está mal identificada, o la foto no muestra lo que dice el registro.</p>
+<p>Escribí en el README que el pipeline no decide cuál, y que las tortugas de Galápagos que salían repetidas eran «taxonomía en disputa entre biólogos».</p>
+<p>Me lo inventé. Sonaba plausible y no lo comprobé.</p>
+<p>Resulta que hay una cuarta explicación, y es comprobable: <strong>GBIF publica instantáneas periódicas, no un espejo en vivo de iNaturalist.</strong> Una observación que iNaturalist ya corrigió puede seguir en GBIF con la identificación vieja.</p>
+<p>Se verifica en dos saltos. GBIF guarda el identificador de iNaturalist en</p>
+<p><code>catalogNumber</code>, así que se puede preguntar cuál es la identificación <strong>de hoy</strong>:</p>
+<pre><code class="lenguaje-python">def _en_inaturalist(clave_gbif):
+    oc = _pedir(f&quot;{GBIF}/occurrence/{clave_gbif}&quot;)
+    id_inat = oc.get(&quot;catalogNumber&quot;)          # el enlace a la fuente
+    d = _pedir(f&quot;{INAT}/observations/{id_inat}&quot;)
+    o = d[&quot;results&quot;][0]
+    return {&quot;taxon_hoy&quot;: (o.get(&quot;taxon&quot;) or {}).get(&quot;name&quot;),
+            &quot;grado&quot;: o.get(&quot;quality_grade&quot;),
+            &quot;identificaciones&quot;: o.get(&quot;identifications_count&quot;, 0)}</code></pre>
+<p>Los 63, dos minutos de peticiones. 24 tienen hoy otra etiqueta.</p>
+<p>Pero ahí hay una trampa que casi me como. No todos los cambios significan lo mismo:</p>
+<table>
+<tr><th>cambio</th><th>qué es</th></tr>
+<tr><td><code>Anous stolidus</code> → <code>Anous stolidus galapagensis</code></td><td><strong>refinamiento</strong>: se precisó la población, la especie es la misma, el modelo falló igual</td></tr>
+<tr><td><code>Chelonoidis porteri</code> → <code>Chelonoidis niger porteri</code></td><td><strong>otra especie</strong>: pasó a colgar de <em>C. niger</em></td></tr></table>
+<p>En el segundo caso el modelo había dicho <code>Chelonoidis niger</code>. Bajo la taxonomía de hoy, <strong>acertó</strong>. La tortuga de Santa Cruz pasó a ser subespecie de <em>C. niger</em> y GBIF aún tenía la versión anterior.</p>
+<p>Contarlos por separado es toda la diferencia entre un hallazgo y un autoengaño, así que la lógica que juzga es lo único con test de verdad:</p>
+<pre><code class="lenguaje-python">def _juzgar(caso, hoy):
+    gbif, dice, ahora = caso[&quot;gbif&quot;], caso[&quot;modelo&quot;], hoy[&quot;taxon_hoy&quot;]
+    if ahora == gbif:                          return &quot;sigue igual&quot;
+    if _es_hijo(ahora, gbif):                  return &quot;precisada&quot;
+    if ahora == dice or _es_hijo(ahora, dice):  return &quot;el modelo tenía razón&quot;
+    return &quot;cambió de especie&quot;</code></pre>
+<p><code>_es_hijo</code> compara por palabras y no con <code>startswith</code>, que daría por buena una coincidencia a media palabra:</p>
+<pre><code class="lenguaje-python">assert not _es_hijo(&quot;Anous stolidusa&quot;, &quot;Anous stolidus&quot;)
+assert not _es_hijo(&quot;Anous stolidus&quot;, &quot;Anous stolidus&quot;)   # ni hija de sí misma
+assert     _es_hijo(&quot;Chelonoidis niger porteri&quot;, &quot;Chelonoidis niger&quot;)</code></pre>
+<p>El resultado:</p>
+<table>
+<tr><th>de los 63 desacuerdos</th><th></th></tr>
+<tr><td>la etiqueta sigue igual</td><td>39</td></tr>
+<tr><td>precisada a subespecie → falló igual</td><td>16</td></tr>
+<tr><td><strong>la etiqueta era vieja: el modelo acertaba</strong></td><td><strong>8</strong></td></tr></table>
+<p>Ocho de 63 no eran fallos. Y los 63 son de grado <em>research</em> en iNaturalist — identificaciones que la comunidad ya confirmó—, así que los otros 55 no tienen dónde escudarse.</p>
+<p><strong>Y aun así hay que rebajarlo.</strong> Las ocho son del mismo taxón. Descontarlas sube la media por especie de 78,7 % a 81,2 %, pero eso arregla una especie de veinte y ninguna otra: es el sesgo del caso 1 entrando por otra puerta. La cifra que seguiría publicando es 78,7 %.</p>
+<hr>
+<h2>Caso 3 · El umbral que había puesto a ojo</h2>
+<p>El agente tiene un RAG sobre las fichas de las 100 especies. La pregunta de siempre: ¿a partir de qué similitud una ficha recuperada es relevante?</p>
+<p>Puse 0,5. Número redondo, sin ninguna razón.</p>
+<p>Lo que hay que medir no es la similitud media, sino <strong>si las dos poblaciones se separan</strong>: las preguntas que el corpus puede responder contra las que no. Si sus distribuciones se solapan, no hay umbral bueno — el problema no es el número.</p>
+<p>Se separaban, con un hueco de 0,075 entre ellas. El punto medio cae en <strong>0,44</strong>, no en 0,5.</p>
+<p>El bonus fue intentar recortar el índice, que ocupaba 235 MB:</p>
+<pre><code>vocabulario   disco    hueco entre las dos poblaciones
+   250.037    235 MB    +0,075   ← el de ahora
+   200.000    204 MB    +0,084   31 MB menos; no compensa el riesgo
+   120.000    140 MB    SE SOLAPAN
+    80.000    108 MB    SE SOLAPAN
+    40.000     75 MB    +0,017   sobrevive por los pelos</code></pre>
+<p>Podando a 120.000 términos el índice adelgaza un 40 % y <strong>el umbral deja de existir</strong>: ya no hay hueco que partir. Sin medir la separación, ese recorte parece gratis — el sistema sigue respondiendo, solo que ya no sabe cuándo callar.</p>
+<hr>
+<h2>Caso 4 · 671 MB en un contenedor de 512</h2>
+<p>Este no es de medición, pero es el que más me enseñó.</p>
+<p>El agente tenía que caber en un plan gratuito: 512 MB. Con <code>fastembed</code>, el proceso se iba a <strong>671 MB</strong> solo por cargar el codificador. Fuera.</p>
+<p>La causa: <code>fastembed</code> carga los pesos del modelo en RAM y los deja ahí.</p>
+<p>Reescribí la inferencia con ONNX Runtime a mano. Dos cosas la arreglaron. La primera, guardar los pesos como <em>external data</em>, que hace que se mapeen en memoria en vez de copiarse:</p>
+<pre><code class="lenguaje-python">onnx.save(modelo, str(LIGERO / &quot;modelo.onnx&quot;), save_as_external_data=True, ...)
+
+opciones = ort.SessionOptions()
+opciones.enable_cpu_mem_arena = False      # sin arena que crece y no vuelve
+ort.InferenceSession(ruta, sess_options=opciones)</code></pre>
+<p>La segunda, soltar la sesión al terminar cada tanda en vez de retenerla:</p>
+<pre><code class="lenguaje-python">def vectorizar(textos):
+    with _candado:
+        try:
+            return _vectorizar(textos)
+        finally:
+            if SOLTAR:
+                _sesion.cache_clear()
+                gc.collect()</code></pre>
+<p>671 → 457 → <strong>154 MB</strong>, con margen de sobra.</p>
+<p>Dos trampas por el camino, ambas silenciosas:</p>
+<ul><li><strong>El <em>mean pooling</em> va ponderado por la máscara de atención.</strong> Si promedias incluyendo el relleno, los vectores salen desplazados. No falla nada: el RAG simplemente recupera algo peor y le echas la culpa al modelo.</li><li><strong><code>enable_padding()</code> sin argumentos rellena hasta 512 tokens.</strong> Una inferencia que tarda 0,2 s pasa a tardar un minuto. Hay que pasarle <code>direction=&quot;right&quot;, pad_id=1, pad_token=&quot;&lt;pad&gt;&quot;</code>.</li></ul>
+<hr>
+<h2>Lo que sí funcionó a la primera (poco)</h2>
+<p>Para no dar la impresión de que todo se cayó:</p>
+<ul><li><strong>Cuantizar a int8</strong> cuesta 0,4 puntos de top-1 y baja el modelo de 13,5 a 3,8 MB. La mejor relación del proyecto.</li><li><strong>Promediar la imagen con su espejo</strong> da 0,2 puntos por duplicar el tiempo de respuesta. Medido, y <strong>no implementado</strong> — medir para descartar también cuenta.</li><li><strong>LangGraph contra una orquestación a mano</strong>: 95 sentencias contra 55, 31,0 s contra 18,4 s. Pero LangGraph reanuda desde el checkpoint en 0,0 s y la mía no. Con dos nodos no compensa; con quince y trabajo caro que no quieres repetir, sí. Me quedé con la mía y dejé la comparación en el repo.</li></ul>
+<hr>
+<h2>Lo que me llevo</h2>
+<p><strong>Una cifra que sube es sospechosa.</strong> Las cuatro veces que un número me gustó, estaba midiendo mi conjunto de datos y no mi modelo.</p>
+<p><strong>Promedia por clase.</strong> En datos de ciencia ciudadana, la media por observación es casi una descripción de qué animales son fotogénicos.</p>
+<p><strong>Comprueba la anécdota que suena bien.</strong> «Taxonomía en disputa entre biólogos» sonaba a que yo sabía de qué hablaba. Eran dos peticiones HTTP averiguar que era falso, y la verdad resultó más interesante.</p>
+<p><strong>Distingue tipos de cambio antes de contarlos.</strong> 24 etiquetas cambiadas parecían 24 fallos ajenos. Eran 8. Los otros 16 eran míos y se disfrazaban de iguales.</p>
+<p><strong>Un umbral sin la separación medida es decoración.</strong> Y si el sistema aguanta con un umbral inútil, nadie va a enterarse.</p>
+<hr>
+<h2>Trabajo futuro</h2>
+<p>Lo honesto es decir dónde no llega:</p>
+<ul><li><strong>400 observaciones y 20 especies</strong> no bastan para las otras 80. El radar tendría que correr semanas para tener algo por especie.</li><li><strong>Un solo modelo, un solo país.</strong> Nada de esto dice si el patrón se repite en otro conjunto.</li><li><strong>La verificación contra iNaturalist es de un día.</strong> Rehacerla dentro de seis meses diría cuál es el desfase típico de GBIF, que sería un dato de verdad útil para cualquiera que use esos datos.</li></ul>
+<p>Los tres repos están abiertos, con los <code>--comprobar</code> que sostienen las cifras: <a href="https://github.com/DiegoFernandoLojanTenesaca/riksi">riksi</a> · <a href="https://github.com/DiegoFernandoLojanTenesaca/riksi-radar">riksi-radar</a> · <a href="https://github.com/DiegoFernandoLojanTenesaca/yachaq">yachaq</a></p>
+</html>
