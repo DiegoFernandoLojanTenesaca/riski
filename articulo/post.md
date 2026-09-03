@@ -1,5 +1,5 @@
 ---
-title: "Si dejas de medir cuando el número te gusta, tu criterio de parada es el sesgo"
+title: "Cuatro cifras que publiqué antes de medirlas bien"
 published: false
 tags: machinelearning, python, mlops, datascience
 cover_image: https://raw.githubusercontent.com/DiegoFernandoLojanTenesaca/riski/main/articulo/imagenes/sesgo.png

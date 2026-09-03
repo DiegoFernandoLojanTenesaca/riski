@@ -13,6 +13,24 @@ serio, la cifra bajó.**
 Los dos Markdown llevan cabecera de Dev.to con `published: false`, así que se
 pueden importar sin que salgan publicados por accidente.
 
+## Tres títulos para el mismo texto
+
+No es un descuido: cada uno se lee en un sitio y compite contra cosas distintas.
+
+| dónde | cuál | por qué |
+|---|---|---|
+| Dev.to y Medium | «Cuatro cifras que publiqué antes de medirlas bien» | el feed premia lo concreto y la primera línea decide si se abre |
+| titular de la página | «Sesgo de muestreo en la evaluación fuera de distribución…» | es la que se cita y la que aparece en un perfil; nombra el objeto de estudio con el vocabulario del campo |
+| etiqueta `<title>` | «Sesgo de muestreo en evaluación fuera de distribución» | los buscadores cortan sobre los 60 caracteres |
+
+El titular académico describe el **hallazgo**, no el sistema. Un «desarrollo de
+un clasificador de especies para…» prometería un artículo de aplicación, y tres
+cuartas partes de éste hablan de errores de medición.
+
+Los tres viven en `ver.py` salvo el de Dev.to, que está en el frontmatter de cada
+`.md`. `ver.py --comprobar` falla si el `<title>` pasa de 62 caracteres o si el
+titular se descuadra.
+
 ## Los dos scripts
 
 ```bash

@@ -235,6 +235,25 @@ def pagina(md, idioma="es"):
 SITIO = AQUI.parent / "docs" / "articulo.html"
 BASE = "https://diegofernandolojantenesaca.github.io/riski"
 
+# **Tres títulos para el mismo texto, y no es una inconsistencia.** Cada uno se
+# lee en un sitio distinto y compite contra cosas distintas:
+#
+# - el de `post.md` va a Dev.to, donde el feed premia lo concreto;
+# - éste encabeza la página propia, que es la que se cita y la que aparece en un
+#   perfil o un currículum, así que nombra el objeto de estudio con el
+#   vocabulario del campo;
+# - y `TITULO_BREVE` es el de la etiqueta `<title>`, porque los buscadores
+#   cortan sobre los 60 caracteres y con el largo se ve media frase.
+#
+# El titular académico describe el **hallazgo** —el sesgo de evaluación— y no el
+# sistema construido. Un «desarrollo de un clasificador de especies…» prometería
+# un artículo de aplicación, y tres cuartas partes de éste hablan de errores de
+# medición.
+TITULO_SITIO = ("Sesgo de muestreo en la evaluación fuera de distribución de un "
+                "clasificador de especies: micro frente a macro-promedio sobre "
+                "datos de ciencia ciudadana")
+TITULO_BREVE = "Sesgo de muestreo en evaluación fuera de distribución"
+
 CABEZA_SITIO = """<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -253,8 +272,10 @@ CABEZA_SITIO = """<!DOCTYPE html>
 <link rel="stylesheet" href="estilo.css">
 <style>
 .escrito {{ max-width: 44rem; margin: 0 auto; padding: 0 20px 90px; }}
-.escrito h1 {{ font-size: clamp(1.9rem, 5vw, 2.6rem); line-height: 1.15;
-               margin: 0 0 .5em; }}
+/* Más contenido que un titular corto: el tamaño baja y el interlineado sube,
+   porque tres líneas a 2,6rem ocupan media pantalla en un móvil. */
+.escrito h1 {{ font-size: clamp(1.6rem, 3.6vw, 2.1rem); line-height: 1.28;
+               margin: 0 0 .55em; letter-spacing: -.01em; }}
 .escrito h2 {{ margin: 2.4em 0 .5em; font-size: 1.5rem; }}
 .escrito h3 {{ margin: 2em 0 .4em; font-size: 1.15rem; color: var(--tinta-2); }}
 .escrito p, .escrito li {{ font-size: 1.05rem; line-height: 1.75; }}
@@ -279,7 +300,10 @@ CABEZA_SITIO = """<!DOCTYPE html>
                        border-left: 3px solid var(--liquen-2);
                        color: var(--tinta-2); font-style: italic; }}
 .escrito hr {{ border: 0; border-top: 1px solid var(--linea); margin: 2.6em 0; }}
-.entradilla {{ color: var(--tinta-2); font-size: .95rem; margin: 0 0 2.8em; }}
+.resumen {{ font-size: 1.15rem; line-height: 1.65; color: var(--tinta);
+            margin: 0 0 1.2em; padding-left: 1.1rem;
+            border-left: 3px solid var(--liquen-2); }}
+.entradilla {{ color: var(--tinta-2); font-size: .95rem; margin: 0 0 3em; }}
 </style>
 </head>
 <body>
@@ -299,6 +323,7 @@ CABEZA_SITIO = """<!DOCTYPE html>
 <div class="envoltura">
 <article class="escrito">
 <h1>{titulo}</h1>
+<p class="resumen">{resumen}</p>
 <p class="entradilla">{firma}</p>
 """
 
@@ -338,23 +363,25 @@ def para_el_sitio():
     de `docs/` y no se publicaría.
     """
     md = (AQUI / "post.md").read_text(encoding="utf-8")
-    titulo, _, cuerpo = convertir(md)
+    _, _, cuerpo = convertir(md)      # el título del frontmatter es el de Dev.to
     cuerpo = cuerpo.replace('src="imagenes/', 'src="articulo/')
     cuerpo = _con_tema_oscuro(cuerpo)
-    resumen = ("Cuatro cifras que publiqué y que bajaron al medirlas bien: el "
-               "sesgo de la ciencia ciudadana, las etiquetas viejas de GBIF, un "
-               "umbral puesto a ojo y 671 MB en un contenedor de 512.")
+    # Doble uso: es la meta-descripción que sale en los buscadores y la
+    # entradilla que se lee bajo el titular, así que tiene que funcionar como
+    # frase suelta y como primer párrafo. Da las dos cifras del hallazgo, porque
+    # quien solo lea esto debería llevarse el resultado.
+    resumen = ("Un clasificador de cien especies evaluado sobre 400 "
+               "observaciones que nadie seleccionó rinde 84,2 % por observación "
+               "y 78,7 % promediando clases. Esos 5,5 puntos son sesgo de "
+               "muestreo, y es una de las cuatro cifras que publiqué antes de "
+               "medirlas bien.")
     firma = ('Diego Fernando Lojan Tenesaca · sobre '
              '<a href="index.html">Riksi</a>, '
              '<a href="https://github.com/DiegoFernandoLojanTenesaca/riksi-radar">riksi-radar</a> y '
              '<a href="https://github.com/DiegoFernandoLojanTenesaca/yachaq">yachaq</a>')
-    # El titular va entero en la página, pero la etiqueta `<title>` se corta a
-    # los ~60 caracteres en los resultados de búsqueda. Con el largo, lo que se
-    # ve en Google es media frase y ningún indicio de qué trata.
-    corto = "Cuatro cifras que publiqué antes de medirlas bien"
     SITIO.write_text(
-        CABEZA_SITIO.format(titulo=html.escape(titulo), resumen=resumen,
-                            titulo_corto=html.escape(corto),
+        CABEZA_SITIO.format(titulo=html.escape(TITULO_SITIO), resumen=resumen,
+                            titulo_corto=html.escape(TITULO_BREVE),
                             firma=firma, base=BASE) + cuerpo + PIE_SITIO,
         encoding="utf-8")
     print(f"  docs/{SITIO.name}  ({SITIO.stat().st_size // 1024} KB)")
@@ -462,6 +489,14 @@ def prueba():
     assert s.count("<picture>") == s.count("<figure>"), (
         "alguna figura se quedó sin variante oscura")
     assert "prefers-color-scheme: dark" in s
+
+    # Los tres títulos: el académico encabeza la página, el breve va en la
+    # etiqueta que cortan los buscadores, y el de Dev.to no debe colarse aquí.
+    assert f"<h1>{TITULO_SITIO}</h1>" in s, "la página no lleva el titular académico"
+    breve = re.search(r"<title>(.*?)</title>", s).group(1)
+    assert len(breve) <= 62, f"<title> de {len(breve)}: los buscadores lo cortan"
+    assert TITULO_SITIO in re.search(r'og:title" content="(.*?)"', s).group(1), (
+        "al compartir se vería el título corto en vez del completo")
     print(f"ok · tablas, código, enlaces y cita · {len(ok)} páginas generadas")
 
 

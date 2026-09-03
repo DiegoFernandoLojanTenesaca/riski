@@ -4,20 +4,22 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#14181b">
-<title>Cuatro cifras que publiqué antes de medirlas bien · Riksi</title>
-<meta name="description" content="Cuatro cifras que publiqué y que bajaron al medirlas bien: el sesgo de la ciencia ciudadana, las etiquetas viejas de GBIF, un umbral puesto a ojo y 671 MB en un contenedor de 512.">
+<title>Sesgo de muestreo en evaluación fuera de distribución · Riksi</title>
+<meta name="description" content="Un clasificador de cien especies evaluado sobre 400 observaciones que nadie seleccionó rinde 84,2 % por observación y 78,7 % promediando clases. Esos 5,5 puntos son sesgo de muestreo, y es una de las cuatro cifras que publiqué antes de medirlas bien.">
 <link rel="canonical" href="https://diegofernandolojantenesaca.github.io/riski/articulo.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Si dejas de medir cuando el número te gusta, tu criterio de parada es el sesgo">
-<meta property="og:description" content="Cuatro cifras que publiqué y que bajaron al medirlas bien: el sesgo de la ciencia ciudadana, las etiquetas viejas de GBIF, un umbral puesto a ojo y 671 MB en un contenedor de 512.">
+<meta property="og:title" content="Sesgo de muestreo en la evaluación fuera de distribución de un clasificador de especies: micro frente a macro-promedio sobre datos de ciencia ciudadana">
+<meta property="og:description" content="Un clasificador de cien especies evaluado sobre 400 observaciones que nadie seleccionó rinde 84,2 % por observación y 78,7 % promediando clases. Esos 5,5 puntos son sesgo de muestreo, y es una de las cuatro cifras que publiqué antes de medirlas bien.">
 <meta property="og:image" content="https://diegofernandolojantenesaca.github.io/riski/articulo/sesgo.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="icono.svg">
 <link rel="stylesheet" href="estilo.css">
 <style>
 .escrito { max-width: 44rem; margin: 0 auto; padding: 0 20px 90px; }
-.escrito h1 { font-size: clamp(1.9rem, 5vw, 2.6rem); line-height: 1.15;
-               margin: 0 0 .5em; }
+/* Más contenido que un titular corto: el tamaño baja y el interlineado sube,
+   porque tres líneas a 2,6rem ocupan media pantalla en un móvil. */
+.escrito h1 { font-size: clamp(1.6rem, 3.6vw, 2.1rem); line-height: 1.28;
+               margin: 0 0 .55em; letter-spacing: -.01em; }
 .escrito h2 { margin: 2.4em 0 .5em; font-size: 1.5rem; }
 .escrito h3 { margin: 2em 0 .4em; font-size: 1.15rem; color: var(--tinta-2); }
 .escrito p, .escrito li { font-size: 1.05rem; line-height: 1.75; }
@@ -42,7 +44,10 @@
                        border-left: 3px solid var(--liquen-2);
                        color: var(--tinta-2); font-style: italic; }
 .escrito hr { border: 0; border-top: 1px solid var(--linea); margin: 2.6em 0; }
-.entradilla { color: var(--tinta-2); font-size: .95rem; margin: 0 0 2.8em; }
+.resumen { font-size: 1.15rem; line-height: 1.65; color: var(--tinta);
+            margin: 0 0 1.2em; padding-left: 1.1rem;
+            border-left: 3px solid var(--liquen-2); }
+.entradilla { color: var(--tinta-2); font-size: .95rem; margin: 0 0 3em; }
 </style>
 </head>
 <body>
@@ -61,7 +66,8 @@
 
 <div class="envoltura">
 <article class="escrito">
-<h1>Si dejas de medir cuando el número te gusta, tu criterio de parada es el sesgo</h1>
+<h1>Sesgo de muestreo en la evaluación fuera de distribución de un clasificador de especies: micro frente a macro-promedio sobre datos de ciencia ciudadana</h1>
+<p class="resumen">Un clasificador de cien especies evaluado sobre 400 observaciones que nadie seleccionó rinde 84,2 % por observación y 78,7 % promediando clases. Esos 5,5 puntos son sesgo de muestreo, y es una de las cuatro cifras que publiqué antes de medirlas bien.</p>
 <p class="entradilla">Diego Fernando Lojan Tenesaca · sobre <a href="index.html">Riksi</a>, <a href="https://github.com/DiegoFernandoLojanTenesaca/riksi-radar">riksi-radar</a> y <a href="https://github.com/DiegoFernandoLojanTenesaca/yachaq">yachaq</a></p>
 <p>Entrené un clasificador de cien especies ecuatorianas, monté un pipeline para evaluarlo sobre observaciones que nadie había seleccionado y construí un agente sobre ambos. Tres repositorios, unos tres meses.</p>
 <p>Lo que sigue no es cómo los construí. Es el patrón que encontré al revisarlos: <strong>cada vez que sustituí una estimación cómoda por una medición correcta, el número empeoró.</strong> Cuatro veces. En las cuatro, la cifra original era defendible, estaba publicada, y describía algo distinto de lo que yo creía.</p>

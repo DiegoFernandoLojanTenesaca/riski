@@ -1,5 +1,5 @@
 ---
-title: "If you stop measuring when the number looks good, your stopping criterion is the bias"
+title: "Four numbers I published before measuring them properly"
 published: false
 tags: machinelearning, python, mlops, datascience
 cover_image: https://raw.githubusercontent.com/DiegoFernandoLojanTenesaca/riski/main/articulo/imagenes/sesgo.png
