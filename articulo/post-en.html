@@ -36,12 +36,18 @@ th { font-weight: 600; border-bottom-width: 2px }
 tr:last-child td { border-bottom: none }
 .cabecera { color: var(--suave); font-size: .92rem; margin: 0 0 3em;
             font-family: -apple-system, "Segoe UI", sans-serif; }
+figure { margin: 2em 0; }
+figure img { width: 100%; height: auto; display: block;
+             border: 1px solid var(--linea); border-radius: 6px; }
+figcaption { margin-top: .6em; font-size: .85rem; color: var(--suave);
+             text-align: center;
+             font-family: -apple-system, "Segoe UI", sans-serif; }
 
 /* Para el PDF: que nada se parta por la mitad al imprimir. */
 @media print {
   body { max-width: none; padding: 0; font-size: 11.5pt }
   h1, h2, h3 { break-after: avoid }
-  pre, table, blockquote { break-inside: avoid }
+  pre, table, blockquote, figure { break-inside: avoid }
   a { color: var(--tinta); text-decoration: none }
   a[href^="http"]::after { content: " (" attr(href) ")";
                            font-size: .8em; color: var(--suave) }
@@ -55,29 +61,60 @@ tr:last-child td { border-bottom: none }
 <h2>The setup</h2>
 <p>Just enough to follow the rest:</p>
 <table>
-<tr><td><strong><a href="https://github.com/DiegoFernandoLojanTenesaca/riksi">riksi</a></strong></td><td>EfficientNet-Lite0, 100 species, 3.8 MB in int8. Runs in the browser via ONNX Runtime Web</td></tr>
+<tr><td><strong><a href="https://github.com/DiegoFernandoLojanTenesaca/riski">riksi</a></strong></td><td>EfficientNet-Lite0, 100 species, 3.8 MB in int8. Runs in the browser via ONNX Runtime Web</td></tr>
 <tr><td><strong><a href="https://github.com/DiegoFernandoLojanTenesaca/riksi-radar">riksi-radar</a></strong></td><td>Kafka → the model → DuckDB → dbt. Pulls new observations from <a href="https://www.gbif.org/">GBIF</a> and classifies them without seeing the label</td></tr>
 <tr><td><strong><a href="https://github.com/DiegoFernandoLojanTenesaca/yachaq">yachaq</a></strong></td><td>An agent over all of it: RAG, memory, MCP server</td></tr></table>
+<figure><img src="imagenes/montaje.png" alt="The radar: GBIF, Kafka, the model, DuckDB, dbt"><figcaption>The radar: GBIF, Kafka, the model, DuckDB, dbt</figcaption></figure>
 <p>The model gets <strong>79.8 %</strong> top-1 on 1000 validation images. That one is measured correctly and isn&#x27;t among the numbers that fall apart.</p>
+<p>Worth stating up front is how it got to 3.8 MB, because it&#x27;s the one decision in the project that came for free:</p>
+<figure><img src="imagenes/cuantizacion.png" alt="Quantizing to int8: 3.5x smaller for 0.4 points"><figcaption>Quantizing to int8: 3.5x smaller for 0.4 points</figcaption></figure>
+<p>That&#x27;s the trade: <strong>0.4 accuracy points for a model 3.5 times smaller</strong>. For a classifier that has to download into someone&#x27;s browser on mobile data, there&#x27;s nothing to discuss.</p>
 <hr>
 <h2>Case 1 · &quot;The model does better outside its own split&quot;</h2>
-<p>Validation images come from the same split as training: same sources, same photographers, same framing bias. 79.8 % there answers a fairly narrow question.</p>
-<p>So I built the radar: take observations uploaded to GBIF <strong>afterwards</strong>, by different people, that nobody hand-picked, and run every photo through the model.</p>
+<p>Validation images come from the same split as training: same sources, same photographers, same framing bias. 79.8 % there answers a fairly narrow question, and not the one that matters. The one that matters is what happens when a photo nobody picked shows up.</p>
+<p>That&#x27;s what the radar is for. The idea is simple: take observations uploaded to GBIF <strong>after</strong> training, by different people, and run each photo through the model without letting it see the label. Then compare.</p>
 <p>400 observations. <strong>337 correct: 84.2 %.</strong></p>
 <p>Six points above the validation bank. I wrote it in the README with &quot;goes up&quot; in bold.</p>
 <p>It&#x27;s wrong. Not the arithmetic — the bias.</p>
-<pre><code>Amblyrhynchus cristatus (marine iguana)   128 of 400   32 %
-top three species combined                198 of 400   50 %
-distinct species, out of the 100 it knows          20</code></pre>
+<figure><img src="imagenes/sesgo.png" alt="One species is 32 % of the 400 observations"><figcaption>One species is 32 % of the 400 observations</figcaption></figure>
+<p>The left panel is the problem: <strong>one species, the marine iguana, is 128 of the 400 observations.</strong> The top three combined are half the set, and out of the 100 species the model knows, only 20 show up at all.</p>
 <p>Citizen science doesn&#x27;t sample uniformly. People photograph what they see, and in the Galápagos they see marine iguanas. That 84.2 % is mostly the model&#x27;s grade on one species, repeated 128 times.</p>
+<p>And the right panel shows why that inflates the number rather than sinking it: the marine iguana is among the species it handles <strong>best</strong> (94.5 %). The set is dominated by an easy case.</p>
 <p>Averaging per species instead of per observation — giving the iguana the same weight as the turtle that shows up three times:</p>
 <table>
 <tr><th></th><th>accuracy</th></tr>
 <tr><td>per observation</td><td>84.2 %</td></tr>
 <tr><td><strong>averaged over species</strong></td><td><strong>78.7 %</strong></td></tr></table>
+<p>It&#x27;s two lines of SQL apart:</p>
+<pre><code class="lenguaje-sql">-- per observation: every photo weighs the same
+select avg(coincide::int) from observaciones;
+
+-- per species: every species weighs the same
+select avg(tasa) from (
+  select especie, avg(coincide::int) tasa
+  from observaciones group by especie
+);</code></pre>
 <p>And there&#x27;s the interesting part: <strong>78.7 % in the field against 78.0 % on the bank.</strong> The model doesn&#x27;t do better outside its split. It performs the same.</p>
 <p>Which is a more boring conclusion and a far more credible one. &quot;No drift&quot; is a result; &quot;improves in production&quot; was an artifact of how I averaged.</p>
 <blockquote><p>If you&#x27;re publishing one number over citizen-science data, average per class. The per-observation mean measures your data distribution as much as your model.</p></blockquote>
+<h3>Why the pipeline has Kafka in it</h3>
+<p>A fair objection: 400 observations fit in a CSV. What&#x27;s Kafka for?</p>
+<p>Because the real number isn&#x27;t 400. GBIF receives roughly <strong>130,000 observations a day from Ecuador alone</strong>, and 1.6 % of those fall in the hundred species the model knows — about 6,000 daily. The 400 are a slice for measuring, not the flow.</p>
+<p>Even so, the lesson from building it was a different one. <strong>Kafka wouldn&#x27;t start</strong>, and the error pointed at the wrong place:</p>
+<pre><code>advertised.listeners cannot use the nonroutable meta-address 0.0.0.0</code></pre>
+<p>I had already overridden <code>advertised.listeners</code>. It took four attempts to see the complaint wasn&#x27;t about that one, but about the <strong>controller</strong> listener, also on</p>
+<p><code>0.0.0.0</code>, which Kafka derives its advertised address from:</p>
+<pre><code class="lenguaje-properties"># the one that matters is the second, not the first
+listeners=PLAINTEXT://0.0.0.0:9092,CONTROLLER://localhost:9093
+advertised.listeners=PLAINTEXT://localhost:9092</code></pre>
+<p>And a second, quieter one: <strong>Kafka kept declaring the consumer dead.</strong> By default it hands over 500 records per <code>poll()</code> and expects the next one within five minutes. Downloading and classifying 500 photos takes far longer, so Kafka reassigned the partitions and the <code>commit</code> failed with <em>&quot;the group has already rebalanced&quot;</em> — losing work already done.</p>
+<pre><code class="lenguaje-python">consumidor = KafkaConsumer(
+    TEMA,
+    max_poll_records=20,        # batches that actually fit the interval
+    max_poll_interval_ms=900_000,
+    enable_auto_commit=False,   # commit after the batch, not before
+)</code></pre>
+<p>The <code>enable_auto_commit=False</code> is the important part: with auto-commit, Kafka marks as processed what you&#x27;re still downloading, and if the process dies halfway those observations never come back.</p>
 <hr>
 <h2>Case 2 · The disagreements that weren&#x27;t the model&#x27;s fault</h2>
 <p>That left 63 observations where the model and GBIF disagreed. Three possible explanations: the model was wrong, the observation is misidentified, or the photo doesn&#x27;t show what the record claims.</p>
@@ -94,6 +131,7 @@ distinct species, out of the 100 it knows          20</code></pre>
     return {&quot;taxon_hoy&quot;: (o.get(&quot;taxon&quot;) or {}).get(&quot;name&quot;),
             &quot;grado&quot;: o.get(&quot;quality_grade&quot;),
             &quot;identificaciones&quot;: o.get(&quot;identifications_count&quot;, 0)}</code></pre>
+<p>(The iNaturalist API&#x27;s <code>photo_id</code> parameter looked like the shortcut. It doesn&#x27;t filter: it returns all 382 million results. Silently ignored.)</p>
 <p>All 63, two minutes of requests. 24 carry a different label today.</p>
 <p>But there&#x27;s a trap I nearly walked into. Not every change means the same thing:</p>
 <table>
@@ -104,48 +142,58 @@ distinct species, out of the 100 it knows          20</code></pre>
 <p>Counting those separately is the whole difference between a finding and self-deception, so the judging logic is the one piece with a real test:</p>
 <pre><code class="lenguaje-python">def _juzgar(caso, hoy):
     gbif, dice, ahora = caso[&quot;gbif&quot;], caso[&quot;modelo&quot;], hoy[&quot;taxon_hoy&quot;]
-    if ahora == gbif:                          return &quot;unchanged&quot;
-    if _es_hijo(ahora, gbif):                  return &quot;narrowed&quot;
+    if ahora == gbif:                           return &quot;unchanged&quot;
+    if _es_hijo(ahora, gbif):                   return &quot;narrowed&quot;
     if ahora == dice or _es_hijo(ahora, dice):  return &quot;the model was right&quot;
     return &quot;species changed&quot;</code></pre>
 <p><code>_es_hijo</code> compares word by word rather than with <code>startswith</code>, which would accept a match halfway through a word:</p>
-<pre><code class="lenguaje-python">assert not _es_hijo(&quot;Anous stolidusa&quot;, &quot;Anous stolidus&quot;)
+<pre><code class="lenguaje-python">def _es_hijo(taxon, especie):
+    partes, base = (taxon or &quot;&quot;).split(), (especie or &quot;&quot;).split()
+    return len(partes) &gt; len(base) and partes[:len(base)] == base
+
+assert not _es_hijo(&quot;Anous stolidusa&quot;, &quot;Anous stolidus&quot;)
 assert not _es_hijo(&quot;Anous stolidus&quot;, &quot;Anous stolidus&quot;)   # nor its own child
 assert     _es_hijo(&quot;Chelonoidis niger porteri&quot;, &quot;Chelonoidis niger&quot;)</code></pre>
 <p>The result:</p>
-<table>
-<tr><th>of the 63 disagreements</th><th></th></tr>
-<tr><td>label unchanged</td><td>39</td></tr>
-<tr><td>narrowed to subspecies → still wrong</td><td>16</td></tr>
-<tr><td><strong>label was stale: the model was right</strong></td><td><strong>8</strong></td></tr></table>
+<figure><img src="imagenes/desacuerdos.png" alt="The 63 disagreements, checked against iNaturalist"><figcaption>The 63 disagreements, checked against iNaturalist</figcaption></figure>
 <p>Eight out of 63 weren&#x27;t errors. And all 63 are <em>research grade</em> on iNaturalist — identifications the community already confirmed — so the other 55 have nowhere to hide.</p>
 <p><strong>And it still needs discounting.</strong> All eight are the same taxon. Removing them lifts the per-species mean from 78.7 % to 81.2 %, but that fixes one species out of twenty and none of the rest: it&#x27;s the Case 1 bias coming back through another door. The number I&#x27;d still publish is 78.7 %.</p>
+<p>What it does leave is something reusable: <strong>GBIF had 13 % of the records I checked out of date.</strong> Anyone training on GBIF data without cross-checking it is inheriting that lag.</p>
 <hr>
 <h2>Case 3 · The threshold I&#x27;d picked by eye</h2>
 <p>The agent has a RAG over the fact sheets for all 100 species. The usual question: above what similarity is a retrieved sheet actually relevant?</p>
 <p>I set 0.5. Round number, no reason behind it.</p>
-<p>What you need to measure isn&#x27;t the mean similarity, it&#x27;s <strong>whether the two populations separate</strong>: questions the corpus can answer versus questions it can&#x27;t. If their distributions overlap, no threshold is good — the number isn&#x27;t the problem.</p>
-<p>They did separate, with a 0.075 gap between them. The midpoint lands on <strong>0.44</strong>, not 0.5.</p>
-<p>The bonus came from trying to shrink the index, which took 235 MB:</p>
-<pre><code>vocabulary    disk     gap between the two populations
-   250,037    235 MB    +0.075   ← the current one
-   200,000    204 MB    +0.084   31 MB less; not worth the risk
-   120,000    140 MB    THEY OVERLAP
-    80,000    108 MB    THEY OVERLAP
-    40,000     75 MB    +0.017   barely survives</code></pre>
-<p>Prune to 120,000 terms and the index gets 40 % smaller while <strong>the threshold stops existing</strong>: there&#x27;s no gap left to split. Without measuring the separation that cut looks free — the system keeps answering, it just no longer knows when to stay quiet.</p>
+<p>What you need to measure isn&#x27;t the mean similarity, it&#x27;s <strong>whether the two populations separate</strong>: questions the corpus can answer versus questions it can&#x27;t. If their distributions overlap, no threshold is good — the number isn&#x27;t the problem, the index is.</p>
+<pre><code class="lenguaje-python">def mejor(p):
+    fragmentos, vectores = _cargar()
+    return float((vectores @ vectorizar([p])[0]).max())
+
+buenas = sorted(mejor(p) for p in con_respuesta)                 # worst first
+malas = sorted((mejor(p) for p in sin_respuesta), reverse=True)  # best first
+corte = round((buenas[0] + malas[0]) / 2, 2)
+
+if buenas[0] &lt;= malas[0]:
+    print(&quot;THEY OVERLAP: no threshold separates them.&quot;)</code></pre>
+<p>What gets compared is <strong>the worst of the good against the best of the bad</strong>. If that comparison inverts, no threshold works and the problem isn&#x27;t the number: it&#x27;s the index.</p>
+<p>They did separate, with a 0.075 gap. The midpoint lands on <strong>0.44</strong>, not 0.5.</p>
+<p>The &quot;unanswerable&quot; questions are deliberately alien — &quot;when did Blade Runner come out?&quot;, &quot;rice pudding recipe&quot;. If the index doesn&#x27;t reject those, it rejects nothing.</p>
+<p>The bonus came from trying to shrink the index, which took 235 MB, 192 of them the vocabulary table: 250,000 tokens covering some 50 languages, of which this project uses 8,403. Looked like dead weight.</p>
+<figure><img src="imagenes/calibracion.png" alt="Pruning the vocabulary erases the threshold before the size"><figcaption>Pruning the vocabulary erases the threshold before the size</figcaption></figure>
+<p>Prune to 120,000 terms and the index gets 40 % smaller while <strong>the threshold stops existing</strong>: there&#x27;s no gap left to split. Without measuring the separation that cut looks free — the system keeps answering, it just no longer knows when to stay quiet, which is the only thing keeping a RAG from making things up.</p>
+<p>The middle ids weren&#x27;t padding from other languages: they&#x27;re the subwords holding Spanish together. Cutting them sinks the good questions more than the bad ones.</p>
 <hr>
 <h2>Case 4 · 671 MB in a 512 MB container</h2>
 <p>Not a measurement story, but the one that taught me most.</p>
 <p>The agent had to fit a free tier: 512 MB. With <code>fastembed</code>, the process hit <strong>671 MB</strong> just loading the encoder. Dead on arrival.</p>
-<p>The cause: <code>fastembed</code> loads the model weights into RAM and keeps them there.</p>
-<p>I rewrote inference by hand on ONNX Runtime. Two things fixed it. First, saving the weights as external data, which gets them memory-mapped instead of copied:</p>
+<figure><img src="imagenes/memoria.png" alt="The same computation, on a quarter of the memory"><figcaption>The same computation, on a quarter of the memory</figcaption></figure>
+<p>I rewrote inference by hand on ONNX Runtime. Two things fixed it. First, saving the weights as external data, which gets onnxruntime to memory-map them off disk instead of copying:</p>
 <pre><code class="lenguaje-python">onnx.save(modelo, str(LIGERO / &quot;modelo.onnx&quot;), save_as_external_data=True, ...)
 
 opciones = ort.SessionOptions()
 opciones.enable_cpu_mem_arena = False      # no arena that grows and never returns
 ort.InferenceSession(ruta, sess_options=opciones)</code></pre>
-<p>Second, releasing the session after each batch instead of holding it:</p>
+<p>That got it to 457 MB at rest. But the peak while answering hit <strong>467</strong>, and with 45 MB of headroom a 512 MB container dies on the first spike. That&#x27;s why the second bar is still red despite sitting under the line: the number that decides isn&#x27;t the resting one.</p>
+<p>Second: releasing the session after each batch instead of holding it.</p>
 <pre><code class="lenguaje-python">def vectorizar(textos):
     with _candado:
         try:
@@ -154,13 +202,23 @@ ort.InferenceSession(ruta, sess_options=opciones)</code></pre>
             if SOLTAR:
                 _sesion.cache_clear()
                 gc.collect()</code></pre>
-<p>671 → 457 → <strong>154 MB</strong>, with room to spare.</p>
+<p>Reloading costs 0.93 s, so the peak exists only while answering. <strong>154 MB</strong>, with 358 to spare. That extra second per question buys the RAG staying on in a free tier; before, it had to be switched off entirely.</p>
+<p>And it&#x27;s not an approximation: <strong>the cosine between vectors from the two paths is 1.0</strong> and the max component-wise difference is 0.0. It&#x27;s the same computation.</p>
 <p>Two traps along the way, both silent:</p>
-<ul><li><strong>Mean pooling is weighted by the attention mask.</strong> Average over the padding too and your vectors come out shifted. Nothing fails: the RAG just retrieves slightly worse results and you blame the model.</li><li><strong><code>enable_padding()</code> with no arguments pads to 512 tokens.</strong> Inference that takes 0.2 s starts taking a minute. You need <code>direction=&quot;right&quot;, pad_id=1, pad_token=&quot;&lt;pad&gt;&quot;</code>.</li></ul>
+<ul><li><strong>Mean pooling is weighted by the attention mask.</strong> Average over the padding too and your vectors come out shifted. Nothing fails: the RAG just retrieves slightly worse results and you blame the model.</li></ul>
+<pre><code class="lenguaje-python"># wrong: padding counts as if it were words
+v = salida.mean(axis=1)
+
+# right: real tokens only
+mascara = lote[&quot;attention_mask&quot;].astype(np.float32)[:, :, None]
+v = (salida * mascara).sum(axis=1) / np.maximum(mascara.sum(axis=1), 1e-9)</code></pre>
+<ul><li><strong><code>enable_padding()</code> with no arguments pads to 512 tokens.</strong> Inference that takes 0.2 s starts taking a minute, with no warning at all. You need <code>direction=&quot;right&quot;, pad_id=1, pad_token=&quot;&lt;pad&gt;&quot;</code>.</li></ul>
+<p>I also tried quantizing the encoder to int8, like the classifier. <strong>It shrinks disk but not RAM</strong>: 252 → 135 MB on disk, and 395 → 397 in memory, because onnxruntime decompresses the weights on load. And the threshold gap narrowed from +0.101 to +0.085. Dropped.</p>
 <hr>
 <h2>What did work first try (not much)</h2>
 <p>So it doesn&#x27;t read like everything collapsed:</p>
-<ul><li><strong>int8 quantization</strong> costs 0.4 top-1 points and takes the model from 13.5 to 3.8 MB. Best trade in the project.</li><li><strong>Averaging an image with its mirror</strong> buys 0.2 points for double the response time. Measured, and <strong>not implemented</strong> — measuring to reject counts too.</li><li><strong>LangGraph versus hand-rolled orchestration</strong>: 95 statements against 55, 31.0 s against 18.4 s. But LangGraph resumes from its checkpoint in 0.0 s and mine doesn&#x27;t. With two nodes it isn&#x27;t worth it; with fifteen and expensive work you don&#x27;t want to repeat, it is. I kept mine and left the comparison in the repo.</li></ul>
+<ul><li><strong>Quantizing the classifier to int8</strong> costs 0.4 points and takes the model from 13.5 to 3.8 MB. Best trade in the project.</li><li><strong>Averaging an image with its mirror</strong> buys 0.2 points for double the response time. Measured, and <strong>not implemented</strong> — measuring to reject counts too.</li><li><strong>LangGraph versus hand-rolled orchestration</strong>: 95 statements against 55, 31.0 s against 18.4 s. But LangGraph resumes from its checkpoint in 0.0 s and mine doesn&#x27;t. With two nodes it isn&#x27;t worth it; with fifteen and expensive work you don&#x27;t want to repeat, it is. I kept mine and left the comparison in the repo.</li></ul>
+<p>And one engineering decision that did pay off: <strong>the agent runs on a cascade of free providers</strong> — Groq, Mistral, Cohere and three more — each with its own rate limit. When one returns 429, the request moves to the next carrying the same history. The obvious mistake I made: all three helpers started at the same provider and tripped over each other. Starting each at a different point in the cascade took it from 15 s to 7 s.</p>
 <hr>
 <h2>What I take from it</h2>
 <p><strong>A number that goes up is suspicious.</strong> All four times a number pleased me, I was measuring my dataset rather than my model.</p>
@@ -168,9 +226,10 @@ ort.InferenceSession(ruta, sess_options=opciones)</code></pre>
 <p><strong>Check the anecdote that sounds good.</strong> &quot;Taxonomy disputed among biologists&quot; sounded like I knew what I was talking about. Two HTTP requests showed it was false, and the truth turned out more interesting.</p>
 <p><strong>Sort changes by kind before counting them.</strong> 24 changed labels looked like 24 errors that weren&#x27;t mine. It was 8. The other 16 were mine, dressed up as the same thing.</p>
 <p><strong>A threshold without a measured separation is decoration.</strong> And if the system still works with a useless threshold, nobody will ever find out.</p>
+<p><strong>Measure the peak, not the resting state.</strong> 457 MB fit inside 512 on paper. In practice the container died.</p>
 <hr>
 <h2>Future work</h2>
 <p>The honest part is saying where this doesn&#x27;t reach:</p>
-<ul><li><strong>400 observations and 20 species</strong> say nothing about the other 80. The radar would need to run for weeks to have anything per species.</li><li><strong>One model, one country.</strong> None of this says whether the pattern holds anywhere else.</li><li><strong>The iNaturalist check is a single day&#x27;s snapshot.</strong> Re-running it in six months would give GBIF&#x27;s typical lag, which would be genuinely useful to anyone relying on that data.</li></ul>
-<p>All three repos are open, with the <code>--comprobar</code> self-checks behind the numbers: <a href="https://github.com/DiegoFernandoLojanTenesaca/riksi">riksi</a> · <a href="https://github.com/DiegoFernandoLojanTenesaca/riksi-radar">riksi-radar</a> · <a href="https://github.com/DiegoFernandoLojanTenesaca/yachaq">yachaq</a></p>
+<ul><li><strong>400 observations and 20 species</strong> say nothing about the other 80. The radar would need to run for weeks to have anything per species, and until then any figure for a species that appears three times is anecdotal.</li><li><strong>One model, one country.</strong> None of this says whether the pattern holds with another dataset or another architecture.</li><li><strong>The iNaturalist check is a single day&#x27;s snapshot.</strong> Re-running it in six months would give GBIF&#x27;s typical lag, which would be genuinely useful to anyone training on that data.</li><li><strong>The bias is measured, not fixed.</strong> Knowing one species is 32 % of the set doesn&#x27;t help the model prove itself on the other 80.</li></ul>
+<p>All three repos are open, and every number in this post comes from a file in them — there&#x27;s a <code>--comprobar</code> self-check in each module that verifies it: <a href="https://github.com/DiegoFernandoLojanTenesaca/riski">riksi</a> · <a href="https://github.com/DiegoFernandoLojanTenesaca/riksi-radar">riksi-radar</a> · <a href="https://github.com/DiegoFernandoLojanTenesaca/yachaq">yachaq</a></p>
 </html>

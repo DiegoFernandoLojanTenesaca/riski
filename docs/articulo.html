@@ -1,59 +1,67 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
+<head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Tres proyectos, una lección: casi todas mis cifras estaban infladas</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#14181b">
+<title>Tres proyectos, una lección: casi todas mis cifras estaban infladas · Riksi</title>
+<meta name="description" content="Cuatro cifras que publiqué y que bajaron al medirlas bien: el sesgo de la ciencia ciudadana, las etiquetas viejas de GBIF, un umbral puesto a ojo y 671 MB en un contenedor de 512.">
+<link rel="canonical" href="https://diegofernandolojantenesaca.github.io/riski/articulo.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tres proyectos, una lección: casi todas mis cifras estaban infladas">
+<meta property="og:description" content="Cuatro cifras que publiqué y que bajaron al medirlas bien: el sesgo de la ciencia ciudadana, las etiquetas viejas de GBIF, un umbral puesto a ojo y 671 MB en un contenedor de 512.">
+<meta property="og:image" content="https://diegofernandolojantenesaca.github.io/riski/articulo/sesgo.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="icono.svg">
+<link rel="stylesheet" href="estilo.css">
 <style>
-:root { --tinta:#1a1a1a; --suave:#666; --linea:#e2e2e2; --fondo:#fff;
-        --acento:#0f766e; --codigo:#f6f8fa; }
-* { box-sizing: border-box }
-body { max-width: 46rem; margin: 0 auto; padding: 3rem 1.5rem 6rem;
-       font: 17px/1.7 Georgia, "Times New Roman", serif;
-       color: var(--tinta); background: var(--fondo); }
-h1 { font-size: 2.1rem; line-height: 1.2; margin: 0 0 .4em;
-     letter-spacing: -.02em; }
-h2 { font-size: 1.45rem; margin: 2.6em 0 .6em; padding-top: .3em;
-     letter-spacing: -.01em; }
-h3 { font-size: 1.15rem; margin: 2em 0 .5em; color: var(--suave); }
-p, li { margin: 0 0 1.1em }
-a { color: var(--acento) }
-strong { font-weight: 700 }
-hr { border: 0; border-top: 1px solid var(--linea); margin: 2.6em 0 }
-blockquote { margin: 1.6em 0; padding: .2em 0 .2em 1.2em;
-             border-left: 3px solid var(--acento); color: var(--suave);
-             font-style: italic; }
-code { font: 14px/1.5 "Cascadia Code", Consolas, monospace;
-       background: var(--codigo); padding: .12em .35em; border-radius: 3px; }
-pre { background: var(--codigo); border: 1px solid var(--linea);
-      border-radius: 6px; padding: 1rem 1.1rem; overflow-x: auto;
-      margin: 1.4em 0; }
-pre code { background: none; padding: 0; font-size: 13.5px; line-height: 1.55 }
-table { border-collapse: collapse; width: 100%; margin: 1.5em 0; font-size: 15px;
-        font-family: -apple-system, "Segoe UI", sans-serif; }
-th, td { border-bottom: 1px solid var(--linea); padding: .6em .7em;
-         text-align: left; vertical-align: top; }
-th { font-weight: 600; border-bottom-width: 2px }
-tr:last-child td { border-bottom: none }
-.cabecera { color: var(--suave); font-size: .92rem; margin: 0 0 3em;
-            font-family: -apple-system, "Segoe UI", sans-serif; }
-figure { margin: 2em 0; }
-figure img { width: 100%; height: auto; display: block;
-             border: 1px solid var(--linea); border-radius: 6px; }
-figcaption { margin-top: .6em; font-size: .85rem; color: var(--suave);
-             text-align: center;
-             font-family: -apple-system, "Segoe UI", sans-serif; }
-
-/* Para el PDF: que nada se parta por la mitad al imprimir. */
-@media print {
-  body { max-width: none; padding: 0; font-size: 11.5pt }
-  h1, h2, h3 { break-after: avoid }
-  pre, table, blockquote, figure { break-inside: avoid }
-  a { color: var(--tinta); text-decoration: none }
-  a[href^="http"]::after { content: " (" attr(href) ")";
-                           font-size: .8em; color: var(--suave) }
-}
+.escrito { max-width: 44rem; margin: 0 auto; padding: 0 20px 90px; }
+.escrito h1 { font-size: clamp(1.9rem, 5vw, 2.6rem); line-height: 1.15;
+               margin: 0 0 .5em; }
+.escrito h2 { margin: 2.4em 0 .5em; font-size: 1.5rem; }
+.escrito h3 { margin: 2em 0 .4em; font-size: 1.15rem; color: var(--tinta-2); }
+.escrito p, .escrito li { font-size: 1.05rem; line-height: 1.75; }
+.escrito figure { margin: 2.2em 0; }
+.escrito figure img { width: 100%; height: auto; display: block;
+                       border: 1px solid var(--linea); border-radius: 10px; }
+.escrito figcaption { margin-top: .6em; font-size: .85rem; color: var(--tinta-2);
+                       text-align: center; }
+.escrito pre { background: var(--basalto); color: var(--texto); padding: 1rem 1.2rem;
+                border-radius: 10px; overflow-x: auto; font-size: .86rem;
+                line-height: 1.6; }
+.escrito pre code { background: none; padding: 0; color: inherit; }
+.escrito code { background: rgba(23,27,28,.07); padding: .12em .38em;
+                 border-radius: 4px; font-size: .9em; }
+.escrito table { width: 100%; border-collapse: collapse; margin: 1.6em 0;
+                  font-size: .95rem; }
+.escrito th, .escrito td { border-bottom: 1px solid var(--linea);
+                            padding: .6em .7em; text-align: left;
+                            vertical-align: top; }
+.escrito blockquote { margin: 1.8em 0; padding: .3em 0 .3em 1.3rem;
+                       border-left: 3px solid var(--liquen-2);
+                       color: var(--tinta-2); font-style: italic; }
+.escrito hr { border: 0; border-top: 1px solid var(--linea); margin: 2.6em 0; }
+.entradilla { color: var(--tinta-2); font-size: .95rem; margin: 0 0 2.8em; }
 </style>
-<h1>Tres proyectos, una lección: casi todas mis cifras estaban infladas</h1><p class="cabecera">machinelearning, python, mlops, datascience · Ctrl+P para guardar en PDF</p>
+</head>
+<body>
+
+<header class="barra">
+  <a class="marca" href="index.html"><img src="icono.svg" alt="">Riksi</a>
+  <nav class="menu">
+    <a href="index.html#como">Cómo usarla</a>
+    <a href="especies.html">Las especies</a>
+    <a href="index.html#herramientas">Herramientas</a>
+    <a href="articulo.html">El artículo</a>
+    <a href="index.html#colaborar">Colaborar</a>
+  </nav>
+  <a class="boton" href="app.html">Abrir la cámara</a>
+</header>
+
+<div class="envoltura">
+<article class="escrito">
+<h1>Tres proyectos, una lección: casi todas mis cifras estaban infladas</h1>
+<p class="entradilla">Diego Fernando Lojan Tenesaca · sobre <a href="index.html">Riksi</a>, <a href="https://github.com/DiegoFernandoLojanTenesaca/riksi-radar">riksi-radar</a> y <a href="https://github.com/DiegoFernandoLojanTenesaca/yachaq">yachaq</a></p>
 <p>Entrené un clasificador de 100 especies de fauna ecuatoriana, monté un pipeline para verlo trabajar sobre observaciones reales, y le puse un agente encima. Tres repositorios, unos tres meses.</p>
 <p>Este post no va de cómo los construí. Va de que <strong>cada vez que medí algo en serio, el número bajó</strong> — y de que ese es el trabajo, no un contratiempo.</p>
 <p>Van cuatro casos. En los cuatro la primera cifra era defendible, estaba publicada y era engañosa.</p>
@@ -64,10 +72,10 @@ figcaption { margin-top: .6em; font-size: .85rem; color: var(--suave);
 <tr><td><strong><a href="https://github.com/DiegoFernandoLojanTenesaca/riski">riksi</a></strong></td><td>EfficientNet-Lite0, 100 especies, 3,8 MB en int8. Corre en el navegador con ONNX Runtime Web</td></tr>
 <tr><td><strong><a href="https://github.com/DiegoFernandoLojanTenesaca/riksi-radar">riksi-radar</a></strong></td><td>Kafka → el modelo → DuckDB → dbt. Trae observaciones nuevas de <a href="https://www.gbif.org/">GBIF</a> y las clasifica sin ver la etiqueta</td></tr>
 <tr><td><strong><a href="https://github.com/DiegoFernandoLojanTenesaca/yachaq">yachaq</a></strong></td><td>Un agente sobre lo anterior: RAG, memoria, servidor MCP</td></tr></table>
-<figure><img src="imagenes/montaje.png" alt="El radar: GBIF, Kafka, el modelo, DuckDB, dbt"><figcaption>El radar: GBIF, Kafka, el modelo, DuckDB, dbt</figcaption></figure>
+<figure><img src="articulo/montaje.png" alt="El radar: GBIF, Kafka, el modelo, DuckDB, dbt"><figcaption>El radar: GBIF, Kafka, el modelo, DuckDB, dbt</figcaption></figure>
 <p>El modelo acierta <strong>79,8 %</strong> top-1 sobre 1000 imágenes de validación. Esa cifra está bien medida y no es ninguna de las que van a caerse.</p>
 <p>Lo que sí conviene decir de entrada es cómo llegó a 3,8 MB, porque es la única decisión del proyecto que salió gratis:</p>
-<figure><img src="imagenes/cuantizacion.png" alt="Cuantizar a int8: 3,5 veces más pequeño por 0,4 puntos"><figcaption>Cuantizar a int8: 3,5 veces más pequeño por 0,4 puntos</figcaption></figure>
+<figure><img src="articulo/cuantizacion.png" alt="Cuantizar a int8: 3,5 veces más pequeño por 0,4 puntos"><figcaption>Cuantizar a int8: 3,5 veces más pequeño por 0,4 puntos</figcaption></figure>
 <p>Ese es el trato: <strong>0,4 puntos de acierto por un modelo 3,5 veces más pequeño</strong>. En un clasificador que tiene que descargarse en el navegador de alguien con datos móviles, no hay discusión.</p>
 <hr>
 <h2>Caso 1 · «El modelo mejora fuera de su reparto»</h2>
@@ -76,7 +84,7 @@ figcaption { margin-top: .6em; font-size: .85rem; color: var(--suave);
 <p>400 observaciones. <strong>337 aciertos: 84,2 %.</strong></p>
 <p>Seis puntos por encima del banco de validación. Lo escribí en el README con la palabra «sube» en negrita.</p>
 <p>Está mal. No la aritmética — el sesgo.</p>
-<figure><img src="imagenes/sesgo.png" alt="Una especie es el 32 % de las 400 observaciones"><figcaption>Una especie es el 32 % de las 400 observaciones</figcaption></figure>
+<figure><img src="articulo/sesgo.png" alt="Una especie es el 32 % de las 400 observaciones"><figcaption>Una especie es el 32 % de las 400 observaciones</figcaption></figure>
 <p>El panel izquierdo es el problema: <strong>una sola especie, la iguana marina, es 128 de las 400 observaciones.</strong> Las tres primeras juntas son la mitad del conjunto, y de las 100 especies que el modelo conoce solo aparecen 20.</p>
 <p>La ciencia ciudadana no muestrea uniformemente. La gente fotografía lo que ve, y en Galápagos ve iguanas marinas. Ese 84,2 % es sobre todo la nota del modelo en una especie, repetida 128 veces.</p>
 <p>Y mirando el panel derecho se ve por qué eso infla el número y no lo hunde: la iguana marina está entre las que <strong>mejor</strong> se le dan (94,5 %). El conjunto está dominado por un caso fácil.</p>
@@ -154,7 +162,7 @@ assert not _es_hijo(&quot;Anous stolidusa&quot;, &quot;Anous stolidus&quot;)
 assert not _es_hijo(&quot;Anous stolidus&quot;, &quot;Anous stolidus&quot;)   # ni hija de sí misma
 assert     _es_hijo(&quot;Chelonoidis niger porteri&quot;, &quot;Chelonoidis niger&quot;)</code></pre>
 <p>El resultado:</p>
-<figure><img src="imagenes/desacuerdos.png" alt="Los 63 desacuerdos, contrastados con iNaturalist"><figcaption>Los 63 desacuerdos, contrastados con iNaturalist</figcaption></figure>
+<figure><img src="articulo/desacuerdos.png" alt="Los 63 desacuerdos, contrastados con iNaturalist"><figcaption>Los 63 desacuerdos, contrastados con iNaturalist</figcaption></figure>
 <p>Ocho de 63 no eran fallos. Y los 63 son de grado <em>research</em> en iNaturalist — identificaciones que la comunidad ya confirmó—, así que los otros 55 no tienen dónde escudarse.</p>
 <p><strong>Y aun así hay que rebajarlo.</strong> Las ocho son del mismo taxón. Descontarlas sube la media por especie de 78,7 % a 81,2 %, pero eso arregla una especie de veinte y ninguna otra: es el sesgo del caso 1 entrando por otra puerta. La cifra que seguiría publicando es 78,7 %.</p>
 <p>Lo que sí deja es un dato reutilizable: <strong>GBIF tenía desactualizado el 13 % de los registros que miré.</strong> Cualquiera que entrene con datos de GBIF sin contrastarlos está heredando ese desfase.</p>
@@ -177,14 +185,14 @@ if buenas[0] &lt;= malas[0]:
 <p>Se separaban, con un hueco de 0,075. El punto medio cae en <strong>0,44</strong>, no en 0,5.</p>
 <p>Las preguntas «sin respuesta» son deliberadamente ajenas —«¿cuándo se estrenó Blade Runner?», «receta de arroz con leche»—: si el índice no las rechaza, no rechaza nada.</p>
 <p>El bonus vino de intentar recortar el índice, que ocupaba 235 MB de los cuales 192 eran la tabla de vocabulario: 250.000 tokens para unos 50 idiomas, de los que este proyecto usa 8.403. Parecía dinero tirado.</p>
-<figure><img src="imagenes/calibracion.png" alt="Podar el vocabulario borra el umbral antes que el tamaño"><figcaption>Podar el vocabulario borra el umbral antes que el tamaño</figcaption></figure>
+<figure><img src="articulo/calibracion.png" alt="Podar el vocabulario borra el umbral antes que el tamaño"><figcaption>Podar el vocabulario borra el umbral antes que el tamaño</figcaption></figure>
 <p>Podando a 120.000 términos el índice adelgaza un 40 % y <strong>el umbral deja de existir</strong>: ya no hay hueco que partir. Sin medir la separación, ese recorte parece gratis — el sistema sigue respondiendo, solo que ya no sabe cuándo callar, que es lo único que impide a un RAG inventarse cosas.</p>
 <p>Los ids intermedios no eran relleno de otros idiomas: son las subpalabras que sostienen el español. Cortarlas hunde las preguntas buenas más de lo que hunde las malas.</p>
 <hr>
 <h2>Caso 4 · 671 MB en un contenedor de 512</h2>
 <p>Este no es de medición, pero es el que más me enseñó.</p>
 <p>El agente tenía que caber en un plan gratuito: 512 MB. Con <code>fastembed</code>, el proceso se iba a <strong>671 MB</strong> solo por cargar el codificador. Fuera.</p>
-<figure><img src="imagenes/memoria.png" alt="El mismo cálculo, con la cuarta parte de memoria"><figcaption>El mismo cálculo, con la cuarta parte de memoria</figcaption></figure>
+<figure><img src="articulo/memoria.png" alt="El mismo cálculo, con la cuarta parte de memoria"><figcaption>El mismo cálculo, con la cuarta parte de memoria</figcaption></figure>
 <p>Reescribí la inferencia con ONNX Runtime a mano. Dos cosas la arreglaron. La primera, guardar los pesos como <em>external data</em>, que hace que onnxruntime los mapee desde disco en vez de copiarlos:</p>
 <pre><code class="lenguaje-python">onnx.save(modelo, str(LIGERO / &quot;modelo.onnx&quot;), save_as_external_data=True, ...)
 
@@ -230,5 +238,7 @@ v = (salida * mascara).sum(axis=1) / np.maximum(mascara.sum(axis=1), 1e-9)</code
 <h2>Trabajo futuro</h2>
 <p>Lo honesto es decir dónde no llega:</p>
 <ul><li><strong>400 observaciones y 20 especies</strong> no bastan para las otras 80. El radar tendría que correr semanas para tener algo por especie, y hasta entonces cualquier cifra por especie de las que salen tres veces es anecdótica.</li><li><strong>Un solo modelo, un solo país.</strong> Nada de esto dice si el patrón se repite en otro conjunto o con otra arquitectura.</li><li><strong>La verificación contra iNaturalist es de un día.</strong> Rehacerla dentro de seis meses diría cuál es el desfase típico de GBIF, que sería un dato de verdad útil para cualquiera que use esos datos para entrenar.</li><li><strong>El sesgo se mide, no se corrige.</strong> Saber que una especie es el 32 % no arregla que el modelo tenga poco con qué demostrarse en las otras 80.</li></ul>
-<p>Los tres repos están abiertos, y cada cifra de este post sale de un fichero que está en ellos —hay un <code>--comprobar</code> en cada módulo que lo verifica: <a href="https://github.com/DiegoFernandoLojanTenesaca/riski">riksi</a> · <a href="https://github.com/DiegoFernandoLojanTenesaca/riksi-radar">riksi-radar</a> · <a href="https://github.com/DiegoFernandoLojanTenesaca/yachaq">yachaq</a></p>
+<p>Los tres repos están abiertos, y cada cifra de este post sale de un fichero que está en ellos —hay un <code>--comprobar</code> en cada módulo que lo verifica: <a href="https://github.com/DiegoFernandoLojanTenesaca/riski">riksi</a> · <a href="https://github.com/DiegoFernandoLojanTenesaca/riksi-radar">riksi-radar</a> · <a href="https://github.com/DiegoFernandoLojanTenesaca/yachaq">yachaq</a></p></article>
+</div>
+</body>
 </html>

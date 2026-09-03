@@ -9,6 +9,11 @@ datos/
 *.png
 !icono.svg
 
+# Las figuras del artículo sí: se generan desde los datos con
+# `articulo/graficos.py`, pero la página publicada las necesita servidas.
+!articulo/imagenes/*.png
+!docs/articulo/*.png
+
 # Los pesos de entrenamiento y el modelo sin cuantizar no van al repo: son
 # 14 y 13 MB que nadie necesita para abrir la web.
 *.pt

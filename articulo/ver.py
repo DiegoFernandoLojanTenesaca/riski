@@ -57,12 +57,18 @@ th { font-weight: 600; border-bottom-width: 2px }
 tr:last-child td { border-bottom: none }
 .cabecera { color: var(--suave); font-size: .92rem; margin: 0 0 3em;
             font-family: -apple-system, "Segoe UI", sans-serif; }
+figure { margin: 2em 0; }
+figure img { width: 100%; height: auto; display: block;
+             border: 1px solid var(--linea); border-radius: 6px; }
+figcaption { margin-top: .6em; font-size: .85rem; color: var(--suave);
+             text-align: center;
+             font-family: -apple-system, "Segoe UI", sans-serif; }
 
 /* Para el PDF: que nada se parta por la mitad al imprimir. */
 @media print {
   body { max-width: none; padding: 0; font-size: 11.5pt }
   h1, h2, h3 { break-after: avoid }
-  pre, table, blockquote { break-inside: avoid }
+  pre, table, blockquote, figure { break-inside: avoid }
   a { color: var(--tinta); text-decoration: none }
   a[href^="http"]::after { content: " (" attr(href) ")";
                            font-size: .8em; color: var(--suave) }
@@ -84,6 +90,11 @@ def _linea(t):
 
     t = re.sub(r"`([^`]+)`", guardar, t)
     t = html.escape(t)
+    # La imagen antes que el enlace: `![x](y)` es un enlace con `!` delante, y
+    # si se convierte primero el enlace queda un `!` suelto y un `<a>` con un
+    # PNG dentro.
+    t = re.sub(r"!\[([^\]]*)\]\(([^)]+)\)",
+               r'<figure><img src="\2" alt="\1"><figcaption>\1</figcaption></figure>', t)
     t = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r'<a href="\2">\1</a>', t)
     # La negrita, antes que la cursiva y aceptando `*` dentro: el post tiene
     # negritas que envuelven un nombre científico en cursiva, y con `[^*]+` esas
@@ -114,11 +125,16 @@ def convertir(md):
     while i < len(lineas):
         L = lineas[i]
 
-        if L.startswith("```"):                       # bloque de código
-            idioma, i = L[3:].strip(), i + 1
+        if L.lstrip().startswith("```"):              # bloque de código
+            # `lstrip` y no `startswith` a secas: el post mete bloques dentro de
+            # elementos de lista, y esos van sangrados. Sin esto se colaban tal
+            # cual, con las comillas incluidas, dentro de un párrafo.
+            sangria = len(L) - len(L.lstrip())
+            idioma, i = L.lstrip()[3:].strip(), i + 1
             trozo = []
-            while i < len(lineas) and not lineas[i].startswith("```"):
-                trozo.append(lineas[i])
+            while i < len(lineas) and not lineas[i].lstrip().startswith("```"):
+                trozo.append(lineas[i][sangria:] if lineas[i][:sangria].isspace()
+                             else lineas[i])
                 i += 1
             clase = f' class="lenguaje-{idioma}"' if idioma else ""
             cuerpo.append(f"<pre><code{clase}>"
@@ -158,10 +174,19 @@ def convertir(md):
         elif L.strip() == "---":
             cuerpo.append("<hr>")
 
+        elif L.startswith("!["):
+            # Rama propia: por la de párrafo saldría un <figure> dentro de un
+            # <p>, que no es HTML válido y que los navegadores desanidan
+            # dejando párrafos vacíos por medio.
+            cuerpo.append(_linea(L.strip()))
+
         elif L.startswith("- "):
             puntos = []
-            while i < len(lineas) and (lineas[i].startswith("- ")
-                                       or (puntos and lineas[i].startswith("  "))):
+            # Se corta en un bloque de código sangrado: si no, se tragaría el
+            # ``` como si fuera continuación del punto anterior.
+            while i < len(lineas) and not lineas[i].lstrip().startswith("```") \
+                    and (lineas[i].startswith("- ")
+                         or (puntos and lineas[i].startswith("  "))):
                 if lineas[i].startswith("- "):
                     puntos.append(lineas[i][2:])
                 else:                                  # continuación indentada
@@ -204,6 +229,124 @@ def pagina(md, idioma="es"):
             f"<style>{ESTILO}</style>\n{encabezado}\n{cuerpo}\n</html>\n")
 
 
+# La del sitio: mismo texto, pero dentro de la plantilla de riksi.github.io para
+# que no parezca una página de otro proyecto. Es el enlace canónico propio, al
+# que apuntan Dev.to y Medium.
+SITIO = AQUI.parent / "docs" / "articulo.html"
+BASE = "https://diegofernandolojantenesaca.github.io/riski"
+
+CABEZA_SITIO = """<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#14181b">
+<title>{titulo} · Riksi</title>
+<meta name="description" content="{resumen}">
+<link rel="canonical" href="{base}/articulo.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="{titulo}">
+<meta property="og:description" content="{resumen}">
+<meta property="og:image" content="{base}/articulo/sesgo.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="icono.svg">
+<link rel="stylesheet" href="estilo.css">
+<style>
+.escrito {{ max-width: 44rem; margin: 0 auto; padding: 0 20px 90px; }}
+.escrito h1 {{ font-size: clamp(1.9rem, 5vw, 2.6rem); line-height: 1.15;
+               margin: 0 0 .5em; }}
+.escrito h2 {{ margin: 2.4em 0 .5em; font-size: 1.5rem; }}
+.escrito h3 {{ margin: 2em 0 .4em; font-size: 1.15rem; color: var(--tinta-2); }}
+.escrito p, .escrito li {{ font-size: 1.05rem; line-height: 1.75; }}
+.escrito figure {{ margin: 2.2em 0; }}
+.escrito figure img {{ width: 100%; height: auto; display: block;
+                       border: 1px solid var(--linea); border-radius: 10px; }}
+.escrito figcaption {{ margin-top: .6em; font-size: .85rem; color: var(--tinta-2);
+                       text-align: center; }}
+.escrito pre {{ background: var(--basalto); color: var(--texto); padding: 1rem 1.2rem;
+                border-radius: 10px; overflow-x: auto; font-size: .86rem;
+                line-height: 1.6; }}
+.escrito pre code {{ background: none; padding: 0; color: inherit; }}
+.escrito code {{ background: rgba(23,27,28,.07); padding: .12em .38em;
+                 border-radius: 4px; font-size: .9em; }}
+.escrito table {{ width: 100%; border-collapse: collapse; margin: 1.6em 0;
+                  font-size: .95rem; }}
+.escrito th, .escrito td {{ border-bottom: 1px solid var(--linea);
+                            padding: .6em .7em; text-align: left;
+                            vertical-align: top; }}
+.escrito blockquote {{ margin: 1.8em 0; padding: .3em 0 .3em 1.3rem;
+                       border-left: 3px solid var(--liquen-2);
+                       color: var(--tinta-2); font-style: italic; }}
+.escrito hr {{ border: 0; border-top: 1px solid var(--linea); margin: 2.6em 0; }}
+.entradilla {{ color: var(--tinta-2); font-size: .95rem; margin: 0 0 2.8em; }}
+</style>
+</head>
+<body>
+
+<header class="barra">
+  <a class="marca" href="index.html"><img src="icono.svg" alt="">Riksi</a>
+  <nav class="menu">
+    <a href="index.html#como">Cómo usarla</a>
+    <a href="especies.html">Las especies</a>
+    <a href="index.html#herramientas">Herramientas</a>
+    <a href="articulo.html">El artículo</a>
+    <a href="index.html#colaborar">Colaborar</a>
+  </nav>
+  <a class="boton" href="app.html">Abrir la cámara</a>
+</header>
+
+<div class="envoltura">
+<article class="escrito">
+<h1>{titulo}</h1>
+<p class="entradilla">{firma}</p>
+"""
+
+PIE_SITIO = """</article>
+</div>
+</body>
+</html>
+"""
+
+
+def para_el_sitio():
+    """El post dentro de la plantilla de riksi.github.io.
+
+    Las imágenes se referencian desde `docs/articulo/`, que es donde GitHub
+    Pages las va a servir: un `imagenes/x.png` relativo al Markdown apunta fuera
+    de `docs/` y no se publicaría.
+    """
+    md = (AQUI / "post.md").read_text(encoding="utf-8")
+    titulo, _, cuerpo = convertir(md)
+    cuerpo = cuerpo.replace('src="imagenes/', 'src="articulo/')
+    resumen = ("Cuatro cifras que publiqué y que bajaron al medirlas bien: el "
+               "sesgo de la ciencia ciudadana, las etiquetas viejas de GBIF, un "
+               "umbral puesto a ojo y 671 MB en un contenedor de 512.")
+    firma = ('Diego Fernando Lojan Tenesaca · sobre '
+             '<a href="index.html">Riksi</a>, '
+             '<a href="https://github.com/DiegoFernandoLojanTenesaca/riksi-radar">riksi-radar</a> y '
+             '<a href="https://github.com/DiegoFernandoLojanTenesaca/yachaq">yachaq</a>')
+    SITIO.write_text(
+        CABEZA_SITIO.format(titulo=html.escape(titulo), resumen=resumen,
+                            firma=firma, base=BASE) + cuerpo + PIE_SITIO,
+        encoding="utf-8")
+    print(f"  docs/{SITIO.name}  ({SITIO.stat().st_size // 1024} KB)")
+    return SITIO
+
+
+def copiar_imagenes():
+    """Las figuras, a `docs/articulo/`, que es lo que GitHub Pages publica."""
+    import shutil
+
+    destino = AQUI.parent / "docs" / "articulo"
+    destino.mkdir(exist_ok=True)
+    copiadas = 0
+    for png in sorted((AQUI / "imagenes").glob("*.png")):
+        shutil.copy2(png, destino / png.name)
+        copiadas += 1
+    print(f"  docs/articulo/  ({copiadas} figuras)")
+    return copiadas
+
+
 def generar(abrir=True):
     hechos = []
     for origen, idioma in (("post.md", "es"), ("post-en.md", "en")):
@@ -212,6 +355,8 @@ def generar(abrir=True):
         destino.write_text(pagina(md, idioma), encoding="utf-8")
         hechos.append(destino)
         print(f"  {destino.name}  ({destino.stat().st_size // 1024} KB)")
+    copiar_imagenes()
+    para_el_sitio()
     if abrir:
         webbrowser.open(hechos[0].as_uri())
     return hechos
@@ -255,14 +400,35 @@ def prueba():
     *_, h = convertir("-x no es una lista\n")
     assert "-x no es una lista" in h, h
 
+    # Un bloque de código dentro de una lista, sangrado. Este se colaba entero
+    # como texto, con las comillas incluidas, dentro de un párrafo.
+    *_, h = convertir("- un punto\n\n  ```python\n  x = 1\n  ```\n")
+    assert "```" not in h and "<pre><code" in h, h
+    assert ">x = 1<" in h, "la sangría del bloque tenía que quitarse"
+
+    # Las imágenes: fuera de un <p>, y sin que el enlace se las coma antes.
+    *_, h = convertir("![pie del gráfico](imagenes/x.png)\n")
+    assert '<img src="imagenes/x.png"' in h and "<p>" not in h, h
+    assert "<figcaption>pie del gráfico</figcaption>" in h, h
+    assert "!<a" not in h, "el enlace se comió la imagen y dejó el ! suelto"
+
     ok = generar(abrir=False)
     for f in ok:
         t = f.read_text(encoding="utf-8")
-        assert t.count("<table") >= 4, f"{f.name}: faltan tablas"
+        assert t.count("<table") >= 3, f"{f.name}: faltan tablas"
+        assert t.count("<img") >= 6, f"{f.name}: faltan figuras"
         assert "```" not in t and "**" not in t, f"{f.name}: quedó Markdown sin convertir"
         # El título sale del frontmatter, no del cuerpo: sin esto la página se
         # generaba entera y sin titular, y el fallo no se veía en el HTML.
         assert t.count("<h1>") == 1, f"{f.name}: la página se quedó sin titular"
+
+    # La del sitio: dentro de `docs/`, con las imágenes donde Pages las sirve.
+    s = SITIO.read_text(encoding="utf-8")
+    assert 'src="articulo/' in s and 'src="imagenes/' not in s, (
+        "las figuras apuntan fuera de docs/: en Pages saldrían rotas")
+    assert "estilo.css" in s and 'class="barra"' in s, "no lleva el envoltorio del sitio"
+    for ref in re.findall(r'src="(articulo/[^"]+)"', s):
+        assert (AQUI.parent / "docs" / ref).exists(), f"falta {ref}"
     print(f"ok · tablas, código, enlaces y cita · {len(ok)} páginas generadas")
 
 
