@@ -1,0 +1,112 @@
+# Que el modelo publicado siga dando las mismas predicciones.
+#
+# **Esto no reentrena nada ni mide calidad.** Coge el `.onnx` de 3,8 MB que está
+# en `docs/` -el mismo que descarga el navegador- lo pasa por el banco de 200
+# imágenes y comprueba que predice lo que predijo el día que se generó.
+#
+# No mide si acierta, y esa distinción importa: sobre este banco acierta el
+# 96,5 %, pero el banco se armó con imágenes que el modelo maneja bien y no es
+# una muestra aleatoria. El número honesto de acierto es el 79,8 % de
+# `metricas.json`, medido sobre las 1.000 de validación.
+#
+# Ese es justo el fallo que más cuesta ver: un preprocesado que no coincide con
+# el del entrenamiento no lanza ningún error. El modelo responde igual, solo que
+# peor, y la culpa se le echa al modelo.
+
+name: comprobar
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  modelo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: instalar
+        run: pip install onnxruntime pillow numpy
+
+      - name: el modelo reproduce las predicciones del banco
+        run: |
+          python - <<'PY'
+          import json, pathlib, sys
+          import numpy as np, onnxruntime as ort
+          from PIL import Image
+
+          docs = pathlib.Path("docs")
+          modelo = docs / "modelo"
+          pre = json.loads((modelo / "preprocesado.json").read_text(encoding="utf-8"))
+          clases = json.loads((modelo / "clases.json").read_text(encoding="utf-8"))
+          banco = dict(json.loads((docs / "banco" / "banco.json").read_text(encoding="utf-8")))
+
+          sesion = ort.InferenceSession(str(modelo / "riksi-int8.onnx"),
+                                        providers=["CPUExecutionProvider"])
+          entrada = sesion.get_inputs()[0].name
+
+          def preparar(ruta):
+              im = Image.open(ruta).convert("RGB")
+              escala = pre["resize"] / min(im.size)
+              im = im.resize((round(im.width * escala), round(im.height * escala)),
+                             Image.BILINEAR)
+              t = pre["tam"]
+              izq, arr = (im.width - t) // 2, (im.height - t) // 2
+              im = im.crop((izq, arr, izq + t, arr + t))
+              x = np.asarray(im, dtype=np.float32) / 255.0
+              x = (x - np.array(pre["media"], np.float32)) / np.array(pre["desv"], np.float32)
+              return x.transpose(2, 0, 1)[None]
+
+          n = aciertos = 0
+          for img in banco["imagenes"]:
+              f = docs / "banco" / img["archivo"]
+              if not f.exists():
+                  continue
+              salida = sesion.run(None, {entrada: preparar(f)})[0][0]
+              # **Contra `python`, no contra `verdadera`.** El banco guarda en ese
+              # campo lo que el modelo predijo cuando se generó, y ésa es la
+              # referencia: aquí se comprueba que hoy predice lo mismo, no si
+              # acierta. Comparar con `verdadera` daría 96,5 %, porque el banco
+              # se armó con imágenes que el modelo maneja bien y no es una
+              # muestra aleatoria.
+              aciertos += clases[int(np.argmax(salida))] == img["python"]
+              n += 1
+
+          reproduce = aciertos / n
+          declarado = banco.get("top1_python", 0)
+          print(f"{n} imágenes · reproduce {reproduce:.1%} · el banco declara {declarado:.1%}")
+
+          # Margen estrecho a propósito: esto no mide calidad, mide que el
+          # modelo publicado siga dando las mismas predicciones. Cualquier
+          # desviación real significa que se reexportó distinto o que el
+          # preprocesado dejó de coincidir con el del entrenamiento, y ese fallo
+          # no lanza ningún error: el modelo responde igual, solo que peor.
+          assert abs(reproduce - declarado) < 0.03, (
+              f"el modelo reproduce {reproduce:.1%} de las predicciones del "
+              f"banco y debería reproducir {declarado:.1%}: o se reexportó "
+              f"distinto, o el preprocesado cambió")
+          PY
+
+      - name: la web referencia lo que existe
+        run: |
+          python - <<'PY'
+          import pathlib, re
+          docs = pathlib.Path("docs")
+          faltan = []
+          for html in docs.glob("*.html"):
+              texto = html.read_text(encoding="utf-8")
+              for ref in re.findall(r'(?:src|href)="([^":#?]+\.(?:js|css|json|svg|onnx|wasm))"', texto):
+                  if not (docs / ref).exists():
+                      faltan.append(f"{html.name} → {ref}")
+          # Un `src` roto no da error en el servidor: da una página que carga a
+          # medias y un modelo que nunca llega.
+          assert not faltan, "referencias rotas: " + ", ".join(faltan)
+          print("todas las referencias de las páginas existen")
+          PY
