@@ -388,7 +388,7 @@ CABEZA_SITIO = """<!DOCTYPE html>
 <h1>{titulo}</h1>
 <p class="bajada-art">{bajada}</p>
 <p class="resumen">{resumen}</p>
-<p class="entradilla">{autor} · {oficio} · {aviso}</p>
+<p class="entradilla">{autor} · {oficio}</p>
 """
 
 # La autoría va al pie y no en una línea bajo el titular: en un texto de tres mil
@@ -471,10 +471,6 @@ def para_el_sitio():
                "fotografía, el 78,7 %. Esos 5,5 puntos no son el modelo: son "
                "que una sola especie aporta un tercio del conjunto. Es una de "
                "las cuatro cifras que publiqué antes de medirlas bien.")
-    # Sobre 200 palabras por minuto, que es lo habitual en prosa técnica.
-    minutos = round(len(md.split()) / 200)
-    aviso = f"{minutos} min de lectura"
-
     SITIO.write_text(
         CABEZA_SITIO.format(titulo=html.escape(TITULO_SITIO), resumen=resumen,
                             titulo_corto=html.escape(TITULO_BREVE),
@@ -482,7 +478,7 @@ def para_el_sitio():
                             # dentro del JSON-LD el `&` no va escapado: ahí no
                             # es HTML, y un buscador leería «&amp;» literal.
                             oficio_json=OFICIO, bajada=BAJADA_SITIO,
-                            aviso=aviso, base=BASE) + cuerpo
+                            base=BASE) + cuerpo
         + PIE_SITIO.format(
             autor=AUTOR, oficio=html.escape(OFICIO), lugar=LUGAR,
             especialidades="".join(f"<li>{e}</li>" for e in ESPECIALIDADES)),

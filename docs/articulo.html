@@ -109,7 +109,7 @@
 <h1>Sesgo de muestreo en la evaluación fuera de distribución de un clasificador de especies: micro frente a macro-promedio sobre datos de ciencia ciudadana</h1>
 <p class="bajada-art">O dicho sin jerga: cuatro cifras que publiqué sobre un clasificador de especies, y qué pasó cuando las medí bien.</p>
 <p class="resumen">Un clasificador de cien especies evaluado sobre 400 observaciones que nadie seleccionó acierta el 84,2 % de las veces. Dando el mismo peso a cada especie en vez de a cada fotografía, el 78,7 %. Esos 5,5 puntos no son el modelo: son que una sola especie aporta un tercio del conjunto. Es una de las cuatro cifras que publiqué antes de medirlas bien.</p>
-<p class="entradilla">Diego Fernando Lojan Tenesaca · Data &amp; AI Engineer · 15 min de lectura</p>
+<p class="entradilla">Diego Fernando Lojan Tenesaca · Data &amp; AI Engineer</p>
 <p>Entrené un clasificador de cien especies ecuatorianas, monté un pipeline para evaluarlo sobre observaciones que nadie había seleccionado y construí un agente sobre ambos. Tres repositorios, unos tres meses.</p>
 <p>Lo que sigue no es cómo los construí. Es el patrón que encontré al revisarlos: <strong>cada vez que sustituí una estimación cómoda por una medición correcta, el número empeoró.</strong> Cuatro veces. En las cuatro, la cifra original era defendible, estaba publicada, y describía algo distinto de lo que yo creía.</p>
 <p>La asimetría tiene una explicación mecánica. Una métrica que sale mal te empuja a revisar el cálculo; una que sale bien se publica. El resultado es que el error solo sobrevive en una dirección, y no en la inocua.</p>
