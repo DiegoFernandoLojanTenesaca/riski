@@ -261,6 +261,7 @@ CABEZA_SITIO = """<!DOCTYPE html>
 .escrito figure {{ margin: 2.2em 0; }}
 .escrito figure img {{ width: 100%; height: auto; display: block;
                        border: 1px solid var(--linea); border-radius: 10px; }}
+.escrito figure picture {{ display: block; }}
 .escrito figcaption {{ margin-top: .6em; font-size: .85rem; color: var(--tinta-2);
                        text-align: center; }}
 .escrito pre {{ background: var(--basalto); color: var(--texto); padding: 1rem 1.2rem;
@@ -308,6 +309,27 @@ PIE_SITIO = """</article>
 """
 
 
+def _con_tema_oscuro(cuerpo):
+    """Cada figura, con su variante oscura para quien navegue en oscuro.
+
+    Con `<picture>` y `prefers-color-scheme` lo resuelve el navegador: no hace
+    falta JavaScript, y quien tenga el sistema en claro no descarga la otra. Una
+    figura de fondo claro sobre una página oscura deslumbra, y es lo primero que
+    delata que las imágenes se pegaron sin mirar.
+    """
+    def cambiar(m):
+        ruta, resto = m.group(1), m.group(2)
+        oscura = ruta.replace(".png", "-oscuro.png")
+        if not (AQUI.parent / "docs" / oscura).exists():
+            return m.group(0)
+        return (f'<picture>'
+                f'<source srcset="{oscura}" media="(prefers-color-scheme: dark)">'
+                f'<img src="{ruta}"{resto}>'
+                f'</picture>')
+
+    return re.sub(r'<img src="(articulo/[^"]+\.png)"([^>]*)>', cambiar, cuerpo)
+
+
 def para_el_sitio():
     """El post dentro de la plantilla de riksi.github.io.
 
@@ -318,6 +340,7 @@ def para_el_sitio():
     md = (AQUI / "post.md").read_text(encoding="utf-8")
     titulo, _, cuerpo = convertir(md)
     cuerpo = cuerpo.replace('src="imagenes/', 'src="articulo/')
+    cuerpo = _con_tema_oscuro(cuerpo)
     resumen = ("Cuatro cifras que publiqué y que bajaron al medirlas bien: el "
                "sesgo de la ciencia ciudadana, las etiquetas viejas de GBIF, un "
                "umbral puesto a ojo y 671 MB en un contenedor de 512.")
@@ -427,8 +450,13 @@ def prueba():
     assert 'src="articulo/' in s and 'src="imagenes/' not in s, (
         "las figuras apuntan fuera de docs/: en Pages saldrían rotas")
     assert "estilo.css" in s and 'class="barra"' in s, "no lleva el envoltorio del sitio"
-    for ref in re.findall(r'src="(articulo/[^"]+)"', s):
+    for ref in re.findall(r'src(?:set)?="(articulo/[^"]+)"', s):
         assert (AQUI.parent / "docs" / ref).exists(), f"falta {ref}"
+    # Cada figura con su variante oscura: si falta el <source>, quien navegue en
+    # oscuro se come un rectángulo claro a plena página.
+    assert s.count("<picture>") == s.count("<figure>"), (
+        "alguna figura se quedó sin variante oscura")
+    assert "prefers-color-scheme: dark" in s
     print(f"ok · tablas, código, enlaces y cita · {len(ok)} páginas generadas")
 
 

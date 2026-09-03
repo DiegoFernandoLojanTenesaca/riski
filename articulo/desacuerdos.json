@@ -1,0 +1,206 @@
+{
+ "pares": [
+  [
+   "Chelonoidis niger",
+   "Chelonoidis porteri",
+   8
+  ],
+  [
+   "Chelonoidis porteri",
+   "Chelonoidis niger",
+   8
+  ],
+  [
+   "Anous stolidus",
+   "Fregata magnificens",
+   3
+  ],
+  [
+   "Butorides sundevalli",
+   "Nyctanassa violacea",
+   3
+  ],
+  [
+   "Bodianus diplotaenia",
+   "Prionurus laticlavius",
+   3
+  ],
+  [
+   "Apis mellifera",
+   "Grapsus grapsus",
+   2
+  ],
+  [
+   "Amblyrhynchus cristatus",
+   "Spheniscus mendiculus",
+   2
+  ],
+  [
+   "Butorides sundevalli",
+   "Creagrus furcatus",
+   2
+  ],
+  [
+   "Anas bahamensis",
+   "Pelecanus occidentalis",
+   1
+  ],
+  [
+   "Bursera graveolens",
+   "Gaultheria myrsinoides",
+   1
+  ],
+  [
+   "Amazilia tzacatl",
+   "Setophaga petechia",
+   1
+  ],
+  [
+   "Anous stolidus",
+   "Coragyps atratus",
+   1
+  ],
+  [
+   "Bursera graveolens",
+   "Opuntia galapageia",
+   1
+  ],
+  [
+   "Butorides sundevalli",
+   "Fregata magnificens",
+   1
+  ],
+  [
+   "Chuquiraga jussieui",
+   "Pyrocephalus rubinus",
+   1
+  ],
+  [
+   "Brachyotum ledifolium",
+   "Vaccinium floribundum",
+   1
+  ],
+  [
+   "Amblyrhynchus cristatus",
+   "Coragyps atratus",
+   1
+  ],
+  [
+   "Chelonia mydas",
+   "Amblyrhynchus cristatus",
+   1
+  ],
+  [
+   "Chelonoidis niger",
+   "Geospiza fortis",
+   1
+  ],
+  [
+   "Apis mellifera",
+   "Xylocopa darwini",
+   1
+  ],
+  [
+   "Amblyrhynchus cristatus",
+   "Microlophus delanonis",
+   1
+  ],
+  [
+   "Amblyrhynchus cristatus",
+   "Thraupis episcopus",
+   1
+  ],
+  [
+   "Anas bahamensis",
+   "Lesbia victoriae",
+   1
+  ],
+  [
+   "Butorides sundevalli",
+   "Sula nebouxii",
+   1
+  ],
+  [
+   "Amblyrhynchus cristatus",
+   "Microlophus albemarlensis",
+   1
+  ],
+  [
+   "Chelonia mydas",
+   "Chelonoidis niger",
+   1
+  ],
+  [
+   "Apis mellifera",
+   "Florisuga mellivora",
+   1
+  ],
+  [
+   "Anartia amathea",
+   "Nyctanassa violacea",
+   1
+  ],
+  [
+   "Bodianus diplotaenia",
+   "Chelonia mydas",
+   1
+  ],
+  [
+   "Anas bahamensis",
+   "Zalophus wollebaeki",
+   1
+  ],
+  [
+   "Amblyrhynchus cristatus",
+   "Zenaida auriculata",
+   1
+  ],
+  [
+   "Apis mellifera",
+   "Dalea coerulea",
+   1
+  ],
+  [
+   "Anous stolidus",
+   "Sula nebouxii",
+   1
+  ],
+  [
+   "Amazilia tzacatl",
+   "Heliodoxa jacula",
+   1
+  ],
+  [
+   "Butorides sundevalli",
+   "Mimus parvulus",
+   1
+  ],
+  [
+   "Chelonia mydas",
+   "Zalophus wollebaeki",
+   1
+  ],
+  [
+   "Amazilia tzacatl",
+   "Butorides sundevalli",
+   1
+  ],
+  [
+   "Anas bahamensis",
+   "Sula nebouxii",
+   1
+  ],
+  [
+   "Butorides sundevalli",
+   "Geospiza fortis",
+   1
+  ],
+  [
+   "Anous stolidus",
+   "Creagrus furcatus",
+   1
+  ]
+ ],
+ "en_top3": 44,
+ "total": 63
+}

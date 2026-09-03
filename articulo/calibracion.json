@@ -1,0 +1,62 @@
+{
+ "con_respuesta": [
+  [
+   "¿por qué tiene los pies azules?",
+   0.7143
+  ],
+  [
+   "¿qué come el hoatzin?",
+   0.6078
+  ],
+  [
+   "¿dónde anida la iguana marina?",
+   0.7707
+  ],
+  [
+   "¿cómo es el cortejo del piquero?",
+   0.5626
+  ],
+  [
+   "¿qué tamaño alcanza la tortuga de Galápagos?",
+   0.7221
+  ],
+  [
+   "¿de qué color es el colibrí cobrizo?",
+   0.7152
+  ],
+  [
+   "¿cuánto vive una iguana terrestre?",
+   0.7444
+  ],
+  [
+   "¿qué hace la fragata con su garganta roja?",
+   0.4756
+  ]
+ ],
+ "sin_respuesta": [
+  [
+   "¿cómo se llama el volcán más alto de Marte?",
+   0.4007
+  ],
+  [
+   "¿cuál es la capital de Mongolia?",
+   0.3858
+  ],
+  [
+   "¿cómo se arregla un motor diésel?",
+   0.3132
+  ],
+  [
+   "¿qué es la inflación estructural?",
+   0.3266
+  ],
+  [
+   "¿cuándo se estrenó Blade Runner?",
+   0.2683
+  ],
+  [
+   "receta de arroz con leche",
+   0.3201
+  ]
+ ]
+}
