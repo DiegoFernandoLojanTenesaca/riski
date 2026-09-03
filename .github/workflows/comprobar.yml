@@ -7,10 +7,9 @@
 
 name: comprobar
 
+# Solo a mano: en push avisaba por correo cada vez que fallaba.
+# `python comprobaciones.py` en local hace lo mismo sin buzón de por medio.
 on:
-  push:
-    branches: [main]
-  pull_request:
   workflow_dispatch:
 
 jobs:
