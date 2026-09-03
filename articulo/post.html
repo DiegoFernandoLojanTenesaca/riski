@@ -2,7 +2,7 @@
 <html lang="es">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Cuatro cifras que publiqué antes de medirlas bien</title>
+<title>Si dejas de medir cuando el número te gusta, tu criterio de parada es el sesgo</title>
 <style>
 :root { --tinta:#1a1a1a; --suave:#666; --linea:#e2e2e2; --fondo:#fff;
         --acento:#0f766e; --codigo:#f6f8fa; }
@@ -53,10 +53,10 @@ figcaption { margin-top: .6em; font-size: .85rem; color: var(--suave);
                            font-size: .8em; color: var(--suave) }
 }
 </style>
-<h1>Cuatro cifras que publiqué antes de medirlas bien</h1><p class="cabecera">machinelearning, python, mlops, datascience · Ctrl+P para guardar en PDF</p>
+<h1>Si dejas de medir cuando el número te gusta, tu criterio de parada es el sesgo</h1><p class="cabecera">machinelearning, python, mlops, datascience · Ctrl+P para guardar en PDF</p>
 <p>Entrené un clasificador de cien especies ecuatorianas, monté un pipeline para evaluarlo sobre observaciones que nadie había seleccionado y construí un agente sobre ambos. Tres repositorios, unos tres meses.</p>
 <p>Lo que sigue no es cómo los construí. Es el patrón que encontré al revisarlos: <strong>cada vez que sustituí una estimación cómoda por una medición correcta, el número empeoró.</strong> Cuatro veces. En las cuatro, la cifra original era defendible, estaba publicada, y describía algo distinto de lo que yo creía.</p>
-<p>Esa asimetría no es casualidad, y merece un nombre: si te paras de medir cuando el resultado te gusta, tu criterio de parada está correlacionado con el sesgo que querías detectar.</p>
+<p>La asimetría tiene una explicación mecánica. Una métrica que sale mal te empuja a revisar el cálculo; una que sale bien se publica. El resultado es que el error solo sobrevive en una dirección, y no en la inocua.</p>
 <hr>
 <h2>El montaje</h2>
 <p>Lo mínimo para seguir el resto:</p>

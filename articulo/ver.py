@@ -241,7 +241,7 @@ CABEZA_SITIO = """<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#14181b">
-<title>{titulo} · Riksi</title>
+<title>{titulo_corto} · Riksi</title>
 <meta name="description" content="{resumen}">
 <link rel="canonical" href="{base}/articulo.html">
 <meta property="og:type" content="article">
@@ -348,8 +348,13 @@ def para_el_sitio():
              '<a href="index.html">Riksi</a>, '
              '<a href="https://github.com/DiegoFernandoLojanTenesaca/riksi-radar">riksi-radar</a> y '
              '<a href="https://github.com/DiegoFernandoLojanTenesaca/yachaq">yachaq</a>')
+    # El titular va entero en la página, pero la etiqueta `<title>` se corta a
+    # los ~60 caracteres en los resultados de búsqueda. Con el largo, lo que se
+    # ve en Google es media frase y ningún indicio de qué trata.
+    corto = "Cuatro cifras que publiqué antes de medirlas bien"
     SITIO.write_text(
         CABEZA_SITIO.format(titulo=html.escape(titulo), resumen=resumen,
+                            titulo_corto=html.escape(corto),
                             firma=firma, base=BASE) + cuerpo + PIE_SITIO,
         encoding="utf-8")
     print(f"  docs/{SITIO.name}  ({SITIO.stat().st_size // 1024} KB)")

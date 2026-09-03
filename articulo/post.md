@@ -1,5 +1,5 @@
 ---
-title: "Cuatro cifras que publiqué antes de medirlas bien"
+title: "Si dejas de medir cuando el número te gusta, tu criterio de parada es el sesgo"
 published: false
 tags: machinelearning, python, mlops, datascience
 cover_image: https://raw.githubusercontent.com/DiegoFernandoLojanTenesaca/riski/main/articulo/imagenes/sesgo.png
@@ -14,9 +14,9 @@ Lo que sigue no es cómo los construí. Es el patrón que encontré al revisarlo
 número empeoró.** Cuatro veces. En las cuatro, la cifra original era defendible,
 estaba publicada, y describía algo distinto de lo que yo creía.
 
-Esa asimetría no es casualidad, y merece un nombre: si te paras de medir cuando
-el resultado te gusta, tu criterio de parada está correlacionado con el sesgo que
-querías detectar.
+La asimetría tiene una explicación mecánica. Una métrica que sale mal te empuja a
+revisar el cálculo; una que sale bien se publica. El resultado es que el error
+solo sobrevive en una dirección, y no en la inocua.
 
 ---
 

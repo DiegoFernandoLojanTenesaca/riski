@@ -8,7 +8,7 @@ serio, la cifra bajó.**
 |---|---|
 | [`post.md`](post.md) | español, el original |
 | [`post-en.md`](post-en.md) | inglés |
-| [`imagenes/`](imagenes) | las seis figuras, generadas desde los datos |
+| [`imagenes/`](imagenes) | ocho figuras, en claro y en oscuro, generadas desde los datos |
 
 Los dos Markdown llevan cabecera de Dev.to con `published: false`, así que se
 pueden importar sin que salgan publicados por accidente.
@@ -41,12 +41,22 @@ Ninguno está escrito a mano. Todos salen de un fichero que está en un repo, y
 | 79,8 % top-1 · 3,8 MB · coste de int8 | [`docs/modelo/metricas.json`](../docs/modelo/metricas.json) |
 | 400 observaciones, 337 aciertos, 20 especies | `datos/radar.duckdb` en riksi-radar, cacheado en [`por-especie.json`](por-especie.json) |
 | 39 / 16 / 8 del contraste con iNaturalist | [`contraste.json`][contraste], versionado a propósito |
-| 0,44 y la tabla de poda del vocabulario | `indice.py` en yachaq, medido con `--calibrar` |
+| los pares de confusión y los 44 en top-3 | [`desacuerdos.json`](desacuerdos.json), exportado del mismo almacén |
+| el hueco de 0,075 y el corte en 0,44 | [`calibracion.json`](calibracion.json), medido con `indice.py --calibrar` |
+| la tabla de poda del vocabulario | `indice.py` en yachaq |
 | 671 → 467 → 154 MB | `codificador.py` y el README de yachaq |
 
 Las dos últimas filas son las únicas que salen de un comentario y no de un
 fichero de datos: son mediciones que no dejaron rastro en disco. Están marcadas
 como tales en la función que las dibuja.
+
+## Los dos temas
+
+Cada figura se genera en claro y en oscuro desde la misma función —un objeto
+`Tema` con los colores, no un `if oscuro` repartido por el fichero— y la página
+sirve la que toque con `<picture>` y `prefers-color-scheme`. Una figura de fondo
+claro sobre una página oscura deslumbra, y es lo primero que delata que las
+imágenes se pegaron sin mirarlas en su sitio.
 
 Si se reentrena o se vuelve a correr el radar, estas cifras cambian y el post
 queda viejo. `graficos.py --comprobar` lo detecta —falla si el DuckDB ya no dice

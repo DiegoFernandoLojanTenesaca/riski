@@ -1,5 +1,5 @@
 ---
-title: "Four numbers I published before measuring them properly"
+title: "If you stop measuring when the number looks good, your stopping criterion is the bias"
 published: false
 tags: machinelearning, python, mlops, datascience
 cover_image: https://raw.githubusercontent.com/DiegoFernandoLojanTenesaca/riski/main/articulo/imagenes/sesgo.png
@@ -14,9 +14,9 @@ What follows isn't how I built them. It's the pattern I found reviewing them:
 number got worse.** Four times. In all four the original figure was defensible,
 published, and describing something other than what I thought.
 
-That asymmetry isn't chance, and it deserves a name: if you stop measuring when
-the result pleases you, your stopping criterion is correlated with the very bias
-you set out to detect.
+The asymmetry has a mechanical explanation. A metric that comes out badly pushes
+you to recheck the computation; one that comes out well gets published. So the
+error only survives in one direction, and not the harmless one.
 
 ---
 
