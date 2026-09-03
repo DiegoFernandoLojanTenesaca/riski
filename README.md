@@ -144,11 +144,15 @@ etiqueta.
 |---|---|
 | banco de validación · 200 imágenes | 78,0 % |
 | campo, vía el radar · 400 observaciones | **84,2 %** |
+| campo, descontando etiquetas viejas de GBIF | **86,2 %** |
 
-**No cae: sube seis puntos.** Que suba no significa que el modelo haya mejorado
-—significa que al campo llegan sobre todo especies fáciles y muy fotografiadas—,
-pero sí significa que no hay deriva: el modelo aguanta fuera del reparto donde
-se entrenó.
+**No cae: sube.** Pero que suba no significa que el modelo haya mejorado.
+Significa que al campo llegan sobre todo especies fáciles y muy fotografiadas:
+una sola es el 32 % de las 400 observaciones, y las tres primeras la mitad.
+Promediando por especie en vez de por observación, el 84,2 % se queda en
+**78,7 %** —lo mismo que en validación—. Esos 5,5 puntos son el sesgo, no el
+modelo. Lo que sí queda demostrado es que **no hay deriva**: aguanta fuera del
+reparto donde se entrenó.
 
 ```bash
 python deriva.py        # la comparación, especie a especie
@@ -161,10 +165,25 @@ más de veinte puntos y quedan marcadas.
 
 **Y los desacuerdos son lo interesante.** Cuando el modelo y GBIF discrepan hay
 tres explicaciones —el modelo se equivocó, la observación está mal identificada,
-o la foto no muestra lo que dice el registro— y el radar no decide cuál. Los
-casos que salen tienen sentido biológico: tres veces *Chelonoidis niger* contra
-*porteri*, dos tortugas de Galápagos con la taxonomía en disputa entre biólogos;
-la iguana marina contra la lagartija de lava, que comparten roca y postura.
+o la etiqueta de GBIF se quedó vieja— y la tercera se puede comprobar, porque
+GBIF publica instantáneas periódicas y no un espejo en vivo de iNaturalist.
+`contrastar.py` sigue el enlace de cada observación y pregunta cuál es su
+identificación **hoy**:
+
+| de los 63 desacuerdos | |
+|---|---|
+| la etiqueta sigue igual | 39 |
+| precisada a subespecie, misma especie | 16 |
+| **la etiqueta era vieja: el modelo acertaba** | **8** |
+
+Los ocho son el mismo caso, y no era una disputa: *Chelonoidis porteri*, la
+tortuga de Santa Cruz, pasó a ser **subespecie** de *C. niger*. El modelo decía
+`Chelonoidis niger` y bajo la taxonomía actual tenía razón; el desacuerdo lo
+causaba el desfase de GBIF.
+
+Corrigiéndolo, **86,2 %** por observación y 81,2 % promediando especies. Los 55
+restantes son fallos de verdad, y todos contra identificaciones de grado
+*research* —confirmadas por la comunidad—, así que no hay dónde escudarse.
 
 ## Los nueve experimentos, en MLflow
 
