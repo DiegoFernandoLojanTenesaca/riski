@@ -17,6 +17,7 @@ dos segundos.
 
 import argparse
 import html
+import json
 import pathlib
 import re
 import sys
@@ -254,6 +255,9 @@ TITULO_SITIO = ("Sesgo de muestreo en la evaluación fuera de distribución de u
                 "datos de ciencia ciudadana")
 TITULO_BREVE = "Sesgo de muestreo en evaluación fuera de distribución"
 
+AUTOR = "Diego Fernando Lojan Tenesaca"
+OFICIO = "Ingeniero de datos e inteligencia artificial"
+
 CABEZA_SITIO = """<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -262,6 +266,7 @@ CABEZA_SITIO = """<!DOCTYPE html>
 <meta name="theme-color" content="#14181b">
 <title>{titulo_corto} · Riksi</title>
 <meta name="description" content="{resumen}">
+<meta name="author" content="{autor}">
 <link rel="canonical" href="{base}/articulo.html">
 <meta property="og:type" content="article">
 <meta property="og:title" content="{titulo}">
@@ -270,40 +275,77 @@ CABEZA_SITIO = """<!DOCTYPE html>
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="icono.svg">
 <link rel="stylesheet" href="estilo.css">
+<script type="application/ld+json">
+{{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "{titulo}",
+  "description": "{resumen}",
+  "image": "{base}/articulo/sesgo.png",
+  "author": {{
+    "@type": "Person",
+    "name": "{autor}",
+    "jobTitle": "{oficio}",
+    "url": "https://github.com/DiegoFernandoLojanTenesaca"
+  }},
+  "inLanguage": "es",
+  "keywords": "evaluación fuera de distribución, macro-promedio, sesgo de muestreo, ciencia ciudadana, GBIF, ONNX"
+}}
+</script>
 <style>
-.escrito {{ max-width: 44rem; margin: 0 auto; padding: 0 20px 90px; }}
+/* **El sitio es de fondo oscuro.** Estas reglas estaban escritas para papel
+   blanco —`--tinta` es #171b1c— y dejaban la entradilla en negro sobre negro,
+   ilegible. Aquí se usa la paleta clara del tema: `--texto` para el cuerpo,
+   `--suave` para lo secundario y `--papel` para lo que va sobre fondo. */
+.escrito {{ max-width: 44rem; margin: 0 auto; padding: 0 20px 90px;
+            color: var(--texto); }}
 /* Más contenido que un titular corto: el tamaño baja y el interlineado sube,
    porque tres líneas a 2,6rem ocupan media pantalla en un móvil. */
 .escrito h1 {{ font-size: clamp(1.6rem, 3.6vw, 2.1rem); line-height: 1.28;
-               margin: 0 0 .55em; letter-spacing: -.01em; }}
-.escrito h2 {{ margin: 2.4em 0 .5em; font-size: 1.5rem; }}
-.escrito h3 {{ margin: 2em 0 .4em; font-size: 1.15rem; color: var(--tinta-2); }}
-.escrito p, .escrito li {{ font-size: 1.05rem; line-height: 1.75; }}
-.escrito figure {{ margin: 2.2em 0; }}
+               margin: 0 0 .55em; letter-spacing: -.01em; color: var(--papel);
+               font-weight: 600; }}
+.escrito h2 {{ margin: 2.4em 0 .5em; font-size: 1.5rem; color: var(--papel);
+               font-weight: 600; }}
+.escrito h3 {{ margin: 2em 0 .4em; font-size: 1.15rem; color: var(--suave);
+               font-weight: 600; }}
+.escrito p, .escrito li {{ font-size: 1.05rem; line-height: 1.75;
+                           color: var(--texto); }}
+.escrito strong {{ color: var(--papel); font-weight: 600; }}
+.escrito em {{ color: var(--suave); }}
+.escrito a {{ color: var(--agua); text-decoration-color: rgba(121,176,168,.4);
+              text-underline-offset: 2px; }}
+.escrito a:hover {{ color: var(--liquen); }}
+.escrito figure {{ margin: 2.4em 0; }}
 .escrito figure img {{ width: 100%; height: auto; display: block;
-                       border: 1px solid var(--linea); border-radius: 10px; }}
-.escrito figure picture {{ display: block; }}
-.escrito figcaption {{ margin-top: .6em; font-size: .85rem; color: var(--tinta-2);
+                       border: 1px solid var(--marea); border-radius: 10px; }}
+.escrito figcaption {{ margin-top: .7em; font-size: .85rem; color: var(--tenue);
                        text-align: center; }}
-.escrito pre {{ background: var(--basalto); color: var(--texto); padding: 1rem 1.2rem;
-                border-radius: 10px; overflow-x: auto; font-size: .86rem;
-                line-height: 1.6; }}
+/* El fondo del código va un paso por debajo del de la página, no por encima:
+   sobre fondo oscuro, un bloque más claro pesa demasiado en la lectura. */
+.escrito pre {{ background: var(--basalto-3); color: var(--texto);
+                border: 1px solid var(--marea); border-radius: 10px;
+                padding: 1rem 1.2rem; overflow-x: auto; margin: 1.5em 0;
+                font-size: .86rem; line-height: 1.62; }}
 .escrito pre code {{ background: none; padding: 0; color: inherit; }}
-.escrito code {{ background: rgba(23,27,28,.07); padding: .12em .38em;
-                 border-radius: 4px; font-size: .9em; }}
-.escrito table {{ width: 100%; border-collapse: collapse; margin: 1.6em 0;
+.escrito code {{ background: rgba(220,224,218,.09); color: var(--papel);
+                 padding: .12em .38em; border-radius: 4px; font-size: .9em; }}
+.escrito table {{ width: 100%; border-collapse: collapse; margin: 1.7em 0;
                   font-size: .95rem; }}
-.escrito th, .escrito td {{ border-bottom: 1px solid var(--linea);
-                            padding: .6em .7em; text-align: left;
-                            vertical-align: top; }}
-.escrito blockquote {{ margin: 1.8em 0; padding: .3em 0 .3em 1.3rem;
+.escrito th, .escrito td {{ border-bottom: 1px solid var(--marea);
+                            padding: .62em .7em; text-align: left;
+                            vertical-align: top; color: var(--texto); }}
+.escrito th {{ color: var(--suave); font-weight: 600; }}
+.escrito blockquote {{ margin: 1.9em 0; padding: .35em 0 .35em 1.3rem;
                        border-left: 3px solid var(--liquen-2);
-                       color: var(--tinta-2); font-style: italic; }}
-.escrito hr {{ border: 0; border-top: 1px solid var(--linea); margin: 2.6em 0; }}
-.resumen {{ font-size: 1.15rem; line-height: 1.65; color: var(--tinta);
-            margin: 0 0 1.2em; padding-left: 1.1rem;
-            border-left: 3px solid var(--liquen-2); }}
-.entradilla {{ color: var(--tinta-2); font-size: .95rem; margin: 0 0 3em; }}
+                       color: var(--suave); font-style: italic; }}
+.escrito hr {{ border: 0; border-top: 1px solid var(--marea); margin: 2.8em 0; }}
+.resumen {{ font-size: 1.15rem; line-height: 1.65; color: var(--papel);
+            margin: 0 0 1.3em; padding-left: 1.1rem;
+            border-left: 3px solid var(--liquen); }}
+.entradilla {{ color: var(--tenue); font-size: .95rem; margin: 0 0 3.2em;
+               line-height: 1.75; }}
+.entradilla b {{ color: var(--suave); font-weight: 600; }}
+.entradilla a {{ color: var(--suave); }}
 </style>
 </head>
 <body>
@@ -335,22 +377,20 @@ PIE_SITIO = """</article>
 
 
 def _con_tema_oscuro(cuerpo):
-    """Cada figura, con su variante oscura para quien navegue en oscuro.
+    """Cada figura, en su variante oscura.
 
-    Con `<picture>` y `prefers-color-scheme` lo resuelve el navegador: no hace
-    falta JavaScript, y quien tenga el sistema en claro no descarga la otra. Una
-    figura de fondo claro sobre una página oscura deslumbra, y es lo primero que
-    delata que las imágenes se pegaron sin mirar.
+    **El sitio de Riksi es oscuro siempre**, no según la preferencia del sistema,
+    así que aquí no vale `prefers-color-scheme`: quien navegue con el sistema en
+    claro vería figuras de fondo blanco sobre una página negra, que es justo lo
+    que se quería evitar. La variante clara existe para los HTML sueltos y para
+    el PDF, que sí se leen sobre papel.
     """
     def cambiar(m):
         ruta, resto = m.group(1), m.group(2)
         oscura = ruta.replace(".png", "-oscuro.png")
         if not (AQUI.parent / "docs" / oscura).exists():
             return m.group(0)
-        return (f'<picture>'
-                f'<source srcset="{oscura}" media="(prefers-color-scheme: dark)">'
-                f'<img src="{ruta}"{resto}>'
-                f'</picture>')
+        return f'<img src="{oscura}"{resto}>'
 
     return re.sub(r'<img src="(articulo/[^"]+\.png)"([^>]*)>', cambiar, cuerpo)
 
@@ -375,13 +415,15 @@ def para_el_sitio():
                "y 78,7 % promediando clases. Esos 5,5 puntos son sesgo de "
                "muestreo, y es una de las cuatro cifras que publiqué antes de "
                "medirlas bien.")
-    firma = ('Diego Fernando Lojan Tenesaca · sobre '
-             '<a href="index.html">Riksi</a>, '
+    firma = (f'<b>{AUTOR}</b> · {OFICIO}<br>'
+             'sobre <a href="index.html">Riksi</a>, '
              '<a href="https://github.com/DiegoFernandoLojanTenesaca/riksi-radar">riksi-radar</a> y '
-             '<a href="https://github.com/DiegoFernandoLojanTenesaca/yachaq">yachaq</a>')
+             '<a href="https://github.com/DiegoFernandoLojanTenesaca/yachaq">yachaq</a> · '
+             '<a href="https://github.com/DiegoFernandoLojanTenesaca">GitHub</a>')
     SITIO.write_text(
         CABEZA_SITIO.format(titulo=html.escape(TITULO_SITIO), resumen=resumen,
                             titulo_corto=html.escape(TITULO_BREVE),
+                            autor=AUTOR, oficio=OFICIO,
                             firma=firma, base=BASE) + cuerpo + PIE_SITIO,
         encoding="utf-8")
     print(f"  docs/{SITIO.name}  ({SITIO.stat().st_size // 1024} KB)")
@@ -484,11 +526,12 @@ def prueba():
     assert "estilo.css" in s and 'class="barra"' in s, "no lleva el envoltorio del sitio"
     for ref in re.findall(r'src(?:set)?="(articulo/[^"]+)"', s):
         assert (AQUI.parent / "docs" / ref).exists(), f"falta {ref}"
-    # Cada figura con su variante oscura: si falta el <source>, quien navegue en
-    # oscuro se come un rectángulo claro a plena página.
-    assert s.count("<picture>") == s.count("<figure>"), (
-        "alguna figura se quedó sin variante oscura")
-    assert "prefers-color-scheme: dark" in s
+    # Todas las figuras en su variante oscura: una clara sobre la página negra
+    # del sitio es un rectángulo que deslumbra a plena anchura.
+    claras = [r for r in re.findall(r'<img src="(articulo/[^"]+\.png)"', s)
+              if "-oscuro" not in r]
+    assert not claras, f"figuras con fondo claro sobre página oscura: {claras}"
+    assert s.count('src="articulo/') == s.count("<figure>")
 
     # Los tres títulos: el académico encabeza la página, el breve va en la
     # etiqueta que cortan los buscadores, y el de Dev.to no debe colarse aquí.
@@ -497,6 +540,24 @@ def prueba():
     assert len(breve) <= 62, f"<title> de {len(breve)}: los buscadores lo cortan"
     assert TITULO_SITIO in re.search(r'og:title" content="(.*?)"', s).group(1), (
         "al compartir se vería el título corto en vez del completo")
+
+    # La autoría, en los tres sitios donde se lee: la firma visible, la meta que
+    # usan los agregadores y los datos estructurados de los buscadores.
+    assert f"<b>{AUTOR}</b> · {OFICIO}" in s, "falta el oficio en la firma"
+    assert f'name="author" content="{AUTOR}"' in s
+    ficha = json.loads(re.search(r'type="application/ld\+json">\s*(\{.*?\})\s*</script>',
+                                 s, re.S).group(1))
+    assert ficha["author"]["jobTitle"] == OFICIO, ficha["author"]
+    assert ficha["headline"] == TITULO_SITIO
+
+    # Y que el texto sea legible: el sitio es de fondo oscuro, y estas reglas
+    # estaban escritas para papel blanco. `--tinta` es #171b1c: negro sobre
+    # negro, invisible.
+    estilos = s[s.index("<style>"):s.index("</style>")]
+    claros = [v for v in re.findall(r"var\(--([\w-]+)\)", estilos)
+              if v in ("tinta", "tinta-2")]
+    assert not claros, (
+        f"colores del tema claro sobre el fondo oscuro del sitio: {set(claros)}")
     print(f"ok · tablas, código, enlaces y cita · {len(ok)} páginas generadas")
 
 

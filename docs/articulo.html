@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#14181b">
 <title>Sesgo de muestreo en evaluación fuera de distribución · Riksi</title>
 <meta name="description" content="Un clasificador de cien especies evaluado sobre 400 observaciones que nadie seleccionó rinde 84,2 % por observación y 78,7 % promediando clases. Esos 5,5 puntos son sesgo de muestreo, y es una de las cuatro cifras que publiqué antes de medirlas bien.">
+<meta name="author" content="Diego Fernando Lojan Tenesaca">
 <link rel="canonical" href="https://diegofernandolojantenesaca.github.io/riski/articulo.html">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Sesgo de muestreo en la evaluación fuera de distribución de un clasificador de especies: micro frente a macro-promedio sobre datos de ciencia ciudadana">
@@ -14,40 +15,77 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="icono.svg">
 <link rel="stylesheet" href="estilo.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Sesgo de muestreo en la evaluación fuera de distribución de un clasificador de especies: micro frente a macro-promedio sobre datos de ciencia ciudadana",
+  "description": "Un clasificador de cien especies evaluado sobre 400 observaciones que nadie seleccionó rinde 84,2 % por observación y 78,7 % promediando clases. Esos 5,5 puntos son sesgo de muestreo, y es una de las cuatro cifras que publiqué antes de medirlas bien.",
+  "image": "https://diegofernandolojantenesaca.github.io/riski/articulo/sesgo.png",
+  "author": {
+    "@type": "Person",
+    "name": "Diego Fernando Lojan Tenesaca",
+    "jobTitle": "Ingeniero de datos e inteligencia artificial",
+    "url": "https://github.com/DiegoFernandoLojanTenesaca"
+  },
+  "inLanguage": "es",
+  "keywords": "evaluación fuera de distribución, macro-promedio, sesgo de muestreo, ciencia ciudadana, GBIF, ONNX"
+}
+</script>
 <style>
-.escrito { max-width: 44rem; margin: 0 auto; padding: 0 20px 90px; }
+/* **El sitio es de fondo oscuro.** Estas reglas estaban escritas para papel
+   blanco —`--tinta` es #171b1c— y dejaban la entradilla en negro sobre negro,
+   ilegible. Aquí se usa la paleta clara del tema: `--texto` para el cuerpo,
+   `--suave` para lo secundario y `--papel` para lo que va sobre fondo. */
+.escrito { max-width: 44rem; margin: 0 auto; padding: 0 20px 90px;
+            color: var(--texto); }
 /* Más contenido que un titular corto: el tamaño baja y el interlineado sube,
    porque tres líneas a 2,6rem ocupan media pantalla en un móvil. */
 .escrito h1 { font-size: clamp(1.6rem, 3.6vw, 2.1rem); line-height: 1.28;
-               margin: 0 0 .55em; letter-spacing: -.01em; }
-.escrito h2 { margin: 2.4em 0 .5em; font-size: 1.5rem; }
-.escrito h3 { margin: 2em 0 .4em; font-size: 1.15rem; color: var(--tinta-2); }
-.escrito p, .escrito li { font-size: 1.05rem; line-height: 1.75; }
-.escrito figure { margin: 2.2em 0; }
+               margin: 0 0 .55em; letter-spacing: -.01em; color: var(--papel);
+               font-weight: 600; }
+.escrito h2 { margin: 2.4em 0 .5em; font-size: 1.5rem; color: var(--papel);
+               font-weight: 600; }
+.escrito h3 { margin: 2em 0 .4em; font-size: 1.15rem; color: var(--suave);
+               font-weight: 600; }
+.escrito p, .escrito li { font-size: 1.05rem; line-height: 1.75;
+                           color: var(--texto); }
+.escrito strong { color: var(--papel); font-weight: 600; }
+.escrito em { color: var(--suave); }
+.escrito a { color: var(--agua); text-decoration-color: rgba(121,176,168,.4);
+              text-underline-offset: 2px; }
+.escrito a:hover { color: var(--liquen); }
+.escrito figure { margin: 2.4em 0; }
 .escrito figure img { width: 100%; height: auto; display: block;
-                       border: 1px solid var(--linea); border-radius: 10px; }
-.escrito figure picture { display: block; }
-.escrito figcaption { margin-top: .6em; font-size: .85rem; color: var(--tinta-2);
+                       border: 1px solid var(--marea); border-radius: 10px; }
+.escrito figcaption { margin-top: .7em; font-size: .85rem; color: var(--tenue);
                        text-align: center; }
-.escrito pre { background: var(--basalto); color: var(--texto); padding: 1rem 1.2rem;
-                border-radius: 10px; overflow-x: auto; font-size: .86rem;
-                line-height: 1.6; }
+/* El fondo del código va un paso por debajo del de la página, no por encima:
+   sobre fondo oscuro, un bloque más claro pesa demasiado en la lectura. */
+.escrito pre { background: var(--basalto-3); color: var(--texto);
+                border: 1px solid var(--marea); border-radius: 10px;
+                padding: 1rem 1.2rem; overflow-x: auto; margin: 1.5em 0;
+                font-size: .86rem; line-height: 1.62; }
 .escrito pre code { background: none; padding: 0; color: inherit; }
-.escrito code { background: rgba(23,27,28,.07); padding: .12em .38em;
-                 border-radius: 4px; font-size: .9em; }
-.escrito table { width: 100%; border-collapse: collapse; margin: 1.6em 0;
+.escrito code { background: rgba(220,224,218,.09); color: var(--papel);
+                 padding: .12em .38em; border-radius: 4px; font-size: .9em; }
+.escrito table { width: 100%; border-collapse: collapse; margin: 1.7em 0;
                   font-size: .95rem; }
-.escrito th, .escrito td { border-bottom: 1px solid var(--linea);
-                            padding: .6em .7em; text-align: left;
-                            vertical-align: top; }
-.escrito blockquote { margin: 1.8em 0; padding: .3em 0 .3em 1.3rem;
+.escrito th, .escrito td { border-bottom: 1px solid var(--marea);
+                            padding: .62em .7em; text-align: left;
+                            vertical-align: top; color: var(--texto); }
+.escrito th { color: var(--suave); font-weight: 600; }
+.escrito blockquote { margin: 1.9em 0; padding: .35em 0 .35em 1.3rem;
                        border-left: 3px solid var(--liquen-2);
-                       color: var(--tinta-2); font-style: italic; }
-.escrito hr { border: 0; border-top: 1px solid var(--linea); margin: 2.6em 0; }
-.resumen { font-size: 1.15rem; line-height: 1.65; color: var(--tinta);
-            margin: 0 0 1.2em; padding-left: 1.1rem;
-            border-left: 3px solid var(--liquen-2); }
-.entradilla { color: var(--tinta-2); font-size: .95rem; margin: 0 0 3em; }
+                       color: var(--suave); font-style: italic; }
+.escrito hr { border: 0; border-top: 1px solid var(--marea); margin: 2.8em 0; }
+.resumen { font-size: 1.15rem; line-height: 1.65; color: var(--papel);
+            margin: 0 0 1.3em; padding-left: 1.1rem;
+            border-left: 3px solid var(--liquen); }
+.entradilla { color: var(--tenue); font-size: .95rem; margin: 0 0 3.2em;
+               line-height: 1.75; }
+.entradilla b { color: var(--suave); font-weight: 600; }
+.entradilla a { color: var(--suave); }
 </style>
 </head>
 <body>
@@ -68,7 +106,7 @@
 <article class="escrito">
 <h1>Sesgo de muestreo en la evaluación fuera de distribución de un clasificador de especies: micro frente a macro-promedio sobre datos de ciencia ciudadana</h1>
 <p class="resumen">Un clasificador de cien especies evaluado sobre 400 observaciones que nadie seleccionó rinde 84,2 % por observación y 78,7 % promediando clases. Esos 5,5 puntos son sesgo de muestreo, y es una de las cuatro cifras que publiqué antes de medirlas bien.</p>
-<p class="entradilla">Diego Fernando Lojan Tenesaca · sobre <a href="index.html">Riksi</a>, <a href="https://github.com/DiegoFernandoLojanTenesaca/riksi-radar">riksi-radar</a> y <a href="https://github.com/DiegoFernandoLojanTenesaca/yachaq">yachaq</a></p>
+<p class="entradilla"><b>Diego Fernando Lojan Tenesaca</b> · Ingeniero de datos e inteligencia artificial<br>sobre <a href="index.html">Riksi</a>, <a href="https://github.com/DiegoFernandoLojanTenesaca/riksi-radar">riksi-radar</a> y <a href="https://github.com/DiegoFernandoLojanTenesaca/yachaq">yachaq</a> · <a href="https://github.com/DiegoFernandoLojanTenesaca">GitHub</a></p>
 <p>Entrené un clasificador de cien especies ecuatorianas, monté un pipeline para evaluarlo sobre observaciones que nadie había seleccionado y construí un agente sobre ambos. Tres repositorios, unos tres meses.</p>
 <p>Lo que sigue no es cómo los construí. Es el patrón que encontré al revisarlos: <strong>cada vez que sustituí una estimación cómoda por una medición correcta, el número empeoró.</strong> Cuatro veces. En las cuatro, la cifra original era defendible, estaba publicada, y describía algo distinto de lo que yo creía.</p>
 <p>La asimetría tiene una explicación mecánica. Una métrica que sale mal te empuja a revisar el cálculo; una que sale bien se publica. El resultado es que el error solo sobrevive en una dirección, y no en la inocua.</p>
@@ -79,11 +117,11 @@
 <tr><td><strong><a href="https://github.com/DiegoFernandoLojanTenesaca/riski">riksi</a></strong></td><td>EfficientNet-Lite0, cien clases, 3,8 MB en int8. Inferencia en el navegador sobre ONNX Runtime Web</td></tr>
 <tr><td><strong><a href="https://github.com/DiegoFernandoLojanTenesaca/riksi-radar">riksi-radar</a></strong></td><td>Kafka → clasificador → DuckDB → dbt. Consume observaciones de <a href="https://www.gbif.org/">GBIF</a> y las clasifica sin acceso a la etiqueta</td></tr>
 <tr><td><strong><a href="https://github.com/DiegoFernandoLojanTenesaca/yachaq">yachaq</a></strong></td><td>Agente sobre ambos: recuperación, memoria persistente, servidor MCP</td></tr></table>
-<figure><picture><source srcset="articulo/arquitectura-oscuro.png" media="(prefers-color-scheme: dark)"><img src="articulo/arquitectura.png" alt="Los tres proyectos y el recorrido del dato"></picture><figcaption>Los tres proyectos y el recorrido del dato</figcaption></figure>
+<figure><img src="articulo/arquitectura-oscuro.png" alt="Los tres proyectos y el recorrido del dato"><figcaption>Los tres proyectos y el recorrido del dato</figcaption></figure>
 <p>El detalle que hace válido el montaje está en la línea roja: la etiqueta de GBIF viaja en paralelo y no entra al clasificador. Se almacenan las dos, se comparan después. Sin esa separación no hay evaluación, hay una consulta.</p>
 <p>El modelo obtiene <strong>79,8 %</strong> de exactitud top-1 sobre 1000 imágenes de validación. Esa cifra está bien medida y no es ninguna de las cuatro que se caen.</p>
 <p>Conviene fijar antes el coste de la cuantización, porque es la única decisión del proyecto que salió gratis:</p>
-<figure><picture><source srcset="articulo/cuantizacion-oscuro.png" media="(prefers-color-scheme: dark)"><img src="articulo/cuantizacion.png" alt="Cuantizar a int8 cuesta 0,4 puntos y reduce el modelo 3,5 veces"></picture><figcaption>Cuantizar a int8 cuesta 0,4 puntos y reduce el modelo 3,5 veces</figcaption></figure>
+<figure><img src="articulo/cuantizacion-oscuro.png" alt="Cuantizar a int8 cuesta 0,4 puntos y reduce el modelo 3,5 veces"><figcaption>Cuantizar a int8 cuesta 0,4 puntos y reduce el modelo 3,5 veces</figcaption></figure>
 <p>Cuatro décimas de exactitud por un factor 3,5 en tamaño. Para un modelo que se descarga en el navegador de alguien con datos móviles, la decisión no admite discusión.</p>
 <hr>
 <h2>Uno · Exactitud fuera de distribución, mal promediada</h2>
@@ -92,7 +130,7 @@
 <p>Sobre 400 observaciones: 337 aciertos. <strong>84,2 %.</strong></p>
 <p>Seis puntos por encima del banco de validación. Publiqué ese número con la palabra «sube» en negrita.</p>
 <p>La aritmética es correcta. La interpretación no.</p>
-<figure><picture><source srcset="articulo/sesgo-oscuro.png" media="(prefers-color-scheme: dark)"><img src="articulo/sesgo.png" alt="Una especie concentra el 32 % de las observaciones"></picture><figcaption>Una especie concentra el 32 % de las observaciones</figcaption></figure>
+<figure><img src="articulo/sesgo-oscuro.png" alt="Una especie concentra el 32 % de las observaciones"><figcaption>Una especie concentra el 32 % de las observaciones</figcaption></figure>
 <p>El panel izquierdo contiene el problema: <em>Amblyrhynchus cristatus</em>, la iguana marina, aporta 128 de las 400 observaciones. Las tres clases más frecuentes suman la mitad del conjunto, y de las cien clases del modelo solo aparecen veinte.</p>
 <p>La ciencia ciudadana no muestrea uniformemente. La gente fotografía lo que ve, y en Galápagos ve iguanas marinas. Ese 84,2 % es, en buena parte, el rendimiento del modelo sobre una clase, repetido 128 veces.</p>
 <p>El panel derecho explica la dirección del sesgo: la iguana marina está entre las clases que <strong>mejor</strong> resuelve (94,5 %). La distribución de evaluación está dominada por un caso fácil, así que el micro-promedio se infla en lugar de hundirse.</p>
@@ -173,13 +211,13 @@ assert not _es_hijo(&quot;Anous stolidusa&quot;, &quot;Anous stolidus&quot;)
 assert not _es_hijo(&quot;Anous stolidus&quot;, &quot;Anous stolidus&quot;)   # ni hija de sí misma
 assert     _es_hijo(&quot;Chelonoidis niger porteri&quot;, &quot;Chelonoidis niger&quot;)</code></pre>
 <p>El resultado:</p>
-<figure><picture><source srcset="articulo/contraste-oscuro.png" media="(prefers-color-scheme: dark)"><img src="articulo/contraste.png" alt="Ocho de los 63 desacuerdos no eran errores del modelo"></picture><figcaption>Ocho de los 63 desacuerdos no eran errores del modelo</figcaption></figure>
+<figure><img src="articulo/contraste-oscuro.png" alt="Ocho de los 63 desacuerdos no eran errores del modelo"><figcaption>Ocho de los 63 desacuerdos no eran errores del modelo</figcaption></figure>
 <p>Ocho de 63 no eran errores. Los 63 son de grado <em>research</em> en iNaturalist — identificaciones que la comunidad ya validó—, de modo que los 55 restantes no admiten atenuantes.</p>
 <p><strong>Y aun así conviene rebajar el hallazgo.</strong> Los ocho pertenecen al mismo taxón. Descontarlos eleva el macro-promedio de 78,7 % a 81,2 %, pero eso corrige una clase de veinte y ninguna otra: es el sesgo del caso anterior reapareciendo por otra vía. La cifra que seguiría publicando es 78,7 %.</p>
 <p>Lo que sí deja es un dato reutilizable: <strong>el 13 % de los registros que verifiqué tenían la etiqueta desactualizada en GBIF.</strong> Quien entrene con datos de GBIF sin contrastar el origen está heredando ese desfase sin saberlo.</p>
 <h3>Los errores tienen estructura</h3>
 <p>Un recuento agregado de errores dice cuántos hay. Los pares dicen cuáles, que es lo accionable:</p>
-<figure><picture><source srcset="articulo/confusion-oscuro.png" media="(prefers-color-scheme: dark)"><img src="articulo/confusion.png" alt="Los errores van entre especies vecinas"></picture><figcaption>Los errores van entre especies vecinas</figcaption></figure>
+<figure><img src="articulo/confusion-oscuro.png" alt="Los errores van entre especies vecinas"><figcaption>Los errores van entre especies vecinas</figcaption></figure>
 <p>Las dos tortugas se confunden <strong>en ambas direcciones</strong>, ocho veces en cada una. Eso no es error disperso: es un par de clases que el modelo no separa. El diagnóstico y la corrección son distintos —más ejemplos de ese par, o fusionar las clases— de los que aplicarían a errores independientes.</p>
 <p>El resto son pares que comparten hábitat: la iguana marina contra el pingüino de Galápagos, la abeja europea contra el cangrejo rojo. Podría explicar por qué — misma roca, misma postura— pero sería exactamente la clase de racionalización que me costó el caso anterior, así que me limito a dejar constancia del patrón.</p>
 <p>Y 44 de los 63 llevan la etiqueta de GBIF en su top-3: el modelo la consideró y la puso segunda. La distancia entre el 78,7 % y un sistema utilizable es más corta de lo que sugiere el número, si la interfaz ofrece tres candidatos en vez de uno.</p>
@@ -188,7 +226,7 @@ assert     _es_hijo(&quot;Chelonoidis niger porteri&quot;, &quot;Chelonoidis nig
 <p>El agente recupera sobre fichas de las cien especies. La pregunta habitual: a partir de qué similitud una ficha recuperada es relevante.</p>
 <p>Puse 0,5. Número redondo, sin justificación.</p>
 <p>Lo que hay que medir no es la similitud media, sino <strong>si las dos poblaciones se separan</strong>: preguntas que el corpus puede responder frente a preguntas que no. Si las distribuciones se solapan, ningún umbral funciona, y el problema deja de ser el número.</p>
-<figure><picture><source srcset="articulo/poblaciones-oscuro.png" media="(prefers-color-scheme: dark)"><img src="articulo/poblaciones.png" alt="El umbral se lee de la separación entre dos poblaciones"></picture><figcaption>El umbral se lee de la separación entre dos poblaciones</figcaption></figure>
+<figure><img src="articulo/poblaciones-oscuro.png" alt="El umbral se lee de la separación entre dos poblaciones"><figcaption>El umbral se lee de la separación entre dos poblaciones</figcaption></figure>
 <p>Se separan, con un hueco de 0,075 entre la peor pregunta respondible y la mejor no respondible. El punto medio cae en <strong>0,44</strong>.</p>
 <pre><code class="lenguaje-python">buenas = sorted(mejor(p) for p in con_respuesta)                 # peor primero
 malas = sorted((mejor(p) for p in sin_respuesta), reverse=True)  # mejor primero
@@ -198,14 +236,14 @@ if buenas[0] &lt;= malas[0]:
     print(&quot;SE SOLAPAN: ningún corte las separa.&quot;)</code></pre>
 <p>Las preguntas no respondibles son deliberadamente ajenas al dominio —«¿cuándo se estrenó Blade Runner?», «receta de arroz con leche»—. Si el índice no las rechaza, no rechaza nada, y el umbral es decorativo.</p>
 <p>El hallazgo colateral vino de intentar reducir el índice, que ocupaba 235 MB, de los cuales 192 eran la tabla de vocabulario: 250.000 tokens para unos cincuenta idiomas, de los que este proyecto usa 8.403. Parecía peso muerto.</p>
-<figure><picture><source srcset="articulo/poda-oscuro.png" media="(prefers-color-scheme: dark)"><img src="articulo/poda.png" alt="Podar el vocabulario destruye el umbral antes que el tamaño"></picture><figcaption>Podar el vocabulario destruye el umbral antes que el tamaño</figcaption></figure>
+<figure><img src="articulo/poda-oscuro.png" alt="Podar el vocabulario destruye el umbral antes que el tamaño"><figcaption>Podar el vocabulario destruye el umbral antes que el tamaño</figcaption></figure>
 <p>A 120.000 términos el índice adelgaza un 40 % y <strong>el umbral deja de existir</strong>: no queda separación que partir. Sin medir el hueco, ese recorte parece gratuito. El sistema sigue respondiendo; lo que pierde es la capacidad de no responder, que es lo único que impide a un sistema de recuperación fabricar contexto.</p>
 <p>Los identificadores intermedios no eran relleno de otros idiomas: son las subpalabras que sostienen el español. Eliminarlos degrada las preguntas respondibles más que las otras, que es exactamente la dirección equivocada.</p>
 <hr>
 <h2>Cuatro · 671 MB en un contenedor de 512</h2>
 <p>Este caso no es de medición, pero es el que más enseñó.</p>
 <p>El agente tenía que caber en una capa gratuita: 512 MB. Con <code>fastembed</code>, el proceso alcanzaba <strong>671 MB</strong> solo cargando el codificador.</p>
-<figure><picture><source srcset="articulo/memoria-oscuro.png" media="(prefers-color-scheme: dark)"><img src="articulo/memoria.png" alt="El mismo cálculo con la cuarta parte de memoria"></picture><figcaption>El mismo cálculo con la cuarta parte de memoria</figcaption></figure>
+<figure><img src="articulo/memoria-oscuro.png" alt="El mismo cálculo con la cuarta parte de memoria"><figcaption>El mismo cálculo con la cuarta parte de memoria</figcaption></figure>
 <p>Reescribí la inferencia sobre ONNX Runtime. Dos cambios la resolvieron. El primero, almacenar los pesos como datos externos, lo que hace que onnxruntime los mapee desde disco en vez de copiarlos a memoria:</p>
 <pre><code class="lenguaje-python">onnx.save(modelo, str(LIGERO / &quot;modelo.onnx&quot;), save_as_external_data=True, ...)
 
