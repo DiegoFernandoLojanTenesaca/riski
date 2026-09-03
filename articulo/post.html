@@ -81,11 +81,13 @@ figcaption { margin-top: .6em; font-size: .85rem; color: var(--suave);
 <p>El panel izquierdo contiene el problema: <em>Amblyrhynchus cristatus</em>, la iguana marina, aporta 128 de las 400 observaciones. Las tres clases más frecuentes suman la mitad del conjunto, y de las cien clases del modelo solo aparecen veinte.</p>
 <p>La ciencia ciudadana no muestrea uniformemente. La gente fotografía lo que ve, y en Galápagos ve iguanas marinas. Ese 84,2 % es, en buena parte, el rendimiento del modelo sobre una clase, repetido 128 veces.</p>
 <p>El panel derecho explica la dirección del sesgo: la iguana marina está entre las clases que <strong>mejor</strong> resuelve (94,5 %). La distribución de evaluación está dominada por un caso fácil, así que el micro-promedio se infla en lugar de hundirse.</p>
-<p>Con macro-promedio —cada clase pesa igual, independientemente de su frecuencia:</p>
+<p>Hay dos formas de resumir esos 400 resultados en un número, y no dicen lo mismo:</p>
+<ul><li><strong>micro-promedio</strong>: aciertos totales entre observaciones totales. Cada fotografía pesa igual, así que una clase con 128 decide un tercio del resultado ella sola.</li><li><strong>macro-promedio</strong>: la exactitud de cada clase por separado, y después la media de esas veinte cifras. Cada <strong>clase</strong> pesa igual, la que aparece 128 veces y la que aparece una.</li></ul>
 <table>
 <tr><th></th><th>exactitud</th></tr>
 <tr><td>micro-promedio (por observación)</td><td>84,2 %</td></tr>
 <tr><td><strong>macro-promedio (por clase)</strong></td><td><strong>78,7 %</strong></td></tr></table>
+<p>Si el conjunto estuviera equilibrado —veinte observaciones por clase— los dos números serían casi idénticos. La diferencia mide exactamente cuánto desequilibrio hay.</p>
 <p>Son dos consultas que difieren en un <code>group by</code>:</p>
 <pre><code class="lenguaje-sql">-- micro: cada observación pesa lo mismo
 select avg(coincide::int) from observaciones;

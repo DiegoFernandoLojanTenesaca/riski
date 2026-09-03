@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#14181b">
 <title>Sesgo de muestreo en evaluación fuera de distribución · Riksi</title>
-<meta name="description" content="Un clasificador de cien especies evaluado sobre 400 observaciones que nadie seleccionó rinde 84,2 % por observación y 78,7 % promediando clases. Esos 5,5 puntos son sesgo de muestreo, y es una de las cuatro cifras que publiqué antes de medirlas bien.">
+<meta name="description" content="Un clasificador de cien especies evaluado sobre 400 observaciones que nadie seleccionó acierta el 84,2 % de las veces. Dando el mismo peso a cada especie en vez de a cada fotografía, el 78,7 %. Esos 5,5 puntos no son el modelo: son que una sola especie aporta un tercio del conjunto. Es una de las cuatro cifras que publiqué antes de medirlas bien.">
 <meta name="author" content="Diego Fernando Lojan Tenesaca">
 <link rel="canonical" href="https://diegofernandolojantenesaca.github.io/riski/articulo.html">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Sesgo de muestreo en la evaluación fuera de distribución de un clasificador de especies: micro frente a macro-promedio sobre datos de ciencia ciudadana">
-<meta property="og:description" content="Un clasificador de cien especies evaluado sobre 400 observaciones que nadie seleccionó rinde 84,2 % por observación y 78,7 % promediando clases. Esos 5,5 puntos son sesgo de muestreo, y es una de las cuatro cifras que publiqué antes de medirlas bien.">
+<meta property="og:description" content="Un clasificador de cien especies evaluado sobre 400 observaciones que nadie seleccionó acierta el 84,2 % de las veces. Dando el mismo peso a cada especie en vez de a cada fotografía, el 78,7 %. Esos 5,5 puntos no son el modelo: son que una sola especie aporta un tercio del conjunto. Es una de las cuatro cifras que publiqué antes de medirlas bien.">
 <meta property="og:image" content="https://diegofernandolojantenesaca.github.io/riski/articulo/sesgo.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="icono.svg">
@@ -20,12 +20,12 @@
   "@context": "https://schema.org",
   "@type": "TechArticle",
   "headline": "Sesgo de muestreo en la evaluación fuera de distribución de un clasificador de especies: micro frente a macro-promedio sobre datos de ciencia ciudadana",
-  "description": "Un clasificador de cien especies evaluado sobre 400 observaciones que nadie seleccionó rinde 84,2 % por observación y 78,7 % promediando clases. Esos 5,5 puntos son sesgo de muestreo, y es una de las cuatro cifras que publiqué antes de medirlas bien.",
+  "description": "Un clasificador de cien especies evaluado sobre 400 observaciones que nadie seleccionó acierta el 84,2 % de las veces. Dando el mismo peso a cada especie en vez de a cada fotografía, el 78,7 %. Esos 5,5 puntos no son el modelo: son que una sola especie aporta un tercio del conjunto. Es una de las cuatro cifras que publiqué antes de medirlas bien.",
   "image": "https://diegofernandolojantenesaca.github.io/riski/articulo/sesgo.png",
   "author": {
     "@type": "Person",
     "name": "Diego Fernando Lojan Tenesaca",
-    "jobTitle": "Ingeniero de datos e inteligencia artificial",
+    "jobTitle": "Data & AI Engineer",
     "url": "https://github.com/DiegoFernandoLojanTenesaca"
   },
   "inLanguage": "es",
@@ -79,6 +79,8 @@
                        border-left: 3px solid var(--liquen-2);
                        color: var(--suave); font-style: italic; }
 .escrito hr { border: 0; border-top: 1px solid var(--marea); margin: 2.8em 0; }
+.bajada-art { font-size: 1.2rem; line-height: 1.55; color: var(--suave);
+               margin: -.2em 0 1.5em; font-weight: 400; }
 .resumen { font-size: 1.15rem; line-height: 1.65; color: var(--papel);
             margin: 0 0 1.3em; padding-left: 1.1rem;
             border-left: 3px solid var(--liquen); }
@@ -105,8 +107,9 @@
 <div class="envoltura">
 <article class="escrito">
 <h1>Sesgo de muestreo en la evaluación fuera de distribución de un clasificador de especies: micro frente a macro-promedio sobre datos de ciencia ciudadana</h1>
-<p class="resumen">Un clasificador de cien especies evaluado sobre 400 observaciones que nadie seleccionó rinde 84,2 % por observación y 78,7 % promediando clases. Esos 5,5 puntos son sesgo de muestreo, y es una de las cuatro cifras que publiqué antes de medirlas bien.</p>
-<p class="entradilla"><b>Diego Fernando Lojan Tenesaca</b> · Ingeniero de datos e inteligencia artificial<br>sobre <a href="index.html">Riksi</a>, <a href="https://github.com/DiegoFernandoLojanTenesaca/riksi-radar">riksi-radar</a> y <a href="https://github.com/DiegoFernandoLojanTenesaca/yachaq">yachaq</a> · <a href="https://github.com/DiegoFernandoLojanTenesaca">GitHub</a></p>
+<p class="bajada-art">O dicho sin jerga: cuatro cifras que publiqué sobre un clasificador de especies, y qué pasó cuando las medí bien.</p>
+<p class="resumen">Un clasificador de cien especies evaluado sobre 400 observaciones que nadie seleccionó acierta el 84,2 % de las veces. Dando el mismo peso a cada especie en vez de a cada fotografía, el 78,7 %. Esos 5,5 puntos no son el modelo: son que una sola especie aporta un tercio del conjunto. Es una de las cuatro cifras que publiqué antes de medirlas bien.</p>
+<p class="entradilla">Diego Fernando Lojan Tenesaca · Data &amp; AI Engineer · 15 min de lectura</p>
 <p>Entrené un clasificador de cien especies ecuatorianas, monté un pipeline para evaluarlo sobre observaciones que nadie había seleccionado y construí un agente sobre ambos. Tres repositorios, unos tres meses.</p>
 <p>Lo que sigue no es cómo los construí. Es el patrón que encontré al revisarlos: <strong>cada vez que sustituí una estimación cómoda por una medición correcta, el número empeoró.</strong> Cuatro veces. En las cuatro, la cifra original era defendible, estaba publicada, y describía algo distinto de lo que yo creía.</p>
 <p>La asimetría tiene una explicación mecánica. Una métrica que sale mal te empuja a revisar el cálculo; una que sale bien se publica. El resultado es que el error solo sobrevive en una dirección, y no en la inocua.</p>
@@ -134,11 +137,13 @@
 <p>El panel izquierdo contiene el problema: <em>Amblyrhynchus cristatus</em>, la iguana marina, aporta 128 de las 400 observaciones. Las tres clases más frecuentes suman la mitad del conjunto, y de las cien clases del modelo solo aparecen veinte.</p>
 <p>La ciencia ciudadana no muestrea uniformemente. La gente fotografía lo que ve, y en Galápagos ve iguanas marinas. Ese 84,2 % es, en buena parte, el rendimiento del modelo sobre una clase, repetido 128 veces.</p>
 <p>El panel derecho explica la dirección del sesgo: la iguana marina está entre las clases que <strong>mejor</strong> resuelve (94,5 %). La distribución de evaluación está dominada por un caso fácil, así que el micro-promedio se infla en lugar de hundirse.</p>
-<p>Con macro-promedio —cada clase pesa igual, independientemente de su frecuencia:</p>
+<p>Hay dos formas de resumir esos 400 resultados en un número, y no dicen lo mismo:</p>
+<ul><li><strong>micro-promedio</strong>: aciertos totales entre observaciones totales. Cada fotografía pesa igual, así que una clase con 128 decide un tercio del resultado ella sola.</li><li><strong>macro-promedio</strong>: la exactitud de cada clase por separado, y después la media de esas veinte cifras. Cada <strong>clase</strong> pesa igual, la que aparece 128 veces y la que aparece una.</li></ul>
 <table>
 <tr><th></th><th>exactitud</th></tr>
 <tr><td>micro-promedio (por observación)</td><td>84,2 %</td></tr>
 <tr><td><strong>macro-promedio (por clase)</strong></td><td><strong>78,7 %</strong></td></tr></table>
+<p>Si el conjunto estuviera equilibrado —veinte observaciones por clase— los dos números serían casi idénticos. La diferencia mide exactamente cuánto desequilibrio hay.</p>
 <p>Son dos consultas que difieren en un <code>group by</code>:</p>
 <pre><code class="lenguaje-sql">-- micro: cada observación pesa lo mismo
 select avg(coincide::int) from observaciones;
@@ -288,7 +293,36 @@ v = (salida * mascara).sum(axis=1) / np.maximum(mascara.sum(axis=1), 1e-9)</code
 <h2>Limitaciones y trabajo futuro</h2>
 <p>Lo que este trabajo no sostiene:</p>
 <ul><li><strong>400 observaciones sobre 20 clases</strong> no dicen nada de las otras 80. Cualquier cifra por clase con tres observaciones es anecdótica; el radar tendría que correr semanas para que dejara de serlo.</li><li><strong>Un modelo, una arquitectura, un país.</strong> Nada aquí indica si el patrón se reproduce en otro conjunto o con otra red.</li><li><strong>La verificación contra iNaturalist es de un solo día.</strong> Repetirla dentro de seis meses estimaría el desfase típico de GBIF, que sería genuinamente útil para cualquiera que entrene con esos datos.</li><li><strong>El sesgo se cuantifica, no se corrige.</strong> Saber que una clase concentra el 32 % no aporta ejemplos de las otras ochenta.</li></ul>
-<p>Los tres repositorios están abiertos, y cada cifra de este artículo procede de un fichero versionado en ellos; hay una comprobación ejecutable (<code>--comprobar</code>) en cada módulo que la verifica, incluidas las que sostienen estas figuras: <a href="https://github.com/DiegoFernandoLojanTenesaca/riski">riksi</a> · <a href="https://github.com/DiegoFernandoLojanTenesaca/riksi-radar">riksi-radar</a> · <a href="https://github.com/DiegoFernandoLojanTenesaca/yachaq">yachaq</a></p></article>
+<p>Los tres repositorios están abiertos, y cada cifra de este artículo procede de un fichero versionado en ellos; hay una comprobación ejecutable (<code>--comprobar</code>) en cada módulo que la verifica, incluidas las que sostienen estas figuras: <a href="https://github.com/DiegoFernandoLojanTenesaca/riski">riksi</a> · <a href="https://github.com/DiegoFernandoLojanTenesaca/riksi-radar">riksi-radar</a> · <a href="https://github.com/DiegoFernandoLojanTenesaca/yachaq">yachaq</a></p>
+<hr>
+<div class="ficha-autor" style="margin-top:44px">
+  <div class="tarjeta">
+    <b>Diego Fernando Lojan Tenesaca</b>
+    <span>Data &amp; AI Engineer · Ecuador</span>
+    <ul><li>Modelos de lenguaje, RAG y agentes</li><li>Embeddings y búsqueda vectorial</li><li>Visión por computador e inferencia con ONNX</li><li>Datos: ingesta, limpieza y publicación</li></ul>
+    <a href="https://github.com/DiegoFernandoLojanTenesaca">github.com/DiegoFernandoLojanTenesaca</a>
+  </div>
+  <div class="relato">
+    <p>Riksi empezó por un problema concreto: casi todas las herramientas para
+      identificar naturaleza dan por sentado que hay internet, y en el Ecuador
+      rural eso casi nunca se cumple. El reto no era entrenar un clasificador
+      —eso lo hace cualquiera con un tutorial— sino que <b>cupiera en un
+      teléfono modesto y siguiera acertando</b>.</p>
+    <p>Este artículo es la continuación de esa idea aplicada a la medición: si
+      cada decisión de ingeniería se justifica con números, esos números también
+      tienen que aguantar que los revisen. Cuatro no aguantaron.</p>
+    <p>De paso toca lo que hay debajo: <b>evaluación fuera de distribución</b>
+      sin conjunto de prueba disponible, <b>calidad de datos</b> en fuentes
+      públicas que se actualizan a distinta velocidad, <b>calibración</b> de un
+      sistema de recuperación, e <b>inferencia con recursos limitados</b> —un
+      clasificador de 3,8 MB en el navegador y un codificador que tenía que
+      caber en 512 MB de RAM.</p>
+    <p><a href="index.html">Riksi</a> ·
+      <a href="https://github.com/DiegoFernandoLojanTenesaca/riksi-radar">riksi-radar</a> ·
+      <a href="https://github.com/DiegoFernandoLojanTenesaca/yachaq">yachaq</a></p>
+  </div>
+</div>
+</article>
 </div>
 </body>
 </html>

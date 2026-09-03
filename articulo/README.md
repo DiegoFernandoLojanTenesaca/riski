@@ -13,6 +13,31 @@ serio, la cifra bajó.**
 Los dos Markdown llevan cabecera de Dev.to con `published: false`, así que se
 pueden importar sin que salgan publicados por accidente.
 
+## Los términos del título, en corto
+
+Por si el titular académico despista:
+
+**Micro y macro-promedio** son dos formas de resumir 400 resultados en un número.
+El conjunto tiene 20 especies pero muy desigual: 128 observaciones de iguana
+marina y una sola de *Brachyotum*.
+
+- **Micro**: aciertos totales entre observaciones totales — 337/400 = 84,2 %.
+  Cada **fotografía** pesa igual, así que la iguana decide un tercio del
+  resultado ella sola.
+- **Macro**: el acierto de cada especie por separado, y la media de esas 20
+  cifras — 78,7 %. Cada **especie** pesa igual.
+
+Los 5,5 puntos de diferencia salen de que la iguana, además de dominar el
+conjunto, es de las que mejor se clasifican (94,5 %). Con un conjunto equilibrado
+los dos números coincidirían.
+
+**Sesgo de muestreo**: el conjunto de evaluación no representa el problema. Nadie
+lo eligió mal; es que la gente fotografía iguanas y no arbustos de páramo.
+
+**Fuera de distribución**: se evalúa con datos de otras fuentes y fechas que los
+de entrenamiento. Lo contrario —evaluar con fotos parecidas a las de
+entrenamiento— siempre da mejor y engaña.
+
 ## Tres títulos para el mismo texto
 
 No es un descuido: cada uno se lee en un sitio y compite contra cosas distintas.

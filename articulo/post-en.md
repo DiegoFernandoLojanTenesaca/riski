@@ -80,12 +80,24 @@ The right panel explains the direction of the bias: the marine iguana is among
 the classes it handles **best** (94.5 %). The evaluation distribution is dominated
 by an easy case, so the micro-average inflates rather than sinks.
 
-Under macro-averaging — every class weighted equally regardless of frequency:
+There are two ways to collapse those 400 results into a single number, and they
+don't say the same thing:
+
+- **micro-average**: total correct over total observations. Every photograph
+  weighs the same, so a class with 128 of them decides a third of the result on
+  its own.
+- **macro-average**: accuracy per class, then the mean of those twenty figures.
+  Every **class** weighs the same — the one appearing 128 times and the one
+  appearing once.
 
 | | accuracy |
 |---|---|
 | micro-average (per observation) | 84.2 % |
 | **macro-average (per class)** | **78.7 %** |
+
+On a balanced set — twenty observations per class — the two numbers would be
+nearly identical. The gap between them measures exactly how much imbalance there
+is.
 
 Two queries that differ by a `group by`:
 

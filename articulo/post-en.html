@@ -81,11 +81,13 @@ figcaption { margin-top: .6em; font-size: .85rem; color: var(--suave);
 <p>The left panel holds the problem: <em>Amblyrhynchus cristatus</em>, the marine iguana, contributes 128 of the 400 observations. The three most frequent classes make up half the set, and of the model&#x27;s hundred classes only twenty appear at all.</p>
 <p>Citizen science doesn&#x27;t sample uniformly. People photograph what they see, and in the Galápagos they see marine iguanas. That 84.2 % is, in large part, the model&#x27;s performance on one class, repeated 128 times.</p>
 <p>The right panel explains the direction of the bias: the marine iguana is among the classes it handles <strong>best</strong> (94.5 %). The evaluation distribution is dominated by an easy case, so the micro-average inflates rather than sinks.</p>
-<p>Under macro-averaging — every class weighted equally regardless of frequency:</p>
+<p>There are two ways to collapse those 400 results into a single number, and they don&#x27;t say the same thing:</p>
+<ul><li><strong>micro-average</strong>: total correct over total observations. Every photograph weighs the same, so a class with 128 of them decides a third of the result on its own.</li><li><strong>macro-average</strong>: accuracy per class, then the mean of those twenty figures. Every <strong>class</strong> weighs the same — the one appearing 128 times and the one appearing once.</li></ul>
 <table>
 <tr><th></th><th>accuracy</th></tr>
 <tr><td>micro-average (per observation)</td><td>84.2 %</td></tr>
 <tr><td><strong>macro-average (per class)</strong></td><td><strong>78.7 %</strong></td></tr></table>
+<p>On a balanced set — twenty observations per class — the two numbers would be nearly identical. The gap between them measures exactly how much imbalance there is.</p>
 <p>Two queries that differ by a <code>group by</code>:</p>
 <pre><code class="lenguaje-sql">-- micro: every observation weighs the same
 select avg(coincide::int) from observaciones;

@@ -254,9 +254,28 @@ TITULO_SITIO = ("Sesgo de muestreo en la evaluación fuera de distribución de u
                 "clasificador de especies: micro frente a macro-promedio sobre "
                 "datos de ciencia ciudadana")
 TITULO_BREVE = "Sesgo de muestreo en evaluación fuera de distribución"
+# El titular académico nombra el problema como lo nombra el campo; esta línea lo
+# dice en castellano llano, justo debajo. Quien conozca los términos se salta la
+# bajada; quien no, no se queda fuera en la primera línea.
+BAJADA_SITIO = ("O dicho sin jerga: cuatro cifras que publiqué sobre un "
+                "clasificador de especies, y qué pasó cuando las medí bien.")
 
 AUTOR = "Diego Fernando Lojan Tenesaca"
-OFICIO = "Ingeniero de datos e inteligencia artificial"
+# El mismo rótulo que la sección «Acerca de» del sitio, en inglés y con el país,
+# porque es como se nombra el puesto en las ofertas y en los perfiles. La
+# traducción al español lo hace menos buscable, no más claro.
+OFICIO = "Data & AI Engineer"
+LUGAR = "Ecuador"
+
+# Lo que se hace, no lo que se sabe. Copiado de la ficha del índice para que las
+# dos digan lo mismo: dos versiones distintas del mismo perfil en el mismo sitio
+# es lo primero que resta credibilidad.
+ESPECIALIDADES = [
+    "Modelos de lenguaje, RAG y agentes",
+    "Embeddings y búsqueda vectorial",
+    "Visión por computador e inferencia con ONNX",
+    "Datos: ingesta, limpieza y publicación",
+]
 
 CABEZA_SITIO = """<!DOCTYPE html>
 <html lang="es">
@@ -285,7 +304,7 @@ CABEZA_SITIO = """<!DOCTYPE html>
   "author": {{
     "@type": "Person",
     "name": "{autor}",
-    "jobTitle": "{oficio}",
+    "jobTitle": "{oficio_json}",
     "url": "https://github.com/DiegoFernandoLojanTenesaca"
   }},
   "inLanguage": "es",
@@ -339,6 +358,8 @@ CABEZA_SITIO = """<!DOCTYPE html>
                        border-left: 3px solid var(--liquen-2);
                        color: var(--suave); font-style: italic; }}
 .escrito hr {{ border: 0; border-top: 1px solid var(--marea); margin: 2.8em 0; }}
+.bajada-art {{ font-size: 1.2rem; line-height: 1.55; color: var(--suave);
+               margin: -.2em 0 1.5em; font-weight: 400; }}
 .resumen {{ font-size: 1.15rem; line-height: 1.65; color: var(--papel);
             margin: 0 0 1.3em; padding-left: 1.1rem;
             border-left: 3px solid var(--liquen); }}
@@ -365,11 +386,45 @@ CABEZA_SITIO = """<!DOCTYPE html>
 <div class="envoltura">
 <article class="escrito">
 <h1>{titulo}</h1>
+<p class="bajada-art">{bajada}</p>
 <p class="resumen">{resumen}</p>
-<p class="entradilla">{firma}</p>
+<p class="entradilla">{autor} · {oficio} · {aviso}</p>
 """
 
-PIE_SITIO = """</article>
+# La autoría va al pie y no en una línea bajo el titular: en un texto de tres mil
+# palabras, quien quiere saber quién lo firma llega abajo, y arriba solo estorba
+# entre el titular y la primera frase. Reutiliza `.tarjeta` del sitio para que
+# sea la misma ficha que hay en la portada, no una variante.
+PIE_SITIO = """
+<hr>
+<div class="ficha-autor" style="margin-top:44px">
+  <div class="tarjeta">
+    <b>{autor}</b>
+    <span>{oficio} · {lugar}</span>
+    <ul>{especialidades}</ul>
+    <a href="https://github.com/DiegoFernandoLojanTenesaca">github.com/DiegoFernandoLojanTenesaca</a>
+  </div>
+  <div class="relato">
+    <p>Riksi empezó por un problema concreto: casi todas las herramientas para
+      identificar naturaleza dan por sentado que hay internet, y en el Ecuador
+      rural eso casi nunca se cumple. El reto no era entrenar un clasificador
+      —eso lo hace cualquiera con un tutorial— sino que <b>cupiera en un
+      teléfono modesto y siguiera acertando</b>.</p>
+    <p>Este artículo es la continuación de esa idea aplicada a la medición: si
+      cada decisión de ingeniería se justifica con números, esos números también
+      tienen que aguantar que los revisen. Cuatro no aguantaron.</p>
+    <p>De paso toca lo que hay debajo: <b>evaluación fuera de distribución</b>
+      sin conjunto de prueba disponible, <b>calidad de datos</b> en fuentes
+      públicas que se actualizan a distinta velocidad, <b>calibración</b> de un
+      sistema de recuperación, e <b>inferencia con recursos limitados</b> —un
+      clasificador de 3,8 MB en el navegador y un codificador que tenía que
+      caber en 512 MB de RAM.</p>
+    <p><a href="index.html">Riksi</a> ·
+      <a href="https://github.com/DiegoFernandoLojanTenesaca/riksi-radar">riksi-radar</a> ·
+      <a href="https://github.com/DiegoFernandoLojanTenesaca/yachaq">yachaq</a></p>
+  </div>
+</div>
+</article>
 </div>
 </body>
 </html>
@@ -411,20 +466,26 @@ def para_el_sitio():
     # frase suelta y como primer párrafo. Da las dos cifras del hallazgo, porque
     # quien solo lea esto debería llevarse el resultado.
     resumen = ("Un clasificador de cien especies evaluado sobre 400 "
-               "observaciones que nadie seleccionó rinde 84,2 % por observación "
-               "y 78,7 % promediando clases. Esos 5,5 puntos son sesgo de "
-               "muestreo, y es una de las cuatro cifras que publiqué antes de "
-               "medirlas bien.")
-    firma = (f'<b>{AUTOR}</b> · {OFICIO}<br>'
-             'sobre <a href="index.html">Riksi</a>, '
-             '<a href="https://github.com/DiegoFernandoLojanTenesaca/riksi-radar">riksi-radar</a> y '
-             '<a href="https://github.com/DiegoFernandoLojanTenesaca/yachaq">yachaq</a> · '
-             '<a href="https://github.com/DiegoFernandoLojanTenesaca">GitHub</a>')
+               "observaciones que nadie seleccionó acierta el 84,2 % de las "
+               "veces. Dando el mismo peso a cada especie en vez de a cada "
+               "fotografía, el 78,7 %. Esos 5,5 puntos no son el modelo: son "
+               "que una sola especie aporta un tercio del conjunto. Es una de "
+               "las cuatro cifras que publiqué antes de medirlas bien.")
+    # Sobre 200 palabras por minuto, que es lo habitual en prosa técnica.
+    minutos = round(len(md.split()) / 200)
+    aviso = f"{minutos} min de lectura"
+
     SITIO.write_text(
         CABEZA_SITIO.format(titulo=html.escape(TITULO_SITIO), resumen=resumen,
                             titulo_corto=html.escape(TITULO_BREVE),
-                            autor=AUTOR, oficio=OFICIO,
-                            firma=firma, base=BASE) + cuerpo + PIE_SITIO,
+                            autor=AUTOR, oficio=html.escape(OFICIO),
+                            # dentro del JSON-LD el `&` no va escapado: ahí no
+                            # es HTML, y un buscador leería «&amp;» literal.
+                            oficio_json=OFICIO, bajada=BAJADA_SITIO,
+                            aviso=aviso, base=BASE) + cuerpo
+        + PIE_SITIO.format(
+            autor=AUTOR, oficio=html.escape(OFICIO), lugar=LUGAR,
+            especialidades="".join(f"<li>{e}</li>" for e in ESPECIALIDADES)),
         encoding="utf-8")
     print(f"  docs/{SITIO.name}  ({SITIO.stat().st_size // 1024} KB)")
     return SITIO
@@ -543,7 +604,21 @@ def prueba():
 
     # La autoría, en los tres sitios donde se lee: la firma visible, la meta que
     # usan los agregadores y los datos estructurados de los buscadores.
-    assert f"<b>{AUTOR}</b> · {OFICIO}" in s, "falta el oficio en la firma"
+    oficio = html.escape(OFICIO)      # «Data & AI» lleva un & que va escapado
+    assert f"{AUTOR} · {oficio}" in s, "falta el oficio bajo el titular"
+    assert f"<b>{AUTOR}</b>" in s and f"{oficio} · {LUGAR}" in s, (
+        "falta la ficha de autor al pie")
+    for e in ESPECIALIDADES:
+        assert f"<li>{e}</li>" in s, f"falta «{e}» en la ficha"
+
+    # La misma ficha que la portada. Dos versiones del mismo perfil en el mismo
+    # sitio es lo primero que resta credibilidad, y se descuadran en cuanto se
+    # toca una y se olvida la otra.
+    portada = (AQUI.parent / "docs" / "index.html").read_text(encoding="utf-8")
+    for e in ESPECIALIDADES:
+        assert e in portada, f"«{e}» no está en la ficha de index.html"
+    assert f"{oficio} · {LUGAR}" in portada, (
+        "el oficio del artículo no coincide con el de la portada")
     assert f'name="author" content="{AUTOR}"' in s
     ficha = json.loads(re.search(r'type="application/ld\+json">\s*(\{.*?\})\s*</script>',
                                  s, re.S).group(1))

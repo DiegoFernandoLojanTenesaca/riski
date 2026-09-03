@@ -84,12 +84,23 @@ clases que **mejor** resuelve (94,5 %). La distribución de evaluación está
 dominada por un caso fácil, así que el micro-promedio se infla en lugar de
 hundirse.
 
-Con macro-promedio —cada clase pesa igual, independientemente de su frecuencia:
+Hay dos formas de resumir esos 400 resultados en un número, y no dicen lo mismo:
+
+- **micro-promedio**: aciertos totales entre observaciones totales. Cada
+  fotografía pesa igual, así que una clase con 128 decide un tercio del
+  resultado ella sola.
+- **macro-promedio**: la exactitud de cada clase por separado, y después la
+  media de esas veinte cifras. Cada **clase** pesa igual, la que aparece 128
+  veces y la que aparece una.
 
 | | exactitud |
 |---|---|
 | micro-promedio (por observación) | 84,2 % |
 | **macro-promedio (por clase)** | **78,7 %** |
+
+Si el conjunto estuviera equilibrado —veinte observaciones por clase— los dos
+números serían casi idénticos. La diferencia mide exactamente cuánto desequilibrio
+hay.
 
 Son dos consultas que difieren en un `group by`:
 
