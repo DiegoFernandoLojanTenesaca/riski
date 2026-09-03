@@ -1,18 +1,9 @@
-# Que el modelo publicado siga dando las mismas predicciones.
+# Que lo publicado siga siendo cierto.
 #
-# **Esto no reentrena nada ni mide calidad.** Coge el `.onnx` de 3,8 MB que está
-# en `docs/` -el mismo que descarga el navegador- y comprueba que sobre la foto
-# de prueba predice lo que `esperado.json` dice que predijo.
-#
-# Ese es el fallo que más cuesta ver: un preprocesado que deja de coincidir con
-# el del entrenamiento no lanza ningún error. El modelo responde igual, solo que
-# peor, y la culpa se le echa al modelo.
-#
-# **Sobre la foto de prueba y no sobre el banco**, aunque el banco tenga 200
-# imágenes: son 11 MB que el `.gitignore` excluye a propósito -se generan en
-# local y no se publican-, así que aquí no existen. Una comprobación que depende
-# de ficheros que no están en el repositorio no es una comprobación, es un fallo
-# garantizado, y así falló el primer intento.
+# **La lógica está en `comprobaciones.py`, no aquí.** Un script metido en un
+# `run: |` con heredoc no se puede correr igual en local, y las comillas
+# anidadas dentro del YAML son una fuente de fallos que no se ven hasta que el
+# CI está en rojo. Así se ejecuta lo mismo en los dos sitios.
 
 name: comprobar
 
@@ -23,7 +14,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  modelo:
+  comprobar:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -36,86 +27,5 @@ jobs:
       - name: instalar
         run: pip install onnxruntime pillow numpy
 
-      - name: el modelo predice lo que esperado.json dice
-        run: |
-          python - <<'PY'
-          import json, pathlib
-          import numpy as np, onnxruntime as ort
-          from PIL import Image
-
-          docs = pathlib.Path("docs")
-          modelo = docs / "modelo"
-          pre = json.loads((modelo / "preprocesado.json").read_text(encoding="utf-8"))
-          clases = json.loads((modelo / "clases.json").read_text(encoding="utf-8"))
-          esperado = json.loads((docs / "prueba" / "esperado.json").read_text(encoding="utf-8"))
-
-          sesion = ort.InferenceSession(str(modelo / "riksi-int8.onnx"),
-                                        providers=["CPUExecutionProvider"])
-          entrada = sesion.get_inputs()[0].name
-
-          im = Image.open(docs / "prueba" / esperado["archivo"]).convert("RGB")
-          escala = pre["resize"] / min(im.size)
-          im = im.resize((round(im.width * escala), round(im.height * escala)),
-                         Image.BILINEAR)
-          t = pre["tam"]
-          izq, arr = (im.width - t) // 2, (im.height - t) // 2
-          im = im.crop((izq, arr, izq + t, arr + t))
-          x = np.asarray(im, dtype=np.float32) / 255.0
-          x = (x - np.array(pre["media"], np.float32)) / np.array(pre["desv"], np.float32)
-
-          salida = sesion.run(None, {entrada: x.transpose(2, 0, 1)[None]})[0][0]
-          e = np.exp(salida - salida.max())
-          probs = e / e.sum()
-          i = int(np.argmax(probs))
-
-          print(f"{clases[i]} {probs[i]:.4f} · esperado {esperado['clase']} "
-                f"{esperado['prob']:.4f}")
-
-          assert clases[i] == esperado["clase"], (
-              f"el modelo dice {clases[i]} y debería decir {esperado['clase']}: "
-              f"o se reexportó distinto, o el preprocesado cambió")
-
-          # La tolerancia sale del propio fichero, que la escribió `comprobar.py`
-          # al generarlo. Está para absorber la diferencia entre versiones de
-          # Pillow y de onnxruntime, que redondean distinto sin estar mal.
-          desvio = abs(float(probs[i]) - esperado["prob"])
-          assert desvio < esperado.get("tolerancia", 0.05), (
-              f"la confianza se desvía {desvio:.4f}, más de lo tolerado")
-          print("el modelo publicado reproduce su predicción")
-          PY
-
-      - name: las métricas del README salen de metricas.json
-        run: |
-          python - <<'PY'
-          import json, pathlib
-          docs = pathlib.Path("docs")
-          m = json.loads((docs / "modelo" / "metricas.json").read_text(encoding="utf-8"))
-          readme = pathlib.Path("README.md").read_text(encoding="utf-8")
-
-          # El README publica el acierto del modelo, y ese número tiene que salir
-          # del fichero que escribe `exportar.py`. Copiado a mano se queda viejo
-          # en cuanto se reentrena, y nadie lo nota porque sigue siendo un número
-          # plausible.
-          esperado = f"{m['int8']['top1'] * 100:.1f}".replace(".", ",")
-          assert esperado in readme, (
-              f"el README no menciona {esperado} %, que es lo que dice "
-              f"metricas.json. ¿Se reentrenó sin actualizarlo?")
-          print(f"el README y metricas.json coinciden en {esperado} %")
-          PY
-
-      - name: la web referencia lo que existe
-        run: |
-          python - <<'PY'
-          import pathlib, re
-          docs = pathlib.Path("docs")
-          faltan = []
-          for html in docs.glob("*.html"):
-              texto = html.read_text(encoding="utf-8")
-              for ref in re.findall(r'(?:src|href)="([^":#?]+\.(?:js|css|json|svg|onnx|wasm))"', texto):
-                  if not (docs / ref).exists():
-                      faltan.append(f"{html.name} → {ref}")
-          # Un `src` roto no da error en el servidor: da una página que carga a
-          # medias y un modelo que nunca llega.
-          assert not faltan, "referencias rotas: " + ", ".join(faltan)
-          print("todas las referencias de las páginas existen")
-          PY
+      - name: el modelo, el README y las páginas
+        run: python comprobaciones.py
